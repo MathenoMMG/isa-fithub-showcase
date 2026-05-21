@@ -28,9 +28,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-r-slate-200 dark:border-r-slate-800">
-      <SidebarHeader className="border-b border-sidebar-border p-4 transition-colors">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 flex items-center justify-center shrink-0 overflow-hidden rounded-xl">
+      <SidebarHeader className="border-b border-sidebar-border p-4 group-data-[collapsible=icon]:p-2 transition-all">
+        <div className="flex items-center gap-3 justify-center">
+          <div className="h-10 w-10 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 flex items-center justify-center shrink-0 overflow-hidden rounded-xl transition-all">
             <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
