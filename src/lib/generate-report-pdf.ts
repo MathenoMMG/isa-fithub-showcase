@@ -19,12 +19,36 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   
   // -- HEADER --
   doc.setFillColor(5, 150, 105); // emerald-600
-  doc.rect(0, 0, 210, 25, "F");
+  doc.rect(0, 0, 210, 30, "F");
+  
+  // Load logo
+  const logoBase64 = await new Promise<string>((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width || 100;
+      canvas.height = img.height || 100;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/png"));
+      } else {
+        resolve("");
+      }
+    };
+    img.onerror = () => resolve("");
+    img.src = "/isa.svg";
+  });
+
+  if (logoBase64) {
+    doc.addImage(logoBase64, "PNG", 14, 5, 20, 20);
+  }
   
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
-  doc.text("FitHub — Reporte de Inventario", 14, 17);
+  doc.text("FitHub — Reporte de Inventario", logoBase64 ? 38 : 14, 18);
   
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(11);
@@ -34,13 +58,13 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   if (range === "mes") rangeText = "Últimos 30 días";
   if (range === "global") rangeText = "Histórico Global";
   
-  doc.text(`Fecha de generación: ${dateStr}`, 14, 35);
-  doc.text(`Tienda Filtro: ${store}`, 14, 42);
-  doc.text(`Periodo analizado: ${rangeText}`, 14, 49);
+  doc.text(`Fecha de generación: ${dateStr}`, 14, 40);
+  doc.text(`Tienda Filtro: ${store}`, 14, 47);
+  doc.text(`Periodo analizado: ${rangeText}`, 14, 54);
 
   // -- CAPTURE CHART --
   const chartEl = document.getElementById("chart-container");
-  let currentY = 55;
+  let currentY = 60;
   
   if (chartEl) {
     try {
