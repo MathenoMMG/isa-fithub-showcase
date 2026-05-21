@@ -30,8 +30,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border p-4 transition-colors">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0">
-            <Dumbbell className="h-6 w-6 text-white" />
+          <div className="h-10 w-10 flex items-center justify-center shrink-0 overflow-hidden rounded-xl">
+            <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="font-bold text-sidebar-foreground text-base leading-tight">FitHub</span>
