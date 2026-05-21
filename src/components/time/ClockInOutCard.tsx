@@ -33,6 +33,20 @@ export function ClockInOutCard() {
     toast.success(`${tipo === "entrada" ? "Entrada" : "Salida"} registrada en ${tiendaName}`);
   };
 
+  const getHorarioEsperado = (dayOfWeek: number) => {
+    switch (dayOfWeek) {
+      case 1: return { horas: 9, texto: "08:00 - 17:00 (9h)" }; // Lunes
+      case 2: return { horas: 8, texto: "08:00 - 16:00 (8h)" }; // Martes
+      case 3: return { horas: 9, texto: "08:00 - 17:00 (9h)" }; // Miércoles
+      case 4: return { horas: 6, texto: "08:00 - 14:00 (6h)" }; // Jueves
+      case 5: return { horas: 7, texto: "08:00 - 15:00 (7h)" }; // Viernes
+      case 6: return { horas: 5, texto: "08:00 - 13:00 (5h)" }; // Sábado
+      default: return null; // Domingo
+    }
+  };
+
+  const horarioHoy = getHorarioEsperado(now.getDay());
+
   return (
     <Card className="p-6 md:p-8 rounded-2xl border-slate-200 bg-white shadow-sm dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <div className="text-center mb-6">
@@ -42,6 +56,11 @@ export function ClockInOutCard() {
           Tienda activa: <span className="font-semibold text-emerald-700 dark:text-emerald-500">{tiendaName}</span>
           {store === "Ambas" && <span className="text-slate-400"> (por defecto Norte)</span>}
         </div>
+        {horarioHoy && (
+          <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">
+            Jornada de hoy: {horarioHoy.texto}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

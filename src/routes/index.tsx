@@ -38,67 +38,60 @@ function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Resumen</h2>
-        <p className="text-slate-500 mt-1">
-          Mostrando datos de <span className="font-semibold text-slate-700">{store === "Ambas" ? "ambas tiendas" : store}</span>.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 transition-colors">Resumen</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors">
+            Mostrando datos de <span className="font-semibold text-slate-700 dark:text-slate-300">{store === "Ambas" ? "ambas tiendas" : store}</span>.
+          </p>
+        </div>
+
+        {store !== "Ambas" && (
+          <Button
+            onClick={handleVisit}
+            disabled={alreadyVisited}
+            variant="outline"
+            className={`h-12 px-6 rounded-xl font-bold transition-all shadow-sm ${
+              alreadyVisited
+                ? "bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700"
+                : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50 dark:bg-slate-900 dark:text-blue-400 dark:border-blue-900/50 dark:hover:bg-blue-900/20"
+            }`}
+          >
+            <CalendarCheck className="h-5 w-5 mr-2" />
+            {alreadyVisited ? "Jornada Registrada" : "Marcar Jornada Aquí"}
+          </Button>
+        )}
       </div>
 
       <KpiCards items={filteredItems} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {store !== "Ambas" && (
-          <Card className="p-6 rounded-2xl border-slate-200 bg-white flex flex-col">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="h-14 w-14 rounded-2xl bg-blue-100 flex items-center justify-center">
-                <CalendarCheck className="h-7 w-7 text-blue-700" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900">Control de Visita</h3>
-                <p className="text-sm text-slate-500 mt-1">Marca el día que asistes a organizar esta tienda.</p>
-              </div>
-            </div>
-            <div className="mt-auto pt-4">
-              <Button
-                onClick={handleVisit}
-                disabled={alreadyVisited}
-                className={`w-full h-11 text-white font-semibold rounded-xl ${
-                  alreadyVisited ? "bg-slate-300 text-slate-500" : "bg-blue-600 hover:bg-blue-700"
-                }`}
-              >
-                {alreadyVisited ? "Visita registrada hoy ✅" : "Registrar visita de hoy"}
-              </Button>
-            </div>
-          </Card>
-        )}
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <Link to="/inventario" className="group">
-          <Card className="p-6 h-full rounded-2xl border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all bg-white flex flex-col justify-center">
+          <Card className="p-6 h-full rounded-2xl border-slate-200 dark:border-slate-800 hover:border-emerald-400 hover:shadow-md transition-all bg-white dark:bg-slate-900 flex flex-col justify-center">
             <div className="flex items-start gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-emerald-100 flex items-center justify-center">
-                <Package className="h-7 w-7 text-emerald-700" />
+              <div className="h-14 w-14 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                <Package className="h-7 w-7 text-emerald-700 dark:text-emerald-400" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900">Gestionar Inventario</h3>
-                <p className="text-sm text-slate-500 mt-1">Revisa stock, caducidades y añade lotes.</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">Gestionar Inventario</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Revisa stock, caducidades y añade lotes.</p>
               </div>
-              <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition" />
+              <ArrowRight className="h-5 w-5 text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-1 transition" />
             </div>
           </Card>
         </Link>
 
         <Link to="/horarios" className="group">
-          <Card className="p-6 h-full rounded-2xl border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all bg-white flex flex-col justify-center">
+          <Card className="p-6 h-full rounded-2xl border-slate-200 dark:border-slate-800 hover:border-emerald-400 hover:shadow-md transition-all bg-white dark:bg-slate-900 flex flex-col justify-center">
             <div className="flex items-start gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                <Clock className="h-7 w-7 text-slate-700" />
+              <div className="h-14 w-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <Clock className="h-7 w-7 text-slate-700 dark:text-slate-400" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900">Registrar Horario</h3>
-                <p className="text-sm text-slate-500 mt-1">Marca tu entrada o salida del turno.</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">Registrar Horario</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Marca tu entrada o salida del turno.</p>
               </div>
-              <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition" />
+              <ArrowRight className="h-5 w-5 text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:translate-x-1 transition" />
             </div>
           </Card>
         </Link>
