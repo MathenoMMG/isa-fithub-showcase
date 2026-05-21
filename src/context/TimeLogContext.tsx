@@ -7,6 +7,8 @@ interface TimeLogContextValue {
   logs: RegistroHorario[];
   loading: boolean;
   addLog: (tipo: "entrada" | "salida", tienda_id: number | null) => Promise<void>;
+  updateLog: (id: string, newDateIso: string) => Promise<void>;
+  deleteLog: (id: string) => Promise<void>;
   refreshLogs: () => Promise<void>;
 }
 
@@ -46,12 +48,26 @@ export function TimeLogProvider({ children }: { children: ReactNode }) {
     await fetchLogs();
   };
 
+  const updateLog = async (id: string, newDateIso: string) => {
+    const { error } = await supabase.from("registros_horario").update({ created_at: newDateIso }).eq("id", id);
+    if (error) throw error;
+    await fetchLogs();
+  };
+
+  const deleteLog = async (id: string) => {
+    const { error } = await supabase.from("registros_horario").delete().eq("id", id);
+    if (error) throw error;
+    await fetchLogs();
+  };
+
   return (
     <TimeLogContext.Provider
       value={{
         logs,
         loading,
         addLog,
+        updateLog,
+        deleteLog,
         refreshLogs: fetchLogs,
       }}
     >

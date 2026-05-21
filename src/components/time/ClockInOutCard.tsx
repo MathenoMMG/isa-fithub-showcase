@@ -19,27 +19,28 @@ export function ClockInOutCard() {
   }, []);
 
   const todayLogs = logs
-    .filter((l) => isToday(parseISO(l.timestamp)))
-    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    .filter((l) => isToday(parseISO(l.created_at)))
+    .sort((a, b) => a.created_at.localeCompare(b.created_at));
   const last = todayLogs[todayLogs.length - 1];
   const canEntrar = !last || last.tipo === "salida";
   const canSalir = last?.tipo === "entrada";
 
-  const tienda = store === "Ambas" ? "Sur" : store;
+  const tiendaName = store === "Ambas" ? "Norte" : store;
+  const tiendaId = tiendaName === "Sur" ? 2 : 1;
 
   const handle = (tipo: "entrada" | "salida") => {
-    addLog(tipo, tienda);
-    toast.success(`${tipo === "entrada" ? "Entrada" : "Salida"} registrada en ${tienda}`);
+    addLog(tipo, tiendaId);
+    toast.success(`${tipo === "entrada" ? "Entrada" : "Salida"} registrada en ${tiendaName}`);
   };
 
   return (
-    <Card className="p-6 md:p-8 rounded-2xl border-slate-200 bg-white shadow-sm">
+    <Card className="p-6 md:p-8 rounded-2xl border-slate-200 bg-white shadow-sm dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <div className="text-center mb-6">
         <div className="text-sm text-slate-500 uppercase tracking-wide font-medium">{format(now, "EEEE d 'de' MMMM", { locale: es })}</div>
-        <div className="text-5xl md:text-6xl font-bold text-slate-900 tabular-nums mt-2">{format(now, "HH:mm:ss")}</div>
+        <div className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-50 tabular-nums mt-2">{format(now, "HH:mm:ss")}</div>
         <div className="text-sm text-slate-500 mt-2">
-          Tienda activa: <span className="font-semibold text-emerald-700">{tienda}</span>
-          {store === "Ambas" && <span className="text-slate-400"> (por defecto Sur)</span>}
+          Tienda activa: <span className="font-semibold text-emerald-700 dark:text-emerald-500">{tiendaName}</span>
+          {store === "Ambas" && <span className="text-slate-400"> (por defecto Norte)</span>}
         </div>
       </div>
 
@@ -55,7 +56,7 @@ export function ClockInOutCard() {
         <Button
           onClick={() => handle("salida")}
           disabled={!canSalir}
-          className="h-20 text-lg font-bold rounded-2xl bg-slate-800 hover:bg-slate-900 text-white gap-3 disabled:opacity-40"
+          className="h-20 text-lg font-bold rounded-2xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white gap-3 disabled:opacity-40"
         >
           <LogOut className="h-6 w-6" />
           Registrar Salida
@@ -63,21 +64,21 @@ export function ClockInOutCard() {
       </div>
 
       {todayLogs.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">Eventos de hoy</h3>
+        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Eventos de hoy</h3>
           <ul className="space-y-2">
             {todayLogs.map((l) => (
-              <li key={l.id} className="flex items-center justify-between text-sm bg-slate-50 rounded-lg px-3 py-2">
+              <li key={l.id} className="flex items-center justify-between text-sm bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2 transition-colors">
                 <span className="flex items-center gap-2">
                   {l.tipo === "entrada" ? (
-                    <LogIn className="h-4 w-4 text-emerald-600" />
+                    <LogIn className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <LogOut className="h-4 w-4 text-slate-700" />
+                    <LogOut className="h-4 w-4 text-slate-700 dark:text-slate-400" />
                   )}
-                  <span className="font-medium capitalize">{l.tipo}</span>
-                  <span className="text-slate-500">· {l.tienda}</span>
+                  <span className="font-medium capitalize dark:text-slate-200">{l.tipo}</span>
+                  <span className="text-slate-500">· {l.tienda_id === 2 ? "Sur" : "Norte"}</span>
                 </span>
-                <span className="tabular-nums text-slate-700 font-medium">{format(parseISO(l.timestamp), "HH:mm:ss")}</span>
+                <span className="tabular-nums text-slate-700 dark:text-slate-300 font-medium">{format(parseISO(l.created_at), "HH:mm:ss")}</span>
               </li>
             ))}
           </ul>

@@ -1,4 +1,5 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { ProfileProvider } from "@/context/ProfileContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { TopBar } from "@/components/layout/TopBar";
@@ -65,25 +66,25 @@ function ErrorComponent({ error }: { error: Error }) {
 
 function RootComponent() {
   return (
-    <StoreProvider>
-      <InventoryProvider>
-        <TimeLogProvider>
-          <VisitProvider>
-            <SidebarProvider>
-              <div className="min-h-screen flex w-full bg-slate-50">
-                <AppSidebar />
-                <div className="flex-1 flex flex-col min-w-0">
-                  <TopBar />
-                  <main className="flex-1 p-4 md:p-6 lg:p-8">
+    <ProfileProvider>
+      <StoreProvider>
+        <InventoryProvider>
+          <TimeLogProvider>
+            <VisitProvider>
+              <SidebarProvider>
+                <div className="flex min-h-screen">
+                  <AppSidebar />
+                  <main className="flex-1">
+                    <TopBar />
                     <Outlet />
                   </main>
                 </div>
-              </div>
-              <Toaster richColors position="top-right" />
-            </SidebarProvider>
-          </VisitProvider>
-        </TimeLogProvider>
-      </InventoryProvider>
-    </StoreProvider>
+                <Toaster richColors position="top-right" />
+              </SidebarProvider>
+            </VisitProvider>
+          </TimeLogProvider>
+        </InventoryProvider>
+      </StoreProvider>
+    </ProfileProvider>
   );
 }

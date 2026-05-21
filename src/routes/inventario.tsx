@@ -29,10 +29,9 @@ function InventarioPage() {
     const q = search.toLowerCase();
     return filteredItems.filter(
       (it) =>
-        it.sku.toLowerCase().includes(q) ||
-        it.nombre.toLowerCase().includes(q) ||
-        it.subcategoria_sabor.toLowerCase().includes(q) ||
-        it.linea_producto.toLowerCase().includes(q),
+        (it.articulo?.toLowerCase() || "").includes(q) ||
+        (it.nombre?.toLowerCase() || "").includes(q) ||
+        (it.categoria?.toLowerCase() || "").includes(q)
     );
   }, [filteredItems, search]);
 

@@ -28,14 +28,14 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-slate-200 p-4">
+      <SidebarHeader className="border-b border-sidebar-border p-4 transition-colors">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0">
             <Dumbbell className="h-6 w-6 text-white" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="font-bold text-slate-900 text-base leading-tight">FitHub</span>
-            <span className="text-xs text-slate-500">Gestión de Inventario</span>
+            <span className="font-bold text-sidebar-foreground text-base leading-tight">FitHub</span>
+            <span className="text-xs text-sidebar-foreground/70">Gestión de Inventario</span>
           </div>
         </div>
       </SidebarHeader>
