@@ -1,33 +1,36 @@
 import { Card } from "@/components/ui/card";
 import { Package, AlertTriangle, XCircle } from "lucide-react";
-import { getExpiryStatus } from "@/lib/expiry";
+import { countLotesByStatus, getTotalQty } from "@/lib/expiry";
 import type { InventoryItem } from "@/types/inventory";
 
 export function KpiCards({ items }: { items: InventoryItem[] }) {
-  const total = items.length;
-  const proximos = items.filter((i) => getExpiryStatus(i.fecha_caducidad) === "proximo").length;
-  const vencidos = items.filter((i) => getExpiryStatus(i.fecha_caducidad) === "vencido").length;
+  const allLotes = items.flatMap((i) => i.lotes);
+  const totalUnidades = getTotalQty(allLotes);
+  const { proximos, vencidos } = countLotesByStatus(allLotes);
 
   const cards = [
     {
-      label: "Total de Productos",
-      value: total,
+      label: "Unidades en stock",
+      value: totalUnidades,
+      hint: `${items.length} productos · ${allLotes.length} lotes`,
       icon: Package,
       iconBg: "bg-slate-100",
       iconColor: "text-slate-700",
       accent: "border-slate-200",
     },
     {
-      label: "Próximos a Vencer",
+      label: "Lotes próximos a vencer",
       value: proximos,
+      hint: "≤ 30 días",
       icon: AlertTriangle,
       iconBg: "bg-amber-100",
       iconColor: "text-amber-600",
       accent: "border-amber-200",
     },
     {
-      label: "Vencidos",
+      label: "Lotes vencidos",
       value: vencidos,
+      hint: "Retirar de góndola",
       icon: XCircle,
       iconBg: "bg-red-100",
       iconColor: "text-red-600",
@@ -48,6 +51,7 @@ export function KpiCards({ items }: { items: InventoryItem[] }) {
               <div>
                 <div className="text-sm font-medium text-slate-500">{c.label}</div>
                 <div className="text-3xl font-bold text-slate-900 tabular-nums">{c.value}</div>
+                <div className="text-xs text-slate-400 mt-0.5">{c.hint}</div>
               </div>
             </div>
           </Card>

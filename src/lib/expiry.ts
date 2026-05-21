@@ -1,5 +1,6 @@
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import type { Lote } from "@/types/inventory";
 
 export type ExpiryStatus = "vencido" | "proximo" | "en_regla";
 
@@ -16,4 +17,39 @@ export function getExpiryStatus(fecha: string): ExpiryStatus {
 
 export function formatExpiryDate(fecha: string): string {
   return format(parseISO(fecha), "dd MMM yyyy", { locale: es });
+}
+
+// ---- Lotes aggregations ----
+
+export function getTotalQty(lotes: Lote[]): number {
+  return lotes.reduce((acc, l) => acc + l.cantidad, 0);
+}
+
+export function countLotesByStatus(lotes: Lote[]) {
+  let vencidos = 0;
+  let proximos = 0;
+  let en_regla = 0;
+  for (const l of lotes) {
+    const s = getExpiryStatus(l.fecha_caducidad);
+    if (s === "vencido") vencidos++;
+    else if (s === "proximo") proximos++;
+    else en_regla++;
+  }
+  return { vencidos, proximos, en_regla };
+}
+
+/** Worst status across the product's lotes (vencido > proximo > en_regla). */
+export function getWorstStatus(lotes: Lote[]): ExpiryStatus {
+  const c = countLotesByStatus(lotes);
+  if (c.vencidos > 0) return "vencido";
+  if (c.proximos > 0) return "proximo";
+  return "en_regla";
+}
+
+/** Earliest expiry date among lotes, or null. */
+export function getEarliestExpiry(lotes: Lote[]): string | null {
+  if (lotes.length === 0) return null;
+  return [...lotes].sort(
+    (a, b) => parseISO(a.fecha_caducidad).getTime() - parseISO(b.fecha_caducidad).getTime(),
+  )[0].fecha_caducidad;
 }

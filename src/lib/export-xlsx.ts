@@ -10,17 +10,41 @@ const statusLabel: Record<ReturnType<typeof getExpiryStatus>, string> = {
 };
 
 export function exportInventoryToExcel(items: InventoryItem[], filename?: string) {
-  const rows = items.map((item) => ({
-    SKU: item.sku,
-    Producto: item.nombre,
-    "Sabor / Subcategoría": item.subcategoria_sabor,
-    Línea: item.linea_producto,
-    Tienda: item.id_tienda,
-    Cantidad: item.cantidad,
-    "Fecha de Caducidad": formatExpiryDate(item.fecha_caducidad),
-    Estado: statusLabel[getExpiryStatus(item.fecha_caducidad)],
-    Proveedor: item.proveedor,
-  }));
+  // Una fila por lote — formato indexado para conciliaciones.
+  const rows: Record<string, string | number>[] = [];
+  for (const item of items) {
+    if (item.lotes.length === 0) {
+      rows.push({
+        SKU: item.sku,
+        Producto: item.nombre,
+        "Sabor / Subcategoría": item.subcategoria_sabor,
+        Línea: item.linea_producto,
+        Tienda: item.id_tienda,
+        "Lote #": "—",
+        "ID Lote": "—",
+        Cantidad: 0,
+        "Fecha de Caducidad": "—",
+        Estado: "Sin stock",
+        Proveedor: item.proveedor,
+      });
+      continue;
+    }
+    item.lotes.forEach((lote, idx) => {
+      rows.push({
+        SKU: item.sku,
+        Producto: item.nombre,
+        "Sabor / Subcategoría": item.subcategoria_sabor,
+        Línea: item.linea_producto,
+        Tienda: item.id_tienda,
+        "Lote #": idx + 1,
+        "ID Lote": lote.id,
+        Cantidad: lote.cantidad,
+        "Fecha de Caducidad": formatExpiryDate(lote.fecha_caducidad),
+        Estado: statusLabel[getExpiryStatus(lote.fecha_caducidad)],
+        Proveedor: item.proveedor,
+      });
+    });
+  }
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
