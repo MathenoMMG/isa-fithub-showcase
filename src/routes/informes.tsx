@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
 import { useProfile } from "@/context/ProfileContext";
+import { useFavorites } from "@/hooks/useFavorites";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,6 +14,14 @@ import { generatePdfReport } from "@/lib/generate-report-pdf";
 import { getExpiryStatus } from "@/lib/expiry";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+
+import {
+  StockOutPredictionCard,
+  SlowMoversCard,
+  StoreComparisonCard,
+  HeatmapCard,
+  RestockSuggestionCard,
+} from "@/components/analytics/AnalyticsCards";
 
 export const Route = createFileRoute("/informes")({
   head: () => ({
@@ -31,6 +40,8 @@ function Informes() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [salesData, setSalesData] = useState<any[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
+
+  const { favorites, toggleFavorite } = useFavorites("fithub_analytics_favs", 2);
 
   // We only show items from the selected store (or both)
   const filteredItems = useMemo(
@@ -161,6 +172,17 @@ function Informes() {
     }
   };
 
+  const ALL_CARDS = [
+    { id: "stockout", Comp: StockOutPredictionCard },
+    { id: "slow", Comp: SlowMoversCard },
+    { id: "compare", Comp: StoreComparisonCard },
+    { id: "heatmap", Comp: HeatmapCard },
+    { id: "restock", Comp: RestockSuggestionCard },
+  ];
+
+  const favoriteCards = ALL_CARDS.filter(c => favorites.includes(c.id));
+  const otherCards = ALL_CARDS.filter(c => !favorites.includes(c.id));
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -231,6 +253,15 @@ function Informes() {
           </div>
         </Card>
       </div>
+
+      {/* Favoritos */}
+      {favoriteCards.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {favoriteCards.map(c => (
+            <c.Comp key={c.id} id={c.id} isFavorite={true} onToggleFavorite={toggleFavorite} productos={filteredItems} ventas={salesData} />
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Bar Chart */}
@@ -324,6 +355,17 @@ function Informes() {
           </div>
         </Card>
       </div>
+
+      {/* Otras Tarjetas Analíticas */}
+      {otherCards.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {otherCards.map(c => (
+            <div key={c.id} className={c.id === "compare" || c.id === "heatmap" ? "lg:col-span-1" : ""}>
+               <c.Comp id={c.id} isFavorite={false} onToggleFavorite={toggleFavorite} productos={filteredItems} ventas={salesData} />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Critical Stock Table */}
       <Card className="rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden transition-all">
