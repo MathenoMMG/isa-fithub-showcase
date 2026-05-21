@@ -27,7 +27,7 @@ export function AppSidebar() {
   const isActive = (p: string) => (p === "/" ? currentPath === "/" : currentPath.startsWith(p));
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-r-slate-200 dark:border-r-slate-800">
       <SidebarHeader className="border-b border-sidebar-border p-4 transition-colors">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 flex items-center justify-center shrink-0 overflow-hidden rounded-xl">

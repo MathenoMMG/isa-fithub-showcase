@@ -64,6 +64,8 @@ function ErrorComponent({ error }: { error: Error }) {
   );
 }
 
+import { GlowBackground } from "@/components/layout/GlowBackground";
+
 function RootComponent() {
   return (
     <ProfileProvider>
@@ -72,11 +74,12 @@ function RootComponent() {
           <TimeLogProvider>
             <VisitProvider>
               <SidebarProvider>
-                <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-950 transition-colors">
+                <div className="flex min-h-screen w-full bg-slate-50/50 dark:bg-slate-950/50 transition-colors relative">
+                  <GlowBackground />
                   <AppSidebar />
                   <div className="flex-1 flex flex-col min-w-0">
                     <TopBar />
-                    <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-[1600px] mx-auto">
+                    <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-[1600px] mx-auto z-10">
                       <Outlet />
                     </main>
                   </div>

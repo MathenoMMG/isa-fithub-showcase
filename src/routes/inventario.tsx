@@ -9,6 +9,8 @@ import { AddProductDialog } from "@/components/inventory/AddProductDialog";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 export const Route = createFileRoute("/inventario")({
   head: () => ({
     meta: [
@@ -20,7 +22,7 @@ export const Route = createFileRoute("/inventario")({
 });
 
 function InventarioPage() {
-  const { filteredItems } = useInventory();
+  const { filteredItems, loading } = useInventory();
   const { store } = useStore();
   const [search, setSearch] = useState("");
 
@@ -51,7 +53,16 @@ function InventarioPage() {
         </div>
       </div>
 
-      <KpiCards items={filteredItems} />
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+        </div>
+      ) : (
+        <KpiCards items={filteredItems} />
+      )}
 
       {/* Búsqueda */}
       <div className="relative flex-1 max-w-xl">
@@ -64,7 +75,16 @@ function InventarioPage() {
         />
       </div>
 
-      <InventoryTable data={visibleItems} />
+      {loading ? (
+        <div className="space-y-4 mt-8">
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
+        </div>
+      ) : (
+        <InventoryTable data={visibleItems} />
+      )}
     </div>
   );
 }

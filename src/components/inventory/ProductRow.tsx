@@ -43,7 +43,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   );
 
   return (
-    <div className={`bg-white rounded-2xl border border-slate-200 border-l-4 ${statusBg[worst]} shadow-sm overflow-hidden`}>
+    <div className={`group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 border-l-4 ${statusBg[worst]} shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 dark:hover:bg-slate-800/50`}>
       {/* Header */}
       <div className="flex items-center gap-3 p-4">
         <button

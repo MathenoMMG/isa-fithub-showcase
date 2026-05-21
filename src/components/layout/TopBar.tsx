@@ -28,7 +28,7 @@ export function TopBar() {
   const initials = profile.name ? profile.name.substring(0, 2).toUpperCase() : "FH";
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/90 backdrop-blur px-4 md:px-6 transition-colors">
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl px-4 md:px-6 transition-colors">
       <SidebarTrigger className="h-11 w-11 dark:text-slate-200" />
       <div className="flex-1 min-w-0">
         <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-50 truncate">{title}</h1>

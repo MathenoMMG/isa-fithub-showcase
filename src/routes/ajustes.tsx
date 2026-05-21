@@ -11,7 +11,7 @@ import { useVisitas } from "@/context/VisitContext";
 import { useProfile } from "@/context/ProfileContext";
 import { toast } from "sonner";
 import type { StoreFilter } from "@/types/inventory";
-import { RotateCcw, Monitor, Moon, Sun, Camera, RefreshCcw, Bell, BellOff, Database, AlertTriangle, Download } from "lucide-react";
+import { RotateCcw, Monitor, Moon, Sun, Camera, RefreshCcw, Bell, BellOff, Database, AlertTriangle, Download, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { Switch } from "@/components/ui/switch";
@@ -276,6 +276,22 @@ function AjustesPage() {
                     } catch(e) {}
                   }
                 }} 
+              />
+            </div>
+          </Card>
+          {/* Glow Effect */}
+          <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                  Efecto Glow (Fondo)
+                  <Sparkles className={`h-4 w-4 ${profile.glowEnabled ? "text-emerald-500" : "text-slate-400"}`} />
+                </h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Luces de fondo para un diseño inmersivo.</p>
+              </div>
+              <Switch 
+                checked={profile.glowEnabled ?? true} 
+                onCheckedChange={(checked) => updateProfile({ glowEnabled: checked })} 
               />
             </div>
           </Card>

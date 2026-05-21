@@ -7,6 +7,7 @@ interface Profile {
   subtitle: string;
   avatar: string; // Base64 image
   soundEnabled: boolean;
+  glowEnabled: boolean;
 }
 
 interface ProfileContextValue {
@@ -22,6 +23,7 @@ const defaultProfile: Profile = {
   subtitle: "FitHub Ciudad Demo",
   avatar: "",
   soundEnabled: true,
+  glowEnabled: true,
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);

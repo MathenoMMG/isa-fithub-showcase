@@ -8,6 +8,8 @@ import { useVisitas } from "@/context/VisitContext";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -19,7 +21,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { filteredItems } = useInventory();
+  const { filteredItems, loading } = useInventory();
   const { store } = useStore();
   const { registrarVisita, visitas } = useVisitas();
   const storeId = store === "Sur" ? 2 : 1;
@@ -63,7 +65,16 @@ function Dashboard() {
         )}
       </div>
 
-      <KpiCards items={filteredItems} />
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+        </div>
+      ) : (
+        <KpiCards items={filteredItems} />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <Link to="/inventario" className="group">
