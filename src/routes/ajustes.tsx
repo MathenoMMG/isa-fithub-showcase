@@ -269,14 +269,10 @@ function AjustesPage() {
                 onCheckedChange={(checked) => {
                   updateProfile({ soundEnabled: checked });
                   if (checked) {
-                    // Test beep just to show it works when they turn it on
                     try {
-                      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                      const osc = audioCtx.createOscillator();
-                      osc.frequency.value = 800;
-                      osc.connect(audioCtx.destination);
-                      osc.start();
-                      osc.stop(audioCtx.currentTime + 0.1);
+                      const audio = new Audio('/sounds/chime.mp3');
+                      audio.volume = 0.6;
+                      audio.play().catch(e => {});
                     } catch(e) {}
                   }
                 }} 

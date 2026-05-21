@@ -65,24 +65,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const playBeep = () => {
     if (!profile.soundEnabled) return;
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // 800Hz beep
-      oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-      
-      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.1);
+      const audio = new Audio('/sounds/chime.mp3');
+      audio.volume = 0.6; // No tan fuerte
+      audio.play().catch(e => console.log('Audio autoplay blocked', e));
     } catch (e) {
-      // Audio context might be blocked if no user interaction yet, ignore
+      console.log('Error playing sound', e);
     }
   };
 
