@@ -35,11 +35,11 @@ export function ClockInOutCard() {
 
   const getHorarioEsperado = (dayOfWeek: number) => {
     switch (dayOfWeek) {
-      case 1: return { horas: 9, texto: "08:00 - 17:00 (9h)" }; // Lunes
-      case 2: return { horas: 8, texto: "08:00 - 16:00 (8h)" }; // Martes
-      case 3: return { horas: 9, texto: "08:00 - 17:00 (9h)" }; // Miércoles
-      case 4: return { horas: 6, texto: "08:00 - 14:00 (6h)" }; // Jueves
-      case 5: return { horas: 7, texto: "08:00 - 15:00 (7h)" }; // Viernes
+      case 1: return { horas: 9, texto: "09:00 - 18:00 (9h)" }; // Lunes
+      case 2: return { horas: 8, texto: "09:00 - 17:00 (8h)" }; // Martes
+      case 3: return { horas: 9, texto: "10:00 - 19:00 (9h)" }; // Miércoles
+      case 4: return { horas: 6, texto: "10:00 - 16:00 (6h)" }; // Jueves
+      case 5: return { horas: 7, texto: "09:00 - 16:00 (7h)" }; // Viernes
       case 6: return { horas: 5, texto: "08:00 - 13:00 (5h)" }; // Sábado
       default: return null; // Domingo
     }
