@@ -1,20 +1,21 @@
 import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { InventoryItem } from "@/types/inventory";
+import type { ProductoConLotes } from "@/types/inventory";
 import { ProductRow } from "./ProductRow";
 
 interface Props {
-  data: InventoryItem[];
+  data: ProductoConLotes[];
 }
 
 export function InventoryTable({ data }: Props) {
   const grouped = useMemo(() => {
-    const map = new Map<string, InventoryItem[]>();
+    const map = new Map<string, ProductoConLotes[]>();
     for (const item of data) {
-      const arr = map.get(item.linea_producto) ?? [];
+      const cat = item.categoria || "Otros";
+      const arr = map.get(cat) ?? [];
       arr.push(item);
-      map.set(item.linea_producto, arr);
+      map.set(cat, arr);
     }
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [data]);
@@ -36,7 +37,7 @@ export function InventoryTable({ data }: Props) {
   );
 }
 
-function LineaGroup({ linea, items }: { linea: string; items: InventoryItem[] }) {
+function LineaGroup({ linea, items }: { linea: string; items: ProductoConLotes[] }) {
   const [open, setOpen] = useState(true);
   return (
     <section>

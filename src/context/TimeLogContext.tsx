@@ -1,49 +1,63 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { TimeLogEntry, TimeLogType } from "@/types/time";
-import type { StoreId } from "@/types/inventory";
+import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
+import type { RegistroHorario, StoreId } from "@/types/inventory";
+import { supabase } from "@/lib/supabase";
+import { useStore } from "./StoreContext";
 
 interface TimeLogContextValue {
-  logs: TimeLogEntry[];
-  addLog: (tipo: TimeLogType, tienda: StoreId) => void;
-  clearLogs: () => void;
+  logs: RegistroHorario[];
+  loading: boolean;
+  addLog: (tipo: "entrada" | "salida", tienda_id: number | null) => Promise<void>;
+  refreshLogs: () => Promise<void>;
 }
 
 const TimeLogContext = createContext<TimeLogContextValue | null>(null);
-const STORAGE_KEY = "fithub.timelogs";
 
 export function TimeLogProvider({ children }: { children: ReactNode }) {
-  const [logs, setLogs] = useState<TimeLogEntry[]>([]);
+  const [logs, setLogs] = useState<RegistroHorario[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-    if (saved) {
-      try {
-        setLogs(JSON.parse(saved));
-      } catch {
-        // ignore
-      }
+  const fetchLogs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("registros_horario")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setLogs(data || []);
+    } catch (err) {
+      console.error("Error fetching time logs:", err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-    }
-  }, [logs]);
+    fetchLogs();
+  }, [fetchLogs]);
 
-  const addLog = (tipo: TimeLogType, tienda: StoreId) => {
-    setLogs((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), timestamp: new Date().toISOString(), tipo, tienda },
-    ]);
+  const addLog = async (tipo: "entrada" | "salida", tienda_id: number | null) => {
+    const { error } = await supabase.from("registros_horario").insert({
+      tipo,
+      tienda_id,
+    });
+    if (error) throw error;
+    await fetchLogs();
   };
 
-  const clearLogs = () => {
-    setLogs([]);
-    if (typeof window !== "undefined") localStorage.removeItem(STORAGE_KEY);
-  };
-
-  return <TimeLogContext.Provider value={{ logs, addLog, clearLogs }}>{children}</TimeLogContext.Provider>;
+  return (
+    <TimeLogContext.Provider
+      value={{
+        logs,
+        loading,
+        addLog,
+        refreshLogs: fetchLogs,
+      }}
+    >
+      {children}
+    </TimeLogContext.Provider>
+  );
 }
 
 export function useTimeLog() {

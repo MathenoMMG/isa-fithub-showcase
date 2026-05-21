@@ -1,14 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-
-import appCss from "../styles.css?url";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { TopBar } from "@/components/layout/TopBar";
@@ -16,6 +6,14 @@ import { StoreProvider } from "@/context/StoreContext";
 import { InventoryProvider } from "@/context/InventoryContext";
 import { TimeLogProvider } from "@/context/TimeLogContext";
 import { Toaster } from "@/components/ui/sonner";
+
+import { VisitProvider } from "@/context/VisitContext";
+
+export const Route = createRootRoute({
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: ErrorComponent,
+});
 
 function NotFoundComponent() {
   return (
@@ -27,38 +25,10 @@ function NotFoundComponent() {
           La página que buscas no existe o fue movida.
         </p>
         <div className="mt-6">
-          <Link
-            to="/"
+          <a
+            href="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Ir al inicio
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
-  const router = useRouter();
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Algo salió mal</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Intenta recargar la página.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
-            Intentar de nuevo
-          </button>
-          <a href="/" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium">
             Ir al inicio
           </a>
         </div>
@@ -67,44 +37,38 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FitHub · Gestión de Inventario" },
-      { name: "description", content: "Gestión de inventario y registro de horarios para mercaimpulsadoras FitHub." },
-    ],
-    links: [{ rel: "stylesheet", href: appCss }],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
-
-function RootShell({ children }: { children: React.ReactNode }) {
+function ErrorComponent({ error }: { error: Error }) {
+  console.error(error);
   return (
-    <html lang="es">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">Algo salió mal</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Intenta recargar la página.</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Intentar de nuevo
+          </button>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium"
+          >
+            Ir al inicio
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <StoreProvider>
-        <InventoryProvider>
-          <TimeLogProvider>
+    <StoreProvider>
+      <InventoryProvider>
+        <TimeLogProvider>
+          <VisitProvider>
             <SidebarProvider>
               <div className="min-h-screen flex w-full bg-slate-50">
                 <AppSidebar />
@@ -117,9 +81,9 @@ function RootComponent() {
               </div>
               <Toaster richColors position="top-right" />
             </SidebarProvider>
-          </TimeLogProvider>
-        </InventoryProvider>
-      </StoreProvider>
-    </QueryClientProvider>
+          </VisitProvider>
+        </TimeLogProvider>
+      </InventoryProvider>
+    </StoreProvider>
   );
 }

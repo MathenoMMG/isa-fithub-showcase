@@ -10,22 +10,23 @@ import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
 import type { StoreId } from "@/types/inventory";
 
-const LINEAS = ["Proteínas", "Pre-entrenos", "Snacks", "Bebidas", "Accesorios"];
+const CATEGORIAS = ["Arepas", "Lácteos", "Snacks", "Bebidas", "Suplementos", "Despensa", "Panadería", "Cereales", "Confitería", "Quesos", "Frutos y Nueces", "Accesorios", "Otros"];
+const STORE_MAP: Record<StoreId, number> = { Norte: 1, Sur: 2 };
 
 export function AddProductDialog() {
   const { addProduct } = useInventory();
   const { store } = useStore();
   const [open, setOpen] = useState(false);
 
-  const defaultStore: StoreId = store === "Ambas" ? "Sur" : store;
+  const defaultStore: StoreId = store === "Ambas" ? "Norte" : store;
 
   const [form, setForm] = useState({
     nombre: "",
-    sku: "",
-    subcategoria_sabor: "",
-    linea_producto: LINEAS[0],
-    proveedor: "",
-    id_tienda: defaultStore,
+    articulo: "",
+    sicol: "",
+    categoria: CATEGORIAS[0],
+    proveedor_nombre: "ADWELLCH S.A.S.",
+    tienda_id: STORE_MAP[defaultStore],
     cantidad: 1,
     fecha_caducidad: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
   });
@@ -33,18 +34,18 @@ export function AddProductDialog() {
   const reset = () =>
     setForm({
       nombre: "",
-      sku: "",
-      subcategoria_sabor: "",
-      linea_producto: LINEAS[0],
-      proveedor: "",
-      id_tienda: defaultStore,
+      articulo: "",
+      sicol: "",
+      categoria: CATEGORIAS[0],
+      proveedor_nombre: "ADWELLCH S.A.S.",
+      tienda_id: STORE_MAP[defaultStore],
       cantidad: 1,
       fecha_caducidad: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
     });
 
   const submit = () => {
-    if (!form.nombre.trim() || !form.sku.trim()) {
-      toast.error("Nombre y SKU son obligatorios");
+    if (!form.nombre.trim() || !form.articulo.trim()) {
+      toast.error("Nombre y Código (Artículo) son obligatorios");
       return;
     }
     addProduct({
@@ -71,46 +72,46 @@ export function AddProductDialog() {
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3 py-2">
           <div className="col-span-2 space-y-1.5">
-            <Label>Nombre</Label>
+            <Label>Nombre del producto</Label>
             <Input className="h-11" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
           </div>
           <div className="space-y-1.5">
-            <Label>SKU</Label>
-            <Input className="h-11" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })} />
+            <Label>Artículo (Código barras)</Label>
+            <Input className="h-11" value={form.articulo} onChange={(e) => setForm({ ...form, articulo: e.target.value.toUpperCase() })} />
           </div>
           <div className="space-y-1.5">
-            <Label>Sabor / Subcategoría</Label>
-            <Input className="h-11" value={form.subcategoria_sabor} onChange={(e) => setForm({ ...form, subcategoria_sabor: e.target.value })} />
+            <Label>Sicol</Label>
+            <Input className="h-11" value={form.sicol} onChange={(e) => setForm({ ...form, sicol: e.target.value })} />
           </div>
           <div className="space-y-1.5">
-            <Label>Línea</Label>
-            <Select value={form.linea_producto} onValueChange={(v) => setForm({ ...form, linea_producto: v })}>
+            <Label>Categoría</Label>
+            <Select value={form.categoria} onValueChange={(v) => setForm({ ...form, categoria: v })}>
               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {LINEAS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                {CATEGORIAS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5">
             <Label>Tienda</Label>
-            <Select value={form.id_tienda} onValueChange={(v) => setForm({ ...form, id_tienda: v as StoreId })}>
+            <Select value={String(form.tienda_id)} onValueChange={(v) => setForm({ ...form, tienda_id: Number(v) })}>
               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Sur">Sur</SelectItem>
-                <SelectItem value="Norte">Norte</SelectItem>
+                <SelectItem value="2">Sur</SelectItem>
+                <SelectItem value="1">Norte</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="col-span-2 space-y-1.5">
             <Label>Proveedor</Label>
-            <Input className="h-11" value={form.proveedor} onChange={(e) => setForm({ ...form, proveedor: e.target.value })} />
+            <Input className="h-11" value={form.proveedor_nombre} onChange={(e) => setForm({ ...form, proveedor_nombre: e.target.value })} />
           </div>
           <div className="space-y-1.5">
-            <Label>Cantidad lote inicial</Label>
+            <Label>Cantidad inicial</Label>
             <Input className="h-11" type="number" min={0} value={form.cantidad} onChange={(e) => setForm({ ...form, cantidad: Number(e.target.value) })} />
           </div>
           <div className="space-y-1.5">
-            <Label>Caducidad</Label>
+            <Label>Caducidad (lote inicial)</Label>
             <Input className="h-11" type="date" value={form.fecha_caducidad} onChange={(e) => setForm({ ...form, fecha_caducidad: e.target.value })} />
           </div>
         </div>

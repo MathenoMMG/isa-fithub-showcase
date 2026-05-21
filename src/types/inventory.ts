@@ -1,35 +1,76 @@
 export type StoreId = "Sur" | "Norte";
 export type StoreFilter = StoreId | "Ambas";
 
-export interface Lote {
-  id: string;
-  cantidad: number;
-  fecha_caducidad: string; // ISO
+// Database types
+export interface Tienda {
+  id: number;
+  codigo: number;
+  nombre: StoreId;
 }
 
-export interface InventoryItem {
+export interface Producto {
   id: string;
-  id_tienda: StoreId;
-  sku: string;
+  tienda_id: number;
+  articulo: string;
+  sicol: string;
   nombre: string;
-  linea_producto: string;
-  subcategoria_sabor: string;
-  proveedor: string;
+  categoria: string | null;
+  proveedor_nombre: string;
+  proveedor_codigo: string | null;
+  created_at: string;
+}
+
+export interface Lote {
+  id: string;
+  producto_id: string;
+  cantidad: number;
+  fecha_caducidad: string | null; // ISO date or null
+  fecha_ingreso: string;
+  notas: string | null;
+  created_at: string;
+}
+
+export interface Venta {
+  id: string;
+  producto_id: string;
+  lote_id: string | null;
+  cantidad: number;
+  created_at: string;
+}
+
+export interface Visita {
+  id: string;
+  tienda_id: number;
+  fecha: string; // YYYY-MM-DD
+  notas: string | null;
+  created_at: string;
+}
+
+export interface RegistroHorario {
+  id: string;
+  tipo: "entrada" | "salida";
+  tienda_id: number | null;
+  created_at: string;
+}
+
+// Frontend enriched types
+export interface ProductoConLotes extends Producto {
   lotes: Lote[];
+  tienda_nombre: StoreId;
+  vendidos_total: number;
 }
 
 export interface NewProductInput {
-  id_tienda: StoreId;
-  sku: string;
+  tienda_id: number;
+  articulo: string;
+  sicol: string;
   nombre: string;
-  linea_producto: string;
-  subcategoria_sabor: string;
-  proveedor: string;
-  cantidad: number;
-  fecha_caducidad: string;
+  categoria: string;
+  proveedor_nombre: string;
+  proveedor_codigo?: string;
 }
 
 export interface NewLoteInput {
   cantidad: number;
-  fecha_caducidad: string;
+  fecha_caducidad: string | null;
 }

@@ -14,14 +14,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import type { InventoryItem } from "@/types/inventory";
+import type { ProductoConLotes } from "@/types/inventory";
 import { useInventory } from "@/context/InventoryContext";
 import { ExpiryBadge } from "./ExpiryBadge";
 import { AddLoteDialog } from "./AddLoteDialog";
 import { formatExpiryDate, getEarliestExpiry, getExpiryStatus, getTotalQty, getWorstStatus } from "@/lib/expiry";
 
 interface Props {
-  product: InventoryItem;
+  product: ProductoConLotes;
   defaultOpen?: boolean;
 }
 
@@ -58,13 +58,13 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-slate-900 text-base truncate">{product.nombre}</span>
             <Badge variant="outline" className="border-slate-300 text-slate-600 text-xs">
-              {product.subcategoria_sabor}
+              {product.categoria || "Otros"}
             </Badge>
             <Badge variant="outline" className="border-slate-300 text-slate-500 text-xs font-mono">
-              {product.sku}
+              {product.articulo}
             </Badge>
             <Badge variant="outline" className="border-slate-300 text-slate-600 text-xs">
-              {product.id_tienda}
+              {product.tienda_nombre}
             </Badge>
           </div>
           <div className="text-sm text-slate-500 mt-1">
@@ -135,25 +135,32 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
 
                 {/* acciones principales: VENTA + eliminar lote */}
                 <div className="flex items-center gap-2 shrink-0 md:ml-auto">
-                  <Button
-                    onClick={() => {
-                      if (lote.cantidad <= 0) {
-                        toast.error("Lote sin stock");
-                        return;
-                      }
-                      sellFromLote(product.id, lote.id, 1);
-                      toast.success(`Venta registrada · ${product.nombre} (lote #${idx + 1})`, {
-                        description:
-                          status === "vencido"
-                            ? "⚠️ Este lote estaba vencido — verifica antes de despachar."
-                            : undefined,
-                      });
-                    }}
-                    className="h-11 px-4 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    Venta
-                  </Button>
+                  <div className="flex flex-col gap-1 mr-2">
+                    <Button
+                      onClick={() => {
+                        if (lote.cantidad <= 0) {
+                          toast.error("Lote sin stock");
+                          return;
+                        }
+                        sellFromLote(product.id, lote.id, 1);
+                        toast.success(`Venta registrada · ${product.nombre} (lote #${idx + 1})`, {
+                          description:
+                            status === "vencido"
+                              ? "⚠️ Este lote estaba vencido — verifica antes de despachar."
+                              : undefined,
+                        });
+                      }}
+                      className="h-11 px-4 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl"
+                    >
+                      <ShoppingCart className="h-5 w-5" />
+                      Venta
+                    </Button>
+                    {product.vendidos_total > 0 && (
+                      <span className="text-[10px] text-center font-medium text-emerald-600">
+                        {product.vendidos_total} vendidos
+                      </span>
+                    )}
+                  </div>
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
