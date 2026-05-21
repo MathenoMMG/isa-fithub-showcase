@@ -36,7 +36,7 @@ function InventarioPage() {
   }, [filteredItems, search]);
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6">
+    <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header con acción protagónica */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>

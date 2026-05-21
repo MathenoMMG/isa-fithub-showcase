@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState, Link } from "@tanstack/react-router";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { StoreSelector } from "./StoreSelector";
 import { format } from "date-fns";
@@ -36,11 +36,11 @@ export function TopBar() {
       
       <StoreSelector />
       
-      <div className="hidden md:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-800 transition-colors">
+      <Link to="/ajustes" className="hidden md:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-800 transition-all hover:scale-105 hover:bg-slate-50 dark:hover:bg-slate-900/50 p-1.5 rounded-xl cursor-pointer">
         {profile.avatar ? (
           <img src={profile.avatar} alt={profile.name} className="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
         ) : (
-          <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold tracking-tight">
+          <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold tracking-tight shadow-sm">
             {initials}
           </div>
         )}
@@ -55,7 +55,7 @@ export function TopBar() {
             {format(now, "d MMM · HH:mm", { locale: es })}
           </div>
         </div>
-      </div>
+      </Link>
     </header>
   );
 }
