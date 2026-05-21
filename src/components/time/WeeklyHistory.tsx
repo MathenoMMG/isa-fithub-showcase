@@ -58,6 +58,7 @@ export function WeeklyHistory() {
         <TableHeader>
           <TableRow className="dark:border-slate-800 border-slate-100">
             <TableHead className="font-semibold text-slate-600 dark:text-slate-400">Día</TableHead>
+            <TableHead className="font-semibold text-slate-600 dark:text-slate-400">Tienda</TableHead>
             <TableHead className="font-semibold text-slate-600 dark:text-slate-400">Entrada</TableHead>
             <TableHead className="font-semibold text-slate-600 dark:text-slate-400">Salida</TableHead>
             <TableHead className="font-semibold text-slate-600 dark:text-slate-400">Horas</TableHead>
@@ -77,10 +78,17 @@ export function WeeklyHistory() {
                 ? (differenceInMinutes(parseISO(salida.created_at), parseISO(entrada.created_at)) / 60).toFixed(2)
                 : "—";
 
+            const storeName = entrada ? (entrada.tienda_id === 2 ? "Sur" : "Norte") 
+                            : salida ? (salida.tienda_id === 2 ? "Sur" : "Norte") 
+                            : "—";
+
             return (
               <TableRow key={day.toISOString()} className="border-t border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                 <TableCell className="py-4 font-medium capitalize dark:text-slate-200">
                   {format(day, "EEE d MMM", { locale: es })}
+                </TableCell>
+                <TableCell className="py-4 font-medium text-slate-500 dark:text-slate-400">
+                  {storeName}
                 </TableCell>
                 <TableCell className="py-4 tabular-nums">
                   {entrada ? (

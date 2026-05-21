@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTimeLog } from "@/context/TimeLogContext";
 import { useStore } from "@/context/StoreContext";
+import { useProfile } from "@/context/ProfileContext";
 import { format, isToday, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 export function ClockInOutCard() {
   const { logs, addLog } = useTimeLog();
   const { store } = useStore();
+  const { playBeep } = useProfile();
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -30,6 +32,7 @@ export function ClockInOutCard() {
 
   const handle = (tipo: "entrada" | "salida") => {
     addLog(tipo, tiendaId);
+    playBeep();
     toast.success(`${tipo === "entrada" ? "Entrada" : "Salida"} registrada en ${tiendaName}`);
   };
 
