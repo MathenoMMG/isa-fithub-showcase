@@ -40,9 +40,9 @@ function InventarioPage() {
       {/* Header con acción protagónica */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Inventario</h2>
-          <p className="text-slate-500 mt-1">
-            Tienda: <span className="font-semibold text-slate-700">{store === "Ambas" ? "Ambas" : store}</span>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 transition-colors">Inventario</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors">
+            Tienda: <span className="font-semibold text-slate-700 dark:text-slate-300">{store === "Ambas" ? "Ambas" : store}</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -55,12 +55,12 @@ function InventarioPage() {
 
       {/* Búsqueda */}
       <div className="relative flex-1 max-w-xl">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500 pointer-events-none" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por SKU, nombre o sabor…"
-          className="h-12 pl-11 text-base rounded-xl border-slate-300 bg-white"
+          placeholder="Buscar por artículo, nombre o categoría…"
+          className="h-12 pl-11 text-base rounded-xl border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 dark:text-slate-200 transition-colors"
         />
       </div>
 

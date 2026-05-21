@@ -72,12 +72,14 @@ function RootComponent() {
           <TimeLogProvider>
             <VisitProvider>
               <SidebarProvider>
-                <div className="flex min-h-screen">
+                <div className="flex min-h-screen w-full bg-slate-50 dark:bg-slate-950 transition-colors">
                   <AppSidebar />
-                  <main className="flex-1">
+                  <div className="flex-1 flex flex-col min-w-0">
                     <TopBar />
-                    <Outlet />
-                  </main>
+                    <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-[1600px] mx-auto">
+                      <Outlet />
+                    </main>
+                  </div>
                 </div>
                 <Toaster richColors position="top-right" />
               </SidebarProvider>

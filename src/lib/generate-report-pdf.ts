@@ -3,13 +3,13 @@ import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { Venta, ProductoConLotes } from "@/types/inventory";
-import { getWorstStatus, getExpiryStatus } from "./expiry";
+import { getExpiryStatus } from "./expiry";
 import html2canvas from "html2canvas";
 
 interface ReportOptions {
   store: string;
   range: string;
-  ventas: (Venta & { productos: { tienda_id: number; nombre: string; categoria: string } })[];
+  ventas: (Venta & { productos: { tienda_id: number; nombre: string; categoria: string; articulo: string } })[];
   inventory: ProductoConLotes[];
 }
 
@@ -35,7 +35,7 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   if (range === "global") rangeText = "Histórico Global";
   
   doc.text(`Fecha de generación: ${dateStr}`, 14, 35);
-  doc.text(`Tienda: ${store}`, 14, 42);
+  doc.text(`Tienda Filtro: ${store}`, 14, 42);
   doc.text(`Periodo analizado: ${rangeText}`, 14, 49);
 
   // -- CAPTURE CHART --
@@ -56,21 +56,37 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   }
 
   // -- VENTAS (TOP) --
-  // Aggregate sales from the query
-  const salesMap: Record<string, { nombre: string; cantidad: number; categoria: string }> = {};
+  // Aggregate sales by (producto_id + tienda_id)
+  const salesMap: Record<string, { id_prod: string; tienda: string; nombre: string; cantidad: number; categoria: string; articulo: string }> = {};
   let totalVendidos = 0;
   
   for (const v of ventas) {
-    if (!v.productos) continue; // safety check
+    if (!v.productos) continue;
     totalVendidos += v.cantidad;
-    const key = v.producto_id;
+    
+    // key depends on product and store to keep them separate if analyzing both stores
+    const tiendaStr = v.productos.tienda_id === 2 ? "Sur" : "Norte";
+    const key = `${v.producto_id}-${tiendaStr}`;
+    
     if (!salesMap[key]) {
-      salesMap[key] = { nombre: v.productos.nombre, cantidad: 0, categoria: v.productos.categoria || "Otros" };
+      salesMap[key] = { 
+        id_prod: v.producto_id,
+        tienda: tiendaStr,
+        nombre: v.productos.nombre, 
+        cantidad: 0, 
+        categoria: v.productos.categoria || "Otros",
+        articulo: v.productos.articulo || "N/A"
+      };
     }
     salesMap[key].cantidad += v.cantidad;
   }
   
-  const sortedSales = Object.values(salesMap).sort((a, b) => b.cantidad - a.cantidad);
+  // Sort: Tienda (Z-A so Sur, then Norte... wait, Norte then Sur is A-Z. Let's do A-Z for Tienda) -> Categoria (A-Z) -> Nombre (A-Z)
+  const sortedSales = Object.values(salesMap).sort((a, b) => {
+    if (a.tienda !== b.tienda) return a.tienda.localeCompare(b.tienda);
+    if (a.categoria !== b.categoria) return a.categoria.localeCompare(b.categoria);
+    return a.nombre.localeCompare(b.nombre);
+  });
   
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
@@ -78,16 +94,16 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   
   autoTable(doc, {
     startY: currentY + 5,
-    head: [["Producto", "Categoría", "Cantidad Vendida"]],
-    body: sortedSales.slice(0, 15).map(s => [s.nombre, s.categoria, s.cantidad.toString()]),
+    head: [["Tienda", "Categoría", "Artículo (ID)", "Producto", "Vendidos"]],
+    body: sortedSales.map(s => [s.tienda, s.categoria, s.articulo, s.nombre, s.cantidad.toString()]),
     headStyles: { fillColor: [5, 150, 105] },
-    theme: "striped"
+    theme: "striped",
+    styles: { fontSize: 8 },
   });
   
   currentY = (doc as any).lastAutoTable.finalY + 15;
 
   // -- STOCK CRÍTICO --
-  // Check if we need a new page
   if (currentY > 250) {
     doc.addPage();
     currentY = 20;
@@ -97,7 +113,7 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   doc.setFont("helvetica", "bold");
   doc.text("Stock Crítico (Vencidos / Próximos)", 14, currentY);
 
-  const criticos: { nombre: string; caducidad: string; estado: string; loteQty: number }[] = [];
+  const criticos: { tienda: string; articulo: string; nombre: string; caducidad: string; estado: string; loteQty: number }[] = [];
   
   for (const product of inventory) {
     if (product.lotes.length === 0) continue;
@@ -107,6 +123,8 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
       const status = getExpiryStatus(lote.fecha_caducidad);
       if (status === "vencido" || status === "proximo") {
         criticos.push({
+          tienda: product.tienda_nombre || "Norte",
+          articulo: product.articulo || "N/A",
           nombre: product.nombre,
           caducidad: lote.fecha_caducidad,
           estado: status === "vencido" ? "VENCIDO" : "Próximo a vencer",
@@ -116,7 +134,10 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
     }
   }
 
-  criticos.sort((a, b) => new Date(a.caducidad).getTime() - new Date(b.caducidad).getTime());
+  criticos.sort((a, b) => {
+    if (a.tienda !== b.tienda) return a.tienda.localeCompare(b.tienda);
+    return new Date(a.caducidad).getTime() - new Date(b.caducidad).getTime();
+  });
 
   if (criticos.length === 0) {
     doc.setFontSize(11);
@@ -125,10 +146,11 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   } else {
     autoTable(doc, {
       startY: currentY + 5,
-      head: [["Estado", "Fecha Cad.", "Unidades", "Producto"]],
-      body: criticos.map(c => [c.estado, format(new Date(c.caducidad), "dd/MM/yyyy"), c.loteQty.toString(), c.nombre]),
+      head: [["Estado", "Fecha Cad.", "Tienda", "Articulo", "Producto", "Uds"]],
+      body: criticos.map(c => [c.estado, format(new Date(c.caducidad), "dd/MM/yyyy"), c.tienda, c.articulo, c.nombre, c.loteQty.toString()]),
       headStyles: { fillColor: [220, 38, 38] }, // Red header for critical
       theme: "striped",
+      styles: { fontSize: 8 },
       didParseCell: (data) => {
         if (data.row.index > -1 && data.column.index === 0) {
           if (data.cell.text[0] === "VENCIDO") {

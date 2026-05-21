@@ -22,7 +22,7 @@ export function InventoryTable({ data }: Props) {
 
   if (data.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center text-slate-500 dark:text-slate-400 transition-colors">
         No hay productos que coincidan con la búsqueda.
       </div>
     );
@@ -43,11 +43,11 @@ function LineaGroup({ linea, items }: { linea: string; items: ProductoConLotes[]
     <section>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-2 px-2 py-2 text-left hover:bg-slate-100 rounded-lg"
+        className="w-full flex items-center gap-2 px-2 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
       >
-        {open ? <ChevronDown className="h-5 w-5 text-slate-600" /> : <ChevronRight className="h-5 w-5 text-slate-600" />}
-        <h3 className="text-lg font-bold text-slate-800">{linea}</h3>
-        <Badge variant="secondary" className="bg-slate-200 text-slate-700">{items.length}</Badge>
+        {open ? <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" /> : <ChevronRight className="h-5 w-5 text-slate-600 dark:text-slate-400" />}
+        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{linea}</h3>
+        <Badge variant="secondary" className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{items.length}</Badge>
       </button>
       {open && (
         <div className="mt-3 space-y-3">

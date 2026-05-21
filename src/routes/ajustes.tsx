@@ -10,8 +10,8 @@ import { useTimeLog } from "@/context/TimeLogContext";
 import { useProfile } from "@/context/ProfileContext";
 import { toast } from "sonner";
 import type { StoreFilter } from "@/types/inventory";
-import { RotateCcw, Monitor, Moon, Sun, Camera } from "lucide-react";
-import { useRef } from "react";
+import { RotateCcw, Monitor, Moon, Sun, Camera, RefreshCcw } from "lucide-react";
+import { useRef, useState } from "react";
 
 export const Route = createFileRoute("/ajustes")({
   head: () => ({
@@ -25,16 +25,30 @@ export const Route = createFileRoute("/ajustes")({
 
 function AjustesPage() {
   const { store, setStore } = useStore();
-  const { resetData } = useInventory();
-  const { clearLogs } = useTimeLog();
+  const { refreshData } = useInventory();
+  const { refreshLogs } = useTimeLog();
   const { theme, setTheme, profile, updateProfile } = useProfile();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    try {
+      await Promise.all([refreshData(), refreshLogs()]);
+      toast.success("Sincronización completada con éxito");
+    } catch (e) {
+      toast.error("Error al sincronizar con Supabase");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const handleReset = () => {
-    if(confirm("¿Estás seguro de restablecer el estado local?")) {
-      resetData();
-      clearLogs();
-      toast.success("Datos locales restablecidos");
+    if(confirm("¿Estás seguro de restablecer los ajustes locales? Esto borrará la foto de perfil, el nombre y el tema, volviendo a los valores por defecto.")) {
+      localStorage.removeItem("fithub-profile");
+      localStorage.removeItem("fithub-theme");
+      window.location.reload();
     }
   };
 
@@ -103,7 +117,7 @@ function AjustesPage() {
                 <Input 
                   value={profile.name} 
                   onChange={(e) => updateProfile({ name: e.target.value })} 
-                  className="h-11 dark:bg-slate-950 dark:border-slate-800"
+                  className="h-11 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-200"
                   placeholder="Ej. Isabella"
                 />
               </div>
@@ -112,7 +126,7 @@ function AjustesPage() {
                 <Input 
                   value={profile.subtitle} 
                   onChange={(e) => updateProfile({ subtitle: e.target.value })} 
-                  className="h-11 dark:bg-slate-950 dark:border-slate-800"
+                  className="h-11 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-200"
                   placeholder="Ej. FitHub Ciudad Demo"
                 />
               </div>
@@ -158,7 +172,7 @@ function AjustesPage() {
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 transition-colors">Tienda predeterminada</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 transition-colors">Define qué tienda se muestra por defecto.</p>
             <Select value={store} onValueChange={(v) => setStore(v as StoreFilter)}>
-              <SelectTrigger className="h-12 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-base transition-colors">
+              <SelectTrigger className="h-12 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 dark:text-slate-200 text-base transition-colors">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -171,24 +185,51 @@ function AjustesPage() {
         </div>
       </div>
 
-      <Card className="p-6 rounded-2xl border-red-200 dark:border-red-900/30 bg-white dark:bg-slate-900 shadow-sm transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Restablecer datos locales</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md">
-              Borra todos los cambios locales y sincroniza desde cero con Supabase.
-            </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {/* Sync Card */}
+        <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all">
+          <div className="flex flex-col gap-4 h-full">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Forzar Sincronización</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Descarga los datos más recientes de inventario y horarios desde la base de datos global.
+              </p>
+            </div>
+            <div className="mt-auto pt-2">
+              <Button
+                onClick={handleSync}
+                disabled={isSyncing}
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl gap-2 transition-colors"
+              >
+                <RefreshCcw className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
+                {isSyncing ? "Sincronizando..." : "Sincronizar Datos"}
+              </Button>
+            </div>
           </div>
-          <Button
-            onClick={handleReset}
-            variant="outline"
-            className="h-11 border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-700 dark:hover:text-red-300 rounded-xl gap-2 transition-colors"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Restablecer datos
-          </Button>
-        </div>
-      </Card>
+        </Card>
+
+        {/* Reset Card */}
+        <Card className="p-6 rounded-2xl border-red-200 dark:border-red-900/30 bg-white dark:bg-slate-900 shadow-sm transition-all">
+          <div className="flex flex-col gap-4 h-full">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Restablecer Ajustes Locales</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Borra únicamente tu foto de perfil, nombre y preferencias de tema de este dispositivo.
+              </p>
+            </div>
+            <div className="mt-auto pt-2">
+              <Button
+                onClick={handleReset}
+                variant="outline"
+                className="w-full h-11 border-red-300 dark:border-red-800/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 rounded-xl gap-2 transition-colors"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Borrar perfil local
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
