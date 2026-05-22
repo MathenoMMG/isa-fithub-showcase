@@ -38,6 +38,7 @@ function Informes() {
   const { items } = useInventory();
   const { store } = useStore();
   const { theme } = useProfile();
+  const navigate = useNavigate();
   const [range, setRange] = useState("semana");
   const [isGenerating, setIsGenerating] = useState(false);
   const [salesDateFilter, setSalesDateFilter] = useState<string>("");
@@ -231,10 +232,13 @@ function Informes() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
-        <Card className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px]">
+        <Card 
+          className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+          onClick={() => navigate({ to: '/inventario' })}
+        >
           <div className="flex items-center gap-[12px]">
             <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-              <TrendingUp size={16} color="#1C4A2E" className="dark:text-emerald-400" />
+              <TrendingUp size={16} className="text-[#1C4A2E] dark:text-emerald-400" />
             </div>
             <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Total Vendidos</p>
           </div>
@@ -243,10 +247,13 @@ function Informes() {
           </h4>
         </Card>
         
-        <Card className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px]">
+        <Card 
+          className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+          onClick={() => topCategory !== "N/A" ? navigate({ to: '/inventario', search: { category: topCategory } }) : navigate({ to: '/inventario' })}
+        >
           <div className="flex items-center gap-[12px]">
             <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-              <PackageOpen size={16} color="#1C4A2E" className="dark:text-emerald-400" />
+              <PackageOpen size={16} className="text-[#1C4A2E] dark:text-emerald-400" />
             </div>
             <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Categoría Estrella</p>
           </div>
@@ -255,10 +262,13 @@ function Informes() {
           </h4>
         </Card>
 
-        <Card className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px]">
+        <Card 
+          className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+          onClick={() => navigate({ to: '/inventario', search: { status: 'vencido' } })}
+        >
           <div className="flex items-center gap-[12px]">
             <div className="w-[32px] h-[32px] rounded-[6px] bg-[#FCEBEB] dark:bg-red-900/30 flex items-center justify-center shrink-0">
-              <AlertTriangle size={16} color="#A32D2D" className="dark:text-red-400" />
+              <AlertTriangle size={16} className="text-[#A32D2D] dark:text-red-400" />
             </div>
             <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Lotes Críticos</p>
           </div>

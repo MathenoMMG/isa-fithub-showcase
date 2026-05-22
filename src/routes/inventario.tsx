@@ -24,12 +24,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type ProductSearch = {
   q?: string;
+  category?: string;
+  status?: string;
 };
 
 export const Route = createFileRoute("/inventario")({
   validateSearch: (search: Record<string, unknown>): ProductSearch => {
     return {
       q: search.q as string | undefined,
+      category: search.category as string | undefined,
+      status: search.status as string | undefined,
     };
   },
   head: () => ({
@@ -44,10 +48,10 @@ export const Route = createFileRoute("/inventario")({
 function InventarioPage() {
   const { filteredItems, loading } = useInventory();
   const { store } = useStore();
-  const { q } = Route.useSearch();
+  const { q, category, status } = Route.useSearch();
   const [search, setSearch] = useState(q || "");
-  const [statusFilters, setStatusFilters] = useState<string[]>([]);
-  const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+  const [statusFilters, setStatusFilters] = useState<string[]>(status ? [status] : []);
+  const [categoryFilters, setCategoryFilters] = useState<string[]>(category ? [category] : []);
 
   // State for collapse/expand all
   const [collapseCounter, setCollapseCounter] = useState(0);
