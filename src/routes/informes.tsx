@@ -38,7 +38,6 @@ function Informes() {
   const { items } = useInventory();
   const { store } = useStore();
   const { theme } = useProfile();
-  const navigate = useNavigate();
   const [range, setRange] = useState("semana");
   const [isGenerating, setIsGenerating] = useState(false);
   const [salesDateFilter, setSalesDateFilter] = useState<string>("");
