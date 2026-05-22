@@ -3,7 +3,17 @@ import { Package, AlertTriangle, XCircle } from "lucide-react";
 import { countLotesByStatus, getTotalQty } from "@/lib/expiry";
 import type { InventoryItem } from "@/types/inventory";
 
-export function KpiCards({ items }: { items: InventoryItem[] }) {
+export function KpiCards({ 
+  items,
+  onFilterStock,
+  onFilterProximos,
+  onFilterVencidos
+}: { 
+  items: InventoryItem[];
+  onFilterStock?: () => void;
+  onFilterProximos?: () => void;
+  onFilterVencidos?: () => void;
+}) {
   const allLotes = items.flatMap((i) => i.lotes);
   const totalUnidades = getTotalQty(allLotes);
   const { proximos, vencidos } = countLotesByStatus(allLotes);
@@ -17,6 +27,7 @@ export function KpiCards({ items }: { items: InventoryItem[] }) {
       iconBg: "bg-slate-100",
       iconColor: "text-slate-700",
       accent: "border-slate-200",
+      onClick: onFilterStock
     },
     {
       label: "Lotes próximos a vencer",
@@ -26,6 +37,7 @@ export function KpiCards({ items }: { items: InventoryItem[] }) {
       iconBg: "bg-amber-100",
       iconColor: "text-amber-600",
       accent: "border-amber-200",
+      onClick: onFilterProximos
     },
     {
       label: "Lotes vencidos",
@@ -35,6 +47,7 @@ export function KpiCards({ items }: { items: InventoryItem[] }) {
       iconBg: "bg-red-100",
       iconColor: "text-red-600",
       accent: "border-red-200",
+      onClick: onFilterVencidos
     },
   ];
 
@@ -43,7 +56,11 @@ export function KpiCards({ items }: { items: InventoryItem[] }) {
       {cards.map((c) => {
         const Icon = c.icon;
         return (
-          <Card key={c.label} className={`p-6 border ${c.accent} rounded-2xl bg-white shadow-sm`}>
+          <Card 
+            key={c.label} 
+            className={`p-6 border ${c.accent} rounded-2xl bg-white shadow-sm transition-all ${c.onClick ? 'cursor-pointer hover:shadow-md hover:-translate-y-1' : ''}`}
+            onClick={c.onClick}
+          >
             <div className="flex items-center gap-4">
               <div className={`h-14 w-14 rounded-2xl ${c.iconBg} flex items-center justify-center`}>
                 <Icon className={`h-7 w-7 ${c.iconColor}`} />

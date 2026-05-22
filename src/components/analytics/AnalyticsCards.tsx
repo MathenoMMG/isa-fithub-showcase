@@ -40,7 +40,10 @@ function CardHeader({ title, icon: Icon, id, isFavorite, onToggleFavorite }: any
   );
 }
 
+import { useNavigate } from "@tanstack/react-router";
+
 export function StockOutPredictionCard(props: CardProps) {
+  const navigate = useNavigate();
   const { isDark, textColor, gridColor } = useThemeColors();
   const predictions = useMemo(() => {
     // Ultimos 7 dias para run rate
@@ -72,7 +75,11 @@ export function StockOutPredictionCard(props: CardProps) {
         {predictions.length > 0 ? (
           <ul className="space-y-3">
             {predictions.map((p, i) => (
-              <li key={i} className="flex items-center justify-between p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30">
+              <li 
+                key={i} 
+                onClick={() => navigate({ to: "/inventario", search: { q: p.producto } })}
+                className="flex items-center justify-between p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <div>
                   <p className="font-bold text-red-900 dark:text-red-200">{p.producto}</p>
                   <p className="text-xs text-red-700 dark:text-red-400">Stock: {p.stock} | Se venden {p.runRate}/día</p>
@@ -94,6 +101,7 @@ export function StockOutPredictionCard(props: CardProps) {
 }
 
 export function SlowMoversCard(props: CardProps) {
+  const navigate = useNavigate();
   const movers = useMemo(() => getSlowMovers(props.productos, props.ventas, 14).slice(0, 5), [props.productos, props.ventas]);
 
   return (
@@ -103,7 +111,11 @@ export function SlowMoversCard(props: CardProps) {
         {movers.length > 0 ? (
           <ul className="space-y-3">
             {movers.map((m, i) => (
-              <li key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+              <li 
+                key={i} 
+                onClick={() => navigate({ to: "/inventario", search: { q: m.producto.nombre } })}
+                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <div>
                   <p className="font-bold text-slate-900 dark:text-slate-200 truncate max-w-[180px]" title={m.producto.nombre}>{m.producto.nombre}</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Capital retenido (uds): {m.stockActual}</p>
@@ -202,6 +214,7 @@ export function HeatmapCard(props: CardProps) {
 }
 
 export function RestockSuggestionCard(props: CardProps) {
+  const navigate = useNavigate();
   const suggestions = useMemo(() => {
     // Tomar solo últimos 7 días
     const limit = new Date();
@@ -218,7 +231,11 @@ export function RestockSuggestionCard(props: CardProps) {
           <div className="space-y-3">
             <div className="text-xs text-slate-500 mb-2">Basado en lo vendido en la última semana, te faltará:</div>
             {suggestions.map((s, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
+              <div 
+                key={i} 
+                onClick={() => navigate({ to: "/inventario", search: { q: s.producto.nombre } })}
+                className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-0 cursor-pointer hover:opacity-80 transition-opacity"
+              >
                 <div className="truncate pr-2">
                   <p className="font-semibold text-slate-800 dark:text-slate-200 text-sm truncate" title={s.producto.nombre}>{s.producto.nombre}</p>
                   <p className="text-xs text-slate-500">Stock: {s.stockActual} (Vendido: {s.ventas7Dias})</p>

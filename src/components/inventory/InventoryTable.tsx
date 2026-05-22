@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { ProductoConLotes } from "@/types/inventory";
@@ -6,9 +6,11 @@ import { ProductRow } from "./ProductRow";
 
 interface Props {
   data: ProductoConLotes[];
+  collapseCounter: number;
+  expandCounter: number;
 }
 
-export function InventoryTable({ data }: Props) {
+export function InventoryTable({ data, collapseCounter, expandCounter }: Props) {
   const grouped = useMemo(() => {
     const map = new Map<string, ProductoConLotes[]>();
     for (const item of data) {
@@ -31,14 +33,39 @@ export function InventoryTable({ data }: Props) {
   return (
     <div className="space-y-6">
       {grouped.map(([linea, items]) => (
-        <LineaGroup key={linea} linea={linea} items={items} />
+        <LineaGroup 
+          key={linea} 
+          linea={linea} 
+          items={items} 
+          collapseCounter={collapseCounter} 
+          expandCounter={expandCounter} 
+        />
       ))}
     </div>
   );
 }
 
-function LineaGroup({ linea, items }: { linea: string; items: ProductoConLotes[] }) {
+function LineaGroup({ 
+  linea, 
+  items, 
+  collapseCounter, 
+  expandCounter 
+}: { 
+  linea: string; 
+  items: ProductoConLotes[];
+  collapseCounter: number;
+  expandCounter: number;
+}) {
   const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    if (collapseCounter > 0) setOpen(false);
+  }, [collapseCounter]);
+
+  useEffect(() => {
+    if (expandCounter > 0) setOpen(true);
+  }, [expandCounter]);
+
   return (
     <section>
       <button

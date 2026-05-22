@@ -49,6 +49,29 @@ function InventarioPage() {
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
 
+  // State for collapse/expand all
+  const [collapseCounter, setCollapseCounter] = useState(0);
+  const [expandCounter, setExpandCounter] = useState(0);
+
+  // Funciones para filtros rápidos desde KpiCards
+  const onFilterStock = () => {
+    setStatusFilters([]);
+    setCategoryFilters([]);
+    setSearch("");
+  };
+  
+  const onFilterProximos = () => {
+    setStatusFilters(["proximo"]);
+    setCategoryFilters([]);
+    setSearch("");
+  };
+  
+  const onFilterVencidos = () => {
+    setStatusFilters(["vencido"]);
+    setCategoryFilters([]);
+    setSearch("");
+  };
+
   const uniqueCategories = useMemo(() => {
     return Array.from(new Set(filteredItems.map(i => i.categoria).filter(Boolean))).sort();
   }, [filteredItems]);
@@ -110,7 +133,12 @@ function InventarioPage() {
           <Skeleton className="h-32 rounded-2xl" />
         </div>
       ) : (
-        <KpiCards items={filteredItems} />
+        <KpiCards 
+          items={filteredItems}
+          onFilterStock={onFilterStock}
+          onFilterProximos={onFilterProximos}
+          onFilterVencidos={onFilterVencidos}
+        />
       )}
 
       {/* Búsqueda y Filtros */}
