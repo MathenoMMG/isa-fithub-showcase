@@ -65,31 +65,34 @@ function ErrorComponent({ error }: { error: Error }) {
 }
 
 import { GlowBackground } from "@/components/layout/GlowBackground";
+import { Gatekeeper } from "@/components/layout/Gatekeeper";
 
 function RootComponent() {
   return (
-    <ProfileProvider>
-      <StoreProvider>
-        <InventoryProvider>
-          <TimeLogProvider>
-            <VisitProvider>
-              <SidebarProvider>
-                <div className="flex min-h-screen w-full bg-slate-50/50 dark:bg-slate-950/50 transition-colors relative">
-                  <GlowBackground />
-                  <AppSidebar />
-                  <div className="flex-1 flex flex-col min-w-0">
-                    <TopBar />
-                    <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-[1600px] mx-auto z-10">
-                      <Outlet />
-                    </main>
+    <Gatekeeper>
+      <ProfileProvider>
+        <StoreProvider>
+          <InventoryProvider>
+            <TimeLogProvider>
+              <VisitProvider>
+                <SidebarProvider>
+                  <div className="flex min-h-screen w-full bg-slate-50/50 dark:bg-slate-950/50 transition-colors relative">
+                    <GlowBackground />
+                    <AppSidebar />
+                    <div className="flex-1 flex flex-col min-w-0">
+                      <TopBar />
+                      <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-[1600px] mx-auto z-10">
+                        <Outlet />
+                      </main>
+                    </div>
                   </div>
-                </div>
-                <Toaster richColors position="top-right" />
-              </SidebarProvider>
-            </VisitProvider>
-          </TimeLogProvider>
-        </InventoryProvider>
-      </StoreProvider>
-    </ProfileProvider>
+                  <Toaster richColors position="top-right" />
+                </SidebarProvider>
+              </VisitProvider>
+            </TimeLogProvider>
+          </InventoryProvider>
+        </StoreProvider>
+      </ProfileProvider>
+    </Gatekeeper>
   );
 }

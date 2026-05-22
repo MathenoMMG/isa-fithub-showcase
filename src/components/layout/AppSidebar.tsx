@@ -30,13 +30,13 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-r-slate-200 dark:border-r-slate-800">
       <SidebarHeader className="border-b border-sidebar-border p-4 group-data-[collapsible=icon]:p-2 transition-all">
-        <Link to="/" className="flex items-center gap-3 justify-center hover:opacity-80 transition-opacity">
+        <Link to="/" className="flex items-center gap-3 justify-start hover:opacity-80 transition-opacity px-2">
           <div className="h-10 w-10 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 flex items-center justify-center shrink-0 overflow-hidden rounded-xl transition-all">
             <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden text-left">
-            <span className="font-bold text-sidebar-foreground text-base leading-tight">FitHub</span>
-            <span className="text-xs text-sidebar-foreground/70">Gestión de Inventario</span>
+            <span className="font-bold text-slate-900 dark:text-slate-100 text-base leading-tight">FitHub</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Gestión de Inventario</span>
           </div>
         </Link>
       </SidebarHeader>
@@ -46,16 +46,19 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navegación</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title} className="h-11 text-base">
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const active = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={active} tooltip={item.title} className={`h-11 text-base transition-colors ${active ? "text-emerald-700 dark:text-emerald-400 font-medium" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"}`}>
+                      <Link to={item.url} className="flex items-center gap-3">
+                        <item.icon className="h-5 w-5 shrink-0" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

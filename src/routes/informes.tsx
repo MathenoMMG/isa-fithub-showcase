@@ -30,7 +30,7 @@ export const Route = createFileRoute("/informes")({
   component: Informes,
 });
 
-const PIE_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
+const PIE_COLORS = ['#059669', '#0284c7', '#d97706', '#9333ea', '#db2777', '#0d9488', '#2563eb', '#65a30d'];
 
 function Informes() {
   const navigate = useNavigate();
@@ -302,7 +302,11 @@ function Informes() {
                     labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                     formatter={(value: number) => [`${value} uds`]}
                   />
-                  <Bar dataKey="vendidos" fill="#1C4A2E" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="vendidos" radius={[6, 6, 0, 0]}>
+                    {topSold.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : (
