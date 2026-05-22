@@ -25,7 +25,7 @@ export function DashboardBanners() {
     const primerNombre = vencidosItems[0]?.nombre || "Producto";
     const masStr = vencidos > 1 ? `y ${vencidos - 1} más` : "";
     return (
-      <Link to="/inventario" className="block w-full">
+      <Link to="/inventario" search={{ q: primerNombre }} className="block w-full">
         <div className="flex flex-row items-center gap-[10px] bg-[#FCEBEB] border-l-[3px] border-l-[#E24B4A] rounded-r-lg py-[10px] px-[14px] min-h-[52px] cursor-pointer hover:brightness-95 transition-all">
           <AlertCircle size={18} color="#E24B4A" className="shrink-0" />
           <div className="flex-1 flex flex-col justify-center">
@@ -46,7 +46,7 @@ export function DashboardBanners() {
     const primerNombre = proximosItems[0]?.nombre || "Producto";
     const masStr = proximos > 1 ? `y ${proximos - 1} más` : "";
     return (
-      <Link to="/inventario" className="block w-full">
+      <Link to="/inventario" search={{ q: primerNombre }} className="block w-full">
         <div className="flex flex-row items-center gap-[10px] bg-[#FAEEDA] border-l-[3px] border-l-[#EF9F27] rounded-r-lg py-[10px] px-[14px] min-h-[52px] cursor-pointer hover:brightness-95 transition-all">
           <Clock size={18} color="#854F0B" className="shrink-0" />
           <div className="flex-1 flex flex-col justify-center">
