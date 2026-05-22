@@ -88,26 +88,25 @@ function Informes() {
 
   // Derive metrics
   const { topSold, categoryData, totalUnits } = useMemo(() => {
-    const salesMap: Record<string, { name: string; category: string; count: number; tienda: string }> = {};
+    const salesMap: Record<string, { category: string; count: number }> = {};
     const catMap: Record<string, number> = {};
     let total = 0;
 
     for (const v of salesData) {
       if (!v.productos) continue;
-      const tiendaStr = v.productos.tienda_id === 2 ? "Sur" : "Norte";
-      const key = `${v.producto_id}-${tiendaStr}`;
+      
+      const cat = v.productos.categoria || "Otros";
+      const key = cat;
       
       if (!salesMap[key]) {
         salesMap[key] = {
-          name: v.productos.nombre,
-          category: v.productos.categoria || "Otros",
-          count: 0,
-          tienda: tiendaStr
+          category: cat,
+          count: 0
         };
       }
       
       salesMap[key].count += v.cantidad;
-      catMap[salesMap[key].category] = (catMap[salesMap[key].category] || 0) + v.cantidad;
+      catMap[cat] = (catMap[cat] || 0) + v.cantidad;
       total += v.cantidad;
     }
 
@@ -115,9 +114,8 @@ function Informes() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
       .map(s => ({
-        name: s.name.length > 20 ? s.name.substring(0, 20) + '...' : s.name,
-        fullName: s.name,
-        tienda: s.tienda,
+        name: s.category.length > 20 ? s.category.substring(0, 20) + '...' : s.category,
+        fullName: s.category,
         vendidos: s.count
       }));
 
@@ -184,73 +182,76 @@ function Informes() {
   const otherCards = ALL_CARDS.filter(c => !favorites.includes(c.id));
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="max-w-[1600px] mx-auto space-y-[24px] animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-[16px]">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 flex items-center gap-3 transition-colors">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl">
-              <FileBarChart className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-            </div>
+          <h1 className="font-sans text-[22px] font-bold text-[#111827] dark:text-slate-50 transition-colors">
             Panel de Analítica
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 transition-colors max-w-xl">
+          </h1>
+          <p className="font-sans text-[13px] text-[#6B7280] dark:text-slate-400 mt-1 transition-colors max-w-xl">
             Monitorea el rendimiento de {store}, analiza ventas por categoría y controla productos en riesgo.
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center gap-[10px]">
           <Select value={range} onValueChange={setRange}>
-            <SelectTrigger className="w-full sm:w-[180px] h-12 bg-white dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 text-base transition-colors">
+            <SelectTrigger className="w-full sm:w-[180px] h-[44px] bg-white dark:bg-slate-900 border-[0.5px] border-[#E5E7EB] dark:border-slate-800 dark:text-slate-200 font-sans text-[13px] transition-colors rounded-[8px] focus:ring-0">
               <SelectValue placeholder="Rango" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="semana" className="text-base py-3">Últimos 7 días</SelectItem>
-              <SelectItem value="mes" className="text-base py-3">Últimos 30 días</SelectItem>
-              <SelectItem value="global" className="text-base py-3">Histórico Global</SelectItem>
+              <SelectItem value="semana" className="font-sans text-[13px] py-2">Últimos 7 días</SelectItem>
+              <SelectItem value="mes" className="font-sans text-[13px] py-2">Últimos 30 días</SelectItem>
+              <SelectItem value="global" className="font-sans text-[13px] py-2">Histórico Global</SelectItem>
             </SelectContent>
           </Select>
           
           <Button 
             onClick={handleGeneratePDF} 
             disabled={isGenerating || loadingSales}
-            className="w-full sm:w-auto h-12 bg-indigo-600 hover:bg-indigo-700 text-white gap-2 font-bold px-6 shadow-md transition-colors"
+            className="w-full sm:w-auto h-[44px] bg-[#1C4A2E] hover:bg-[#1C4A2E]/90 text-white gap-[8px] font-sans font-medium px-[20px] rounded-[8px] transition-colors cursor-pointer"
           >
-            <Download className="h-5 w-5" />
+            <Download size={16} />
             {isGenerating ? "Creando PDF..." : "Generar Reporte PDF"}
           </Button>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md flex items-center gap-4">
-          <div className="h-14 w-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-            <TrendingUp className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
+        <Card className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px]">
+          <div className="flex items-center gap-[12px]">
+            <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+              <TrendingUp size={16} color="#1C4A2E" className="dark:text-emerald-400" />
+            </div>
+            <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Total Vendidos</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total Vendidos</p>
-            <h4 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{loadingSales ? "-" : totalUnits} uds</h4>
-          </div>
+          <h4 className="font-mono-data text-[24px] font-semibold text-[#111827] dark:text-slate-50 mt-auto">
+            {loadingSales ? "-" : totalUnits} <span className="font-sans text-[14px] text-[#6B7280] font-normal">uds</span>
+          </h4>
         </Card>
         
-        <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md flex items-center gap-4">
-          <div className="h-14 w-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-            <PackageOpen className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+        <Card className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px]">
+          <div className="flex items-center gap-[12px]">
+            <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+              <PackageOpen size={16} color="#1C4A2E" className="dark:text-emerald-400" />
+            </div>
+            <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Categoría Estrella</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Categoría Estrella</p>
-            <h4 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{loadingSales ? "-" : topCategory}</h4>
-          </div>
+          <h4 className="font-sans text-[20px] font-semibold text-[#111827] dark:text-slate-50 mt-auto truncate">
+            {loadingSales ? "-" : topCategory}
+          </h4>
         </Card>
 
-        <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md flex items-center gap-4">
-          <div className="h-14 w-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
-            <AlertTriangle className="h-7 w-7 text-red-600 dark:text-red-400" />
+        <Card className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px]">
+          <div className="flex items-center gap-[12px]">
+            <div className="w-[32px] h-[32px] rounded-[6px] bg-[#FCEBEB] dark:bg-red-900/30 flex items-center justify-center shrink-0">
+              <AlertTriangle size={16} color="#A32D2D" className="dark:text-red-400" />
+            </div>
+            <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Lotes Críticos</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Lotes Críticos</p>
-            <h4 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{criticos.length} alertas</h4>
-          </div>
+          <h4 className="font-mono-data text-[24px] font-semibold text-[#A32D2D] dark:text-red-400 mt-auto">
+            {criticos.length} <span className="font-sans text-[14px] text-[#A32D2D]/70 font-normal">alertas</span>
+          </h4>
         </Card>
       </div>
 
@@ -265,12 +266,12 @@ function Informes() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Bar Chart */}
-        <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm lg:col-span-2 transition-all">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 transition-colors">Top 10 Productos Más Vendidos</h3>
+        <Card className="p-[24px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm lg:col-span-2 transition-all">
+          <h3 className="font-sans text-[16px] font-bold text-[#111827] dark:text-slate-100 mb-[24px] transition-colors">Top Categorías Más Vendidas</h3>
           <div className="h-[350px] w-full" id="chart-container">
             {loadingSales ? (
               <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500">Cargando datos...</div>
-            ) : topSold.length > 0 ? (
+            ) : topSold.filter(t => t.vendidos > 0).length >= 2 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topSold} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
@@ -298,14 +299,15 @@ function Informes() {
                       boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' 
                     }}
                     labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                    formatter={(value: number, name: string, props: any) => [`${value} uds`, props.payload.tienda]}
+                    formatter={(value: number) => [`${value} uds`]}
                   />
-                  <Bar dataKey="vendidos" fill="#059669" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="vendidos" fill="#1C4A2E" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
-                Aún no hay ventas registradas en este periodo
+              <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                <FileBarChart size={32} className="text-[#D1D5DB] dark:text-slate-700 mb-3" />
+                <p className="font-sans text-[13px] text-[#6B7280] dark:text-slate-400">Registra conteos para ver el análisis por categoría</p>
               </div>
             )}
           </div>

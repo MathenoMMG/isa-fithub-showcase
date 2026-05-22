@@ -2,7 +2,7 @@ import { LogIn, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTimeLog } from "@/context/TimeLogContext";
-import { useStore } from "@/context/StoreContext";
+import { useStore, getRotativeStore } from "@/context/StoreContext";
 import { useProfile } from "@/context/ProfileContext";
 import { format, isToday, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
@@ -27,7 +27,7 @@ export function ClockInOutCard() {
   const canEntrar = !last || last.tipo === "salida";
   const canSalir = last?.tipo === "entrada";
 
-  const tiendaName = store === "Ambas" ? "Norte" : store;
+  const tiendaName = store === "Ambas" ? getRotativeStore(now) : store;
   const tiendaId = tiendaName === "Sur" ? 2 : 1;
 
   const handle = (tipo: "entrada" | "salida") => {
@@ -57,7 +57,7 @@ export function ClockInOutCard() {
         <div className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-50 tabular-nums mt-2">{format(now, "HH:mm:ss")}</div>
         <div className="text-sm text-slate-500 mt-2">
           Tienda activa: <span className="font-semibold text-emerald-700 dark:text-emerald-500">{tiendaName}</span>
-          {store === "Ambas" && <span className="text-slate-400"> (por defecto Norte)</span>}
+          {store === "Ambas" && <span className="text-slate-400"> (por rotación)</span>}
         </div>
         {horarioHoy && (
           <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">

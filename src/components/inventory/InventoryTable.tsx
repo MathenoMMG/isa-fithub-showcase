@@ -43,11 +43,17 @@ function LineaGroup({ linea, items }: { linea: string; items: ProductoConLotes[]
     <section>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-2 px-2 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
+        className="w-full flex items-center gap-[8px] bg-[#F9FAF8] dark:bg-slate-900 border-l-[3px] border-l-[#1C4A2E] dark:border-l-emerald-500 rounded-r-md p-[8px_14px] text-left hover:brightness-95 transition-all outline-none"
       >
-        {open ? <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" /> : <ChevronRight className="h-5 w-5 text-slate-600 dark:text-slate-400" />}
-        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{linea}</h3>
-        <Badge variant="secondary" className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">{items.length}</Badge>
+        <span className="font-sans text-[13px] font-semibold text-[#1C4A2E] dark:text-emerald-400 leading-none">
+          {linea}
+        </span>
+        <span className="font-sans text-[10px] font-medium bg-[#EAF3DE] dark:bg-emerald-900/30 text-[#3B6D11] dark:text-emerald-400 px-[6px] py-[1px] rounded-full leading-none">
+          {items.length}
+        </span>
+        <div className="ml-auto text-[#1C4A2E] dark:text-emerald-400">
+          {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </div>
       </button>
       {open && (
         <div className="mt-3 space-y-3">

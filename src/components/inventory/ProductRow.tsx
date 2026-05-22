@@ -25,10 +25,10 @@ interface Props {
   defaultOpen?: boolean;
 }
 
-const statusBg: Record<ReturnType<typeof getWorstStatus>, string> = {
-  vencido: "border-l-red-500",
-  proximo: "border-l-amber-500",
-  en_regla: "border-l-emerald-500",
+const rowStyles: Record<ReturnType<typeof getWorstStatus>, { bg: string; dot: string; text: string; border: string }> = {
+  vencido: { bg: "bg-[#FCEBEB] dark:bg-red-900/10", dot: "bg-[#E24B4A]", text: "text-[#A32D2D] dark:text-red-400", border: "border-[#E24B4A]/30" },
+  proximo: { bg: "bg-[#FAEEDA] dark:bg-amber-900/10", dot: "bg-[#EF9F27]", text: "text-[#854F0B] dark:text-amber-400", border: "border-[#EF9F27]/30" },
+  en_regla: { bg: "bg-white dark:bg-slate-900", dot: "bg-[#97C459]", text: "text-[#3B6D11] dark:text-emerald-400", border: "border-[#97C459]/30" },
 };
 
 export function ProductRow({ product, defaultOpen = false }: Props) {
@@ -42,40 +42,34 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
     (a, b) => new Date(a.fecha_caducidad).getTime() - new Date(b.fecha_caducidad).getTime(),
   );
 
-  return (
-    <div className={`group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 border-l-4 ${statusBg[worst]} shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 dark:hover:bg-slate-800/50`}>
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4">
-        <button
-          onClick={() => setOpen((o) => !o)}
-          className="h-10 w-10 rounded-xl hover:bg-slate-100 flex items-center justify-center shrink-0"
-          aria-label={open ? "Colapsar" : "Expandir"}
-        >
-          {open ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-        </button>
+  const styles = rowStyles[worst];
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-slate-900 text-base truncate">{product.nombre}</span>
-            <Badge variant="outline" className="border-slate-300 text-slate-600 text-xs">
-              {product.categoria || "Otros"}
-            </Badge>
-            <Badge variant="outline" className="border-slate-300 text-slate-500 text-xs font-mono">
-              {product.articulo}
-            </Badge>
-            <Badge variant="outline" className="border-slate-300 text-slate-600 text-xs">
-              {product.tienda_nombre}
-            </Badge>
-          </div>
-          <div className="text-sm text-slate-500 mt-1">
-            {product.lotes.length} lote{product.lotes.length === 1 ? "" : "s"}
-            {earliest && <> · próx. vence {formatExpiryDate(earliest)}</>}
-          </div>
+  return (
+    <div className={`group rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${styles.bg}`}>
+      {/* Header */}
+      <div 
+        className="flex items-center gap-[10px] p-[9px_14px] cursor-pointer hover:brightness-95 transition-all"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <div className={`w-[8px] h-[8px] rounded-full shrink-0 ${styles.dot}`} />
+        
+        <div className="flex-1 min-w-0 flex items-center gap-[8px] flex-wrap">
+          <span className="font-sans text-[13px] font-medium text-[#111827] dark:text-slate-100 truncate">{product.nombre}</span>
+          <span className="font-sans text-[9px] text-[#9CA3AF]">
+            {product.categoria || "Otros"} · {product.tienda_nombre}
+          </span>
+          <span className="font-mono-data text-[10px] text-[#6B7280]">
+            SKU: {product.articulo}
+          </span>
         </div>
 
         <div className="text-right shrink-0">
-          <div className="text-2xl font-bold text-slate-900 tabular-nums">{total}</div>
-          <div className="text-xs text-slate-500">unidades</div>
+          <div className="font-mono-data text-[18px] font-semibold text-[#111827] dark:text-slate-100">{total}</div>
+          <div className="font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]">unidades</div>
+        </div>
+
+        <div className="shrink-0 text-slate-400 ml-[4px]">
+          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </div>
       </div>
 
@@ -99,7 +93,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                     #{idx + 1}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-medium text-slate-800 tabular-nums">
+                    <div className="font-mono-data font-medium text-slate-800">
                       {formatExpiryDate(lote.fecha_caducidad)}
                     </div>
                     <div className="mt-1">
