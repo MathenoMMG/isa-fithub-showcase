@@ -268,7 +268,11 @@ function InventarioPage() {
           <Skeleton className="h-16 w-full rounded-2xl" />
         </div>
       ) : (
-        <InventoryTable data={visibleItems} />
+        <InventoryTable 
+          data={visibleItems} 
+          collapseCounter={collapseCounter} 
+          expandCounter={expandCounter} 
+        />
       )}
     </div>
   );
