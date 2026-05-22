@@ -13,7 +13,7 @@ import type { StoreId } from "@/types/inventory";
 const DEFAULT_CATEGORIAS = ["Arepas", "Lácteos", "Snacks", "Bebidas", "Suplementos", "Despensa", "Panadería", "Cereales", "Confitería", "Quesos", "Frutos y Nueces", "Accesorios", "Otros"];
 const STORE_MAP: Record<StoreId, number> = { Norte: 1, Sur: 2 };
 
-export function AddProductDialog() {
+export function AddProductDialog({ customTrigger }: { customTrigger?: React.ReactNode }) {
   const { addProduct, filteredItems } = useInventory();
   const { store } = useStore();
   const [open, setOpen] = useState(false);
@@ -83,10 +83,12 @@ export function AddProductDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="h-12 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-semibold gap-2 rounded-xl shadow-sm">
-          <Plus className="h-5 w-5" />
-          Añadir Producto
-        </Button>
+        {customTrigger || (
+          <Button className="h-12 px-5 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-semibold gap-2 rounded-xl shadow-sm">
+            <Plus className="h-5 w-5" />
+            Añadir Producto
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Clock, Settings, Dumbbell, LogIn, FileBarChart } from "lucide-react";
+import { LayoutDashboard, Package, Clock, Settings, LogIn, FileBarChart, Plus } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +13,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { AddProductDialog } from "@/components/inventory/AddProductDialog";
 
 const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -29,15 +30,15 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-r-slate-200 dark:border-r-slate-800">
       <SidebarHeader className="border-b border-sidebar-border p-4 group-data-[collapsible=icon]:p-2 transition-all">
-        <div className="flex items-center gap-3 justify-center">
+        <Link to="/" className="flex items-center gap-3 justify-center hover:opacity-80 transition-opacity">
           <div className="h-10 w-10 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 flex items-center justify-center shrink-0 overflow-hidden rounded-xl transition-all">
             <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain" />
           </div>
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden text-left">
             <span className="font-bold text-sidebar-foreground text-base leading-tight">FitHub</span>
             <span className="text-xs text-sidebar-foreground/70">Gestión de Inventario</span>
           </div>
-        </div>
+        </Link>
       </SidebarHeader>
 
       <SidebarContent>
@@ -60,7 +61,17 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-slate-200 p-3">
+      <SidebarFooter className="border-t border-slate-200 p-3 flex flex-col gap-2">
+        <AddProductDialog 
+          customTrigger={
+            <Button
+              className="h-12 bg-white hover:bg-slate-50 text-emerald-600 border border-emerald-200 font-semibold rounded-xl gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
+            >
+              <Plus className="h-5 w-5" />
+              <span className="group-data-[collapsible=icon]:hidden">Añadir Producto</span>
+            </Button>
+          }
+        />
         <Button
           asChild
           className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
