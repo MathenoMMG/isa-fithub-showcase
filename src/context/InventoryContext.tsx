@@ -8,6 +8,7 @@ interface InventoryContextValue {
   filteredItems: ProductoConLotes[];
   loading: boolean;
   addProduct: (input: NewProductInput & { cantidad: number; fecha_caducidad: string | null }) => Promise<void>;
+  updateProduct: (productId: string, updates: Partial<ProductoConLotes>) => Promise<void>;
   removeProduct: (productId: string) => Promise<void>;
   addLote: (productId: string, input: NewLoteInput) => Promise<void>;
   removeLote: (productId: string, loteId: string) => Promise<void>;
@@ -104,6 +105,12 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     await fetchData();
   };
 
+  const updateProduct = async (productId: string, updates: Partial<Producto>) => {
+    const { error } = await supabase.from("productos").update(updates).eq("id", productId);
+    if (error) throw error;
+    await fetchData(true); // skip loading state for smooth UI
+  };
+
   const addLote = async (productId: string, input: NewLoteInput) => {
     const { error } = await supabase.from("lotes").insert({
       producto_id: productId,
@@ -198,6 +205,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         filteredItems,
         loading,
         addProduct,
+        updateProduct,
         removeProduct,
         addLote,
         removeLote,

@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,8 +33,11 @@ const rowStyles: Record<ReturnType<typeof getWorstStatus>, { bg: string; dot: st
 };
 
 export function ProductRow({ product, defaultOpen = false }: Props) {
-  const { sellFromLote, adjustLote, removeLote, removeProduct } = useInventory();
+  const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct } = useInventory();
   const [open, setOpen] = useState(defaultOpen);
+  
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [notesTemp, setNotesTemp] = useState(product.notas || "");
 
   const total = getTotalQty(product.lotes);
   const worst = getWorstStatus(product.lotes);
@@ -43,6 +47,16 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   );
 
   const styles = rowStyles[worst];
+
+  const handleSaveNotes = async () => {
+    try {
+      await updateProduct(product.id, { notas: notesTemp });
+      toast.success("Notas actualizadas");
+      setIsEditingNotes(false);
+    } catch (e) {
+      toast.error("Error al guardar las notas");
+    }
+  };
 
   return (
     <div className={`group rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${styles.bg}`}>
@@ -76,6 +90,51 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
       {/* Lotes */}
       {open && (
         <div className="border-t border-slate-100 bg-slate-50/60 p-3 sm:p-4 space-y-2">
+          
+          {/* Sección de Notas */}
+          <div className="bg-white rounded-xl border border-slate-200 p-3 mb-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Notas del Producto</span>
+              {!isEditingNotes ? (
+                <button 
+                  onClick={() => { setNotesTemp(product.notas || ""); setIsEditingNotes(true); }}
+                  className="text-emerald-600 hover:text-emerald-700 p-1 flex items-center gap-1"
+                >
+                  <Edit2 size={12} /> <span className="text-[10px] font-medium">Editar</span>
+                </button>
+              ) : (
+                <span className={`text-[10px] ${notesTemp.length > 150 ? 'text-red-500' : 'text-slate-400'}`}>
+                  {notesTemp.length}/150
+                </span>
+              )}
+            </div>
+            
+            {!isEditingNotes ? (
+              <p className="text-sm text-slate-700 italic">
+                {product.notas ? product.notas : <span className="text-slate-400">Sin notas. Haz clic en editar para agregar información...</span>}
+              </p>
+            ) : (
+              <div className="flex gap-2">
+                <Input 
+                  value={notesTemp} 
+                  onChange={(e) => {
+                    if (e.target.value.length <= 150) setNotesTemp(e.target.value);
+                  }}
+                  className="h-8 text-sm"
+                  placeholder="Escribe hasta 150 caracteres..."
+                  autoFocus
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSaveNotes(); }}
+                />
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-600" onClick={handleSaveNotes}>
+                  <Check size={16} />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={() => setIsEditingNotes(false)}>
+                  <X size={16} />
+                </Button>
+              </div>
+            )}
+          </div>
+
           {sortedLotes.length === 0 && (
             <div className="text-sm text-slate-500 italic px-2 py-3">Sin lotes en stock.</div>
           )}

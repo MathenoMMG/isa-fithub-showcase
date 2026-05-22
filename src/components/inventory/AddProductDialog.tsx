@@ -35,6 +35,7 @@ export function AddProductDialog() {
     tienda_id: STORE_MAP[defaultStore],
     cantidad: 1,
     fecha_caducidad: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
+    notas: "",
   });
 
   const [isNewCategory, setIsNewCategory] = useState(false);
@@ -50,6 +51,7 @@ export function AddProductDialog() {
       tienda_id: STORE_MAP[defaultStore],
       cantidad: 1,
       fecha_caducidad: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
+      notas: "",
     });
     setIsNewCategory(false);
     setCustomCategory("");
@@ -154,6 +156,25 @@ export function AddProductDialog() {
           <div className="space-y-1.5">
             <Label>Caducidad (lote inicial)</Label>
             <Input className="h-11" type="date" value={form.fecha_caducidad} onChange={(e) => setForm({ ...form, fecha_caducidad: e.target.value })} />
+          </div>
+          <div className="col-span-2 space-y-1.5">
+            <Label className="flex justify-between">
+              <span>Notas (opcional)</span>
+              <span className={`text-xs ${form.notas.length > 150 ? 'text-red-500' : 'text-slate-400'}`}>
+                {form.notas.length}/150
+              </span>
+            </Label>
+            <Input 
+              className="h-11" 
+              placeholder="Anotaciones sobre el producto..." 
+              maxLength={150}
+              value={form.notas} 
+              onChange={(e) => {
+                if (e.target.value.length <= 150) {
+                  setForm({ ...form, notas: e.target.value });
+                }
+              }} 
+            />
           </div>
         </div>
         <DialogFooter>

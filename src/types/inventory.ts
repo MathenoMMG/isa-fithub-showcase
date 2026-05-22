@@ -17,6 +17,7 @@ export interface Producto {
   categoria: string | null;
   proveedor_nombre: string;
   proveedor_codigo: string | null;
+  notas: string | null;
   created_at: string;
 }
 
@@ -68,6 +69,7 @@ export interface NewProductInput {
   categoria: string;
   proveedor_nombre: string;
   proveedor_codigo?: string;
+  notas?: string;
 }
 
 export interface NewLoteInput {
