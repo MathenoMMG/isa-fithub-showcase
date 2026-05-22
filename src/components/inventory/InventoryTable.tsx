@@ -31,7 +31,7 @@ export function InventoryTable({ data, collapseCounter, expandCounter }: Props) 
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {grouped.map(([linea, items]) => (
         <LineaGroup 
           key={linea} 
@@ -70,20 +70,22 @@ function LineaGroup({
     <section>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-[8px] bg-[#F9FAF8] dark:bg-slate-900 border-l-[3px] border-l-[#1C4A2E] dark:border-l-emerald-500 rounded-r-md p-[8px_14px] text-left hover:brightness-95 transition-all outline-none"
+        className="w-full flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 text-left hover:shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all outline-none"
       >
-        <span className="font-sans text-[13px] font-semibold text-[#1C4A2E] dark:text-emerald-400 leading-none">
-          {linea}
-        </span>
-        <span className="font-sans text-[10px] font-medium bg-[#EAF3DE] dark:bg-emerald-900/30 text-[#3B6D11] dark:text-emerald-400 px-[6px] py-[1px] rounded-full leading-none">
-          {items.length}
-        </span>
-        <div className="ml-auto text-[#1C4A2E] dark:text-emerald-400">
-          {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        <div className="flex items-center gap-3">
+          <span className="font-sans text-[15px] font-bold text-slate-800 dark:text-slate-100">
+            {linea}
+          </span>
+          <span className="font-sans text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full">
+            {items.length} {items.length === 1 ? 'producto' : 'productos'}
+          </span>
+        </div>
+        <div className="text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 p-1 rounded-md">
+          {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </div>
       </button>
       {open && (
-        <div className="mt-3 space-y-3">
+        <div className="mt-2 space-y-2">
           {items.map((p) => (
             <ProductRow key={p.id} product={p} />
           ))}
