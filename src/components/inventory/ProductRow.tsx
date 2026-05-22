@@ -89,16 +89,16 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
 
       {/* Lotes */}
       {open && (
-        <div className="border-t border-slate-100 bg-slate-50/60 p-3 sm:p-4 space-y-2">
+        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 p-3 sm:p-4 space-y-2">
           
           {/* Sección de Notas */}
-          <div className="bg-white rounded-xl border border-slate-200 p-3 mb-4">
+          <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Notas del Producto</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notas del Producto</span>
               {!isEditingNotes ? (
                 <button 
                   onClick={() => { setNotesTemp(product.notas || ""); setIsEditingNotes(true); }}
-                  className="text-emerald-600 hover:text-emerald-700 p-1 flex items-center gap-1"
+                  className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 flex items-center gap-1"
                 >
                   <Edit2 size={12} /> <span className="text-[10px] font-medium">Editar</span>
                 </button>
@@ -110,8 +110,8 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
             </div>
             
             {!isEditingNotes ? (
-              <p className="text-sm text-slate-700 italic">
-                {product.notas ? product.notas : <span className="text-slate-400">Sin notas. Haz clic en editar para agregar información...</span>}
+              <p className="text-sm text-slate-700 dark:text-slate-300 italic">
+                {product.notas ? product.notas : <span className="text-slate-400 dark:text-slate-500">Sin notas. Haz clic en editar para agregar información...</span>}
               </p>
             ) : (
               <div className="flex gap-2">
@@ -120,15 +120,15 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                   onChange={(e) => {
                     if (e.target.value.length <= 150) setNotesTemp(e.target.value);
                   }}
-                  className="h-8 text-sm"
+                  className="h-8 text-sm dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
                   placeholder="Escribe hasta 150 caracteres..."
                   autoFocus
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveNotes(); }}
                 />
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-600" onClick={handleSaveNotes}>
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-600 dark:text-emerald-400" onClick={handleSaveNotes}>
                   <Check size={16} />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={() => setIsEditingNotes(false)}>
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 dark:text-slate-500" onClick={() => setIsEditingNotes(false)}>
                   <X size={16} />
                 </Button>
               </div>
@@ -136,7 +136,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           </div>
 
           {sortedLotes.length === 0 && (
-            <div className="text-sm text-slate-500 italic px-2 py-3">Sin lotes en stock.</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400 italic px-2 py-3">Sin lotes en stock.</div>
           )}
 
           {sortedLotes.map((lote, idx) => {
@@ -144,7 +144,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
             return (
               <div
                 key={lote.id}
-                className="bg-white rounded-xl border border-slate-200 p-3 flex flex-col md:flex-row md:items-center gap-3"
+                className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex flex-col md:flex-row md:items-center gap-3"
               >
                 {/* índice + caducidad */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">

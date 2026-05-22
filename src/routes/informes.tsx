@@ -6,8 +6,9 @@ import { useProfile } from "@/context/ProfileContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, FileBarChart, PackageOpen, TrendingUp, AlertTriangle } from "lucide-react";
+import { Download, FileBarChart, PackageOpen, TrendingUp, AlertTriangle, X } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 import { supabase } from "@/lib/supabase";
 import { generatePdfReport } from "@/lib/generate-report-pdf";
@@ -39,8 +40,19 @@ function Informes() {
   const { theme } = useProfile();
   const [range, setRange] = useState("semana");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [salesDateFilter, setSalesDateFilter] = useState<string>("");
   const [salesData, setSalesData] = useState<any[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
+
+  const filteredSalesTable = useMemo(() => {
+    if (!salesDateFilter) return salesData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    
+    return salesData.filter(v => {
+      // YYYY-MM-DD
+      const vDate = new Date(v.created_at).toISOString().split('T')[0];
+      return vDate === salesDateFilter;
+    }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [salesData, salesDateFilter]);
 
   const { favorites, toggleFavorite } = useFavorites("fithub_analytics_favs", 2);
 
@@ -425,6 +437,75 @@ function Informes() {
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                     No hay productos vencidos o próximos a vencer. ¡Excelente!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Tabla de Historial de Ventas */}
+      <Card className="rounded-[12px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Registro de Ventas</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Historial detallado del rango seleccionado</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Día específico:</span>
+            <Input 
+              type="date"
+              value={salesDateFilter}
+              onChange={(e) => setSalesDateFilter(e.target.value)}
+              className="h-9 w-[160px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
+            />
+            {salesDateFilter && (
+              <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-red-500" onClick={() => setSalesDateFilter("")}>
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 dark:bg-slate-950/50 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+              <tr>
+                <th className="px-6 py-4">Fecha y Hora</th>
+                <th className="px-6 py-4">Producto</th>
+                <th className="px-6 py-4">Tienda</th>
+                <th className="px-6 py-4 text-right">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {filteredSalesTable.length > 0 ? (
+                filteredSalesTable.map((v) => (
+                  <tr key={v.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                      {format(new Date(v.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-200">
+                      {v.productos?.nombre || "Producto desconocido"}
+                    </td>
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
+                      {v.productos?.tienda_id === 1 ? "Norte" : v.productos?.tienda_id === 2 ? "Sur" : "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
+                      +{v.cantidad}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
+                    No se encontraron registros de ventas para el filtro seleccionado.
                   </td>
                 </tr>
               )}
