@@ -70,18 +70,19 @@ function LineaGroup({
     <section>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 text-left hover:shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all outline-none"
+        className="w-full flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl p-3 sm:p-4 text-left hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all outline-none group"
       >
         <div className="flex items-center gap-3">
-          <span className="font-sans text-[15px] font-bold text-slate-800 dark:text-slate-100">
+          <div className="w-1.5 h-5 bg-emerald-600 dark:bg-emerald-500 rounded-full opacity-80" />
+          <span className="font-sans text-[16px] font-extrabold text-slate-700 dark:text-slate-200 tracking-tight uppercase">
             {linea}
           </span>
-          <span className="font-sans text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full">
-            {items.length} {items.length === 1 ? 'producto' : 'productos'}
+          <span className="font-sans text-[11px] font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 px-2.5 py-0.5 rounded-full shadow-sm">
+            {items.length} {items.length === 1 ? 'ud' : 'uds'}
           </span>
         </div>
-        <div className="text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 p-1 rounded-md">
-          {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        <div className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-lg shadow-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+          {open ? <ChevronDown size={16} strokeWidth={2.5} /> : <ChevronRight size={16} strokeWidth={2.5} />}
         </div>
       </button>
       {open && (
