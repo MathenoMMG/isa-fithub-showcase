@@ -55,7 +55,7 @@ function InventarioPage() {
 
   // Funciones para filtros rápidos desde KpiCards
   const onFilterStock = () => {
-    setStatusFilters([]);
+    setStatusFilters(["stock"]);
     setCategoryFilters([]);
     setSearch("");
   };
@@ -95,12 +95,25 @@ function InventarioPage() {
       result = result.filter(it => categoryFilters.includes(it.categoria));
     }
 
-    // Filtro por estado (Vencido, Próximo a vencer)
+    // Filtro por estado (Vencido, Próximo a vencer, Con Stock)
     if (statusFilters.length > 0) {
       result = result.filter(it => {
+        const hasStock = it.lotes.reduce((acc, l) => acc + l.cantidad, 0) > 0;
+        
+        // Si el filtro "stock" está activo, y no tiene stock, no pasa.
+        if (statusFilters.includes("stock") && !hasStock) {
+          return false;
+        }
+
+        // Si solo está el filtro "stock" y tiene stock, pasa.
+        if (statusFilters.length === 1 && statusFilters.includes("stock")) {
+          return true;
+        }
+
+        // Si hay otros filtros de caducidad, verificamos si cumple alguno de los lotes con stock (o cualquier lote dependiendo de la lógica, pero preferiblemente lotes con stock)
         return it.lotes.some(lote => {
           const st = getExpiryStatus(lote.fecha_caducidad);
-          return statusFilters.includes(st);
+          return statusFilters.includes(st) && (!statusFilters.includes("stock") || lote.cantidad > 0);
         });
       });
     }
@@ -161,8 +174,15 @@ function InventarioPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl shadow-lg">
-            <DropdownMenuLabel className="font-semibold text-slate-800 dark:text-slate-200">Estado de Caducidad</DropdownMenuLabel>
+            <DropdownMenuLabel className="font-semibold text-slate-800 dark:text-slate-200">Estado de Caducidad / Stock</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+            <DropdownMenuCheckboxItem 
+              checked={statusFilters.includes("stock")}
+              onCheckedChange={(c) => setStatusFilters(prev => c ? [...prev, "stock"] : prev.filter(x => x !== "stock"))}
+              className="dark:text-slate-300 dark:focus:bg-slate-800"
+            >
+              Con Stock (&gt;0)
+            </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem 
               checked={statusFilters.includes("vencido")}
               onCheckedChange={(c) => setStatusFilters(prev => c ? [...prev, "vencido"] : prev.filter(x => x !== "vencido"))}
@@ -215,12 +235,29 @@ function InventarioPage() {
         {(statusFilters.length > 0 || categoryFilters.length > 0 || search.trim()) && (
           <Button 
             variant="ghost" 
-            className="h-12 text-slate-500 dark:text-slate-400"
+            className="h-12 text-slate-500 dark:text-slate-400 shrink-0"
             onClick={() => { setStatusFilters([]); setCategoryFilters([]); setSearch(""); }}
           >
             Resetear
           </Button>
         )}
+
+        <div className="flex items-center gap-2 ml-auto shrink-0 border-l border-slate-200 dark:border-slate-800 pl-3">
+          <Button 
+            variant="ghost" 
+            className="h-12 text-slate-600 dark:text-slate-300"
+            onClick={() => setCollapseCounter(c => c + 1)}
+          >
+            Contraer todo
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="h-12 text-slate-600 dark:text-slate-300"
+            onClick={() => setExpandCounter(c => c + 1)}
+          >
+            Expandir todo
+          </Button>
+        </div>
       </div>
 
       {loading ? (

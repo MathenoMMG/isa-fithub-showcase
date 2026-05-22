@@ -13,6 +13,7 @@ interface InventoryContextValue {
   addLote: (productId: string, input: NewLoteInput) => Promise<void>;
   removeLote: (productId: string, loteId: string) => Promise<void>;
   sellFromLote: (productId: string, loteId: string, qty?: number) => Promise<void>;
+  undoSale: (productId: string, loteId: string) => Promise<void>;
   adjustLote: (productId: string, loteId: string, delta: number) => Promise<void>;
   updateProductCategories: (updates: Record<string, string>) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -153,6 +154,43 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     await fetchData();
   };
 
+  const undoSale = async (productId: string, loteId: string) => {
+    // Buscar la última venta de este lote
+    const { data: lastSale, error: fetchErr } = await supabase
+      .from("ventas")
+      .select("*")
+      .eq("lote_id", loteId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (fetchErr && fetchErr.code !== 'PGRST116') throw fetchErr; // PGRST116 = no rows returned
+    if (!lastSale) return; // No hay venta que deshacer
+
+    // Eliminar la venta
+    const { error: delErr } = await supabase
+      .from("ventas")
+      .delete()
+      .eq("id", lastSale.id);
+    if (delErr) throw delErr;
+
+    // Restaurar cantidad en lote
+    const lote = items
+      .find((p) => p.id === productId)
+      ?.lotes.find((l) => l.id === loteId);
+
+    if (lote) {
+      const newQty = lote.cantidad + lastSale.cantidad;
+      const { error: lErr } = await supabase
+        .from("lotes")
+        .update({ cantidad: newQty })
+        .eq("id", loteId);
+      if (lErr) throw lErr;
+    }
+
+    await fetchData();
+  };
+
   const adjustLote = async (_productId: string, loteId: string, delta: number) => {
     // Find current quantity
     const currentLote = items
@@ -210,6 +248,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         addLote,
         removeLote,
         sellFromLote,
+        undoSale,
         adjustLote,
         updateProductCategories,
         refreshData: fetchData,

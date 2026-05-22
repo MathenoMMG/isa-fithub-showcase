@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -188,26 +188,42 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
 
                 {/* acciones principales: VENTA + eliminar lote */}
                 <div className="flex items-center gap-2 shrink-0 md:ml-auto">
-                  <div className="flex flex-col gap-1 mr-2">
-                    <Button
-                      onClick={() => {
-                        if (lote.cantidad <= 0) {
-                          toast.error("Lote sin stock");
-                          return;
-                        }
-                        sellFromLote(product.id, lote.id, 1);
-                        toast.success(`Venta registrada · ${product.nombre} (lote #${idx + 1})`, {
-                          description:
-                            status === "vencido"
-                              ? "⚠️ Este lote estaba vencido — verifica antes de despachar."
-                              : undefined,
-                        });
-                      }}
-                      className="h-11 px-4 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl"
-                    >
-                      <ShoppingCart className="h-5 w-5" />
-                      Venta
-                    </Button>
+                  <div className="flex flex-col gap-1 mr-2 items-center">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await undoSale(product.id, lote.id);
+                            toast.success("Venta deshecha");
+                          } catch (e) {
+                            toast.error("No se pudo deshacer la venta");
+                          }
+                        }}
+                        variant="outline"
+                        size="icon"
+                        className="h-11 w-11 rounded-xl border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                        title="Deshacer última venta"
+                      >
+                        <Undo2 className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        disabled={status === "vencido" || lote.cantidad <= 0}
+                        onClick={() => {
+                          if (lote.cantidad <= 0) {
+                            toast.error("Lote sin stock");
+                            return;
+                          }
+                          sellFromLote(product.id, lote.id, 1);
+                          toast.success(`Venta registrada · ${product.nombre} (lote #${idx + 1})`);
+                        }}
+                        className={`h-11 px-4 gap-2 font-semibold rounded-xl text-white ${
+                          status === "vencido" ? "bg-slate-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"
+                        }`}
+                      >
+                        <ShoppingCart className="h-5 w-5" />
+                        Venta
+                      </Button>
+                    </div>
                     {product.vendidos_total > 0 && (
                       <span className="text-[10px] text-center font-medium text-emerald-600">
                         {product.vendidos_total} vendidos
