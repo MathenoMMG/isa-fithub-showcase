@@ -233,7 +233,9 @@ function Informes() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
         <Card 
           className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
-          onClick={() => navigate({ to: '/inventario' })}
+          onClick={() => {
+            document.getElementById('registro-ventas')?.scrollIntoView({ behavior: 'smooth' });
+          }}
         >
           <div className="flex items-center gap-[12px]">
             <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
@@ -455,7 +457,7 @@ function Informes() {
       </Card>
 
       {/* Tabla de Historial de Ventas */}
-      <Card className="rounded-[12px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+      <Card id="registro-ventas" className="rounded-[12px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
