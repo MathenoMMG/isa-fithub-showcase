@@ -2,13 +2,23 @@ import { Clock } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useTimeLog } from "@/context/TimeLogContext";
 import { useStore } from "@/context/StoreContext";
+import { useEffect, useState } from "react";
 
 export function DashboardJornada() {
   const { logs } = useTimeLog();
   const { store } = useStore();
   
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 60000); // update every minute
+    return () => clearInterval(timer);
+  }, []);
+  
   // Encontrar logs de hoy
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = now.toISOString().slice(0, 10);
   const storeId = store === "Sur" ? 2 : 1;
   
   const todayLogs = logs.filter(l => {
@@ -35,6 +45,25 @@ export function DashboardJornada() {
     return d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
   };
 
+  const getExpectedExitDate = () => {
+    if (!entrada) return null;
+    const d = new Date(entrada.created_at);
+    const day = d.getDay(); 
+    
+    let expectedHour = 18;
+    if (day === 1) expectedHour = 18;
+    else if (day === 2) expectedHour = 17;
+    else if (day === 3) expectedHour = 19;
+    else if (day === 4) expectedHour = 16;
+    else if (day === 5) expectedHour = 16;
+    else if (day === 6) expectedHour = 13;
+    else if (day === 0) expectedHour = 12;
+
+    const expectedDate = new Date(d);
+    expectedDate.setHours(expectedHour, 0, 0, 0);
+    return expectedDate;
+  };
+
   const getSalidaLabel = () => {
     if (salida) {
       const d = new Date(salida.created_at);
@@ -42,23 +71,10 @@ export function DashboardJornada() {
     }
 
     if (estado === "Activa" && entrada) {
-      // Calculate expected exit time based on day of week
-      const d = new Date(entrada.created_at);
-      const day = d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-      
-      let expectedHour = 18; // Default
-      if (day === 1) expectedHour = 18; // Lunes 9-18
-      else if (day === 2) expectedHour = 17; // Martes 9-17
-      else if (day === 3) expectedHour = 19; // Miercoles 10-19
-      else if (day === 4) expectedHour = 16; // Jueves 10-16
-      else if (day === 5) expectedHour = 16; // Viernes 9-16
-      else if (day === 6) expectedHour = 13; // Sabado 8-13
-      
-      // We don't have Sunday, assume no work or default 12
-      if (day === 0) expectedHour = 12;
-
-      // format as hour string "18:00"
-      return `${expectedHour.toString().padStart(2, '0')}:00`;
+      const expected = getExpectedExitDate();
+      if (expected) {
+        return expected.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+      }
     }
 
     return "—";
@@ -73,12 +89,35 @@ export function DashboardJornada() {
 
   const getPassedHoursText = () => {
     if (!entrada) return "";
-    const diffMs = new Date().getTime() - new Date(entrada.created_at).getTime();
+    const diffMs = now.getTime() - new Date(entrada.created_at).getTime();
     const mins = Math.floor(diffMs / (1000 * 60));
     if (mins < 60) return `hace ${mins} min`;
     const hours = Math.floor(mins / 60);
     return `hace ${hours} h`;
   };
+
+  const getProgressPercentage = () => {
+    if (estado === "Completada") return 100;
+    if (estado !== "Activa" || !entrada) return 0;
+    
+    const startMs = new Date(entrada.created_at).getTime();
+    const expected = getExpectedExitDate();
+    if (!expected) return 50;
+
+    const endMs = expected.getTime();
+    const currentMs = now.getTime();
+    
+    if (currentMs >= endMs) return 100;
+    if (currentMs <= startMs) return 0;
+
+    const totalMs = endMs - startMs;
+    const elapsedMs = currentMs - startMs;
+    const percentage = (elapsedMs / totalMs) * 100;
+    
+    return Math.min(100, Math.max(0, percentage));
+  };
+
+  const progress = getProgressPercentage();
 
   return (
     <div className="bg-white dark:bg-slate-900 border-[0.5px] border-[#E5E7EB] dark:border-slate-800 rounded-[10px] overflow-hidden shadow-sm">
@@ -122,10 +161,13 @@ export function DashboardJornada() {
             </p>
           </div>
 
-          <div className="flex-1 flex items-center h-[2px] bg-[#F3F4F6] dark:bg-slate-800 relative rounded-full mx-4">
-            <div className="absolute left-0 top-0 bottom-0 bg-[#EAF3DE] dark:bg-emerald-900" style={{ width: estado === "Completada" ? "100%" : "50%" }}></div>
+          <div className="flex-1 flex items-center h-[4px] bg-[#F3F4F6] dark:bg-slate-800 relative rounded-full mx-4">
+            <div className="absolute left-0 top-0 bottom-0 bg-[#EAF3DE] dark:bg-emerald-900 transition-all duration-1000 ease-in-out rounded-full" style={{ width: `${progress}%` }}></div>
             {estado === "Activa" && (
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[8px] h-[8px] rounded-full bg-[#1C4A2E] dark:bg-emerald-500"></div>
+              <div 
+                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-[10px] h-[10px] rounded-full bg-[#1C4A2E] dark:bg-emerald-500 shadow-sm transition-all duration-1000 ease-in-out" 
+                style={{ left: `${progress}%` }}
+              ></div>
             )}
             {estado === "Completada" && (
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-sans text-[10px] font-medium px-2 py-0.5 bg-[#EAF3DE] text-[#3B6D11] dark:bg-emerald-900/50 dark:text-emerald-400 rounded-full whitespace-nowrap">
@@ -146,7 +188,7 @@ export function DashboardJornada() {
           {estado === "Activa" && (
             <div className="flex flex-col items-center gap-[4px] ml-[12px]">
               <Link to="/horarios">
-                <button className="bg-[#F3F4F6] dark:bg-slate-800 hover:bg-[#E5E7EB] dark:hover:bg-slate-700 text-[#374151] dark:text-slate-300 rounded-[8px] p-[8px_16px] font-sans text-[13px] font-medium transition-colors cursor-pointer">
+                <button className="bg-[#F3F4F6] dark:bg-slate-800 hover:bg-[#E5E7EB] dark:hover:bg-slate-700 text-[#374151] dark:text-slate-300 rounded-[8px] p-[8px_16px] font-sans text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap">
                   Registrar salida
                 </button>
               </Link>
