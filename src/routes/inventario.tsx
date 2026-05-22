@@ -1,13 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 import { KpiCards } from "@/components/inventory/KpiCards";
 import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { ExportExcelButton } from "@/components/inventory/ExportExcelButton";
 import { AddProductDialog } from "@/components/inventory/AddProductDialog";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
+import { getExpiryStatus } from "@/lib/expiry";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -35,17 +45,44 @@ function InventarioPage() {
   const { store } = useStore();
   const { q } = Route.useSearch();
   const [search, setSearch] = useState(q || "");
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
+  const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
+
+  const uniqueCategories = useMemo(() => {
+    return Array.from(new Set(filteredItems.map(i => i.categoria).filter(Boolean))).sort();
+  }, [filteredItems]);
 
   const visibleItems = useMemo(() => {
-    if (!search.trim()) return filteredItems;
-    const q = search.toLowerCase();
-    return filteredItems.filter(
-      (it) =>
-        (it.articulo?.toLowerCase() || "").includes(q) ||
-        (it.nombre?.toLowerCase() || "").includes(q) ||
-        (it.categoria?.toLowerCase() || "").includes(q)
-    );
-  }, [filteredItems, search]);
+    let result = filteredItems;
+
+    // Filtro por búsqueda de texto
+    if (search.trim()) {
+      const qs = search.toLowerCase();
+      result = result.filter(
+        (it) =>
+          (it.articulo?.toLowerCase() || "").includes(qs) ||
+          (it.nombre?.toLowerCase() || "").includes(qs) ||
+          (it.categoria?.toLowerCase() || "").includes(qs)
+      );
+    }
+
+    // Filtro por categorías seleccionadas
+    if (categoryFilters.length > 0) {
+      result = result.filter(it => categoryFilters.includes(it.categoria));
+    }
+
+    // Filtro por estado (Vencido, Próximo a vencer)
+    if (statusFilters.length > 0) {
+      result = result.filter(it => {
+        return it.lotes.some(lote => {
+          const st = getExpiryStatus(lote.fecha_caducidad);
+          return statusFilters.includes(st);
+        });
+      });
+    }
+
+    return result;
+  }, [filteredItems, search, categoryFilters, statusFilters]);
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -74,15 +111,86 @@ function InventarioPage() {
         <KpiCards items={filteredItems} />
       )}
 
-      {/* Búsqueda */}
-      <div className="relative flex-1 max-w-xl">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500 pointer-events-none" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por artículo, nombre o categoría…"
-          className="h-12 pl-11 text-base rounded-xl border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 dark:text-slate-200 transition-colors"
-        />
+      {/* Búsqueda y Filtros */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
+        <div className="relative flex-1 w-full sm:max-w-xl">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500 pointer-events-none" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por artículo, nombre o categoría…"
+            className="h-12 pl-11 text-base rounded-xl border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 dark:text-slate-200 transition-colors"
+          />
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-12 w-full sm:w-auto border-dashed bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-xl">
+              <Filter className="mr-2 h-4 w-4" />
+              Filtros {(statusFilters.length > 0 || categoryFilters.length > 0) && `(${statusFilters.length + categoryFilters.length})`}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl shadow-lg">
+            <DropdownMenuLabel className="font-semibold text-slate-800 dark:text-slate-200">Estado de Caducidad</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+            <DropdownMenuCheckboxItem 
+              checked={statusFilters.includes("vencido")}
+              onCheckedChange={(c) => setStatusFilters(prev => c ? [...prev, "vencido"] : prev.filter(x => x !== "vencido"))}
+              className="dark:text-slate-300 dark:focus:bg-slate-800"
+            >
+              Vencido
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={statusFilters.includes("proximo")}
+              onCheckedChange={(c) => setStatusFilters(prev => c ? [...prev, "proximo"] : prev.filter(x => x !== "proximo"))}
+              className="dark:text-slate-300 dark:focus:bg-slate-800"
+            >
+              Próximo a vencer
+            </DropdownMenuCheckboxItem>
+            
+            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+            <DropdownMenuLabel className="font-semibold text-slate-800 dark:text-slate-200">Categorías</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+            <div className="max-h-48 overflow-y-auto">
+              {uniqueCategories.map(cat => (
+                <DropdownMenuCheckboxItem 
+                  key={cat}
+                  checked={categoryFilters.includes(cat)}
+                  onCheckedChange={(c) => setCategoryFilters(prev => c ? [...prev, cat] : prev.filter(x => x !== cat))}
+                  className="dark:text-slate-300 dark:focus:bg-slate-800"
+                >
+                  {cat}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </div>
+            
+            {(statusFilters.length > 0 || categoryFilters.length > 0) && (
+              <>
+                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+                <div className="p-1">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 justify-start"
+                    onClick={() => { setStatusFilters([]); setCategoryFilters([]); }}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Limpiar Filtros
+                  </Button>
+                </div>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {(statusFilters.length > 0 || categoryFilters.length > 0 || search.trim()) && (
+          <Button 
+            variant="ghost" 
+            className="h-12 text-slate-500 dark:text-slate-400"
+            onClick={() => { setStatusFilters([]); setCategoryFilters([]); setSearch(""); }}
+          >
+            Resetear
+          </Button>
+        )}
       </div>
 
       {loading ? (

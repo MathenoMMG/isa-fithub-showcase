@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,46 +10,66 @@ import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
 import type { StoreId } from "@/types/inventory";
 
-const CATEGORIAS = ["Arepas", "Lácteos", "Snacks", "Bebidas", "Suplementos", "Despensa", "Panadería", "Cereales", "Confitería", "Quesos", "Frutos y Nueces", "Accesorios", "Otros"];
+const DEFAULT_CATEGORIAS = ["Arepas", "Lácteos", "Snacks", "Bebidas", "Suplementos", "Despensa", "Panadería", "Cereales", "Confitería", "Quesos", "Frutos y Nueces", "Accesorios", "Otros"];
 const STORE_MAP: Record<StoreId, number> = { Norte: 1, Sur: 2 };
 
 export function AddProductDialog() {
-  const { addProduct } = useInventory();
+  const { addProduct, filteredItems } = useInventory();
   const { store } = useStore();
   const [open, setOpen] = useState(false);
 
   const defaultStore: StoreId = store === "Ambas" ? "Norte" : store;
 
+  const allCategorias = useMemo(() => {
+    const existing = filteredItems.map(i => i.categoria).filter(Boolean);
+    const unique = Array.from(new Set([...DEFAULT_CATEGORIAS, ...existing]));
+    return unique.sort();
+  }, [filteredItems]);
+
   const [form, setForm] = useState({
     nombre: "",
     articulo: "",
     sicol: "",
-    categoria: CATEGORIAS[0],
+    categoria: DEFAULT_CATEGORIAS[0],
     proveedor_nombre: "ADWELLCH S.A.S.",
     tienda_id: STORE_MAP[defaultStore],
     cantidad: 1,
     fecha_caducidad: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
   });
 
-  const reset = () =>
+  const [isNewCategory, setIsNewCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState("");
+
+  const reset = () => {
     setForm({
       nombre: "",
       articulo: "",
       sicol: "",
-      categoria: CATEGORIAS[0],
+      categoria: DEFAULT_CATEGORIAS[0],
       proveedor_nombre: "ADWELLCH S.A.S.",
       tienda_id: STORE_MAP[defaultStore],
       cantidad: 1,
       fecha_caducidad: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
     });
+    setIsNewCategory(false);
+    setCustomCategory("");
+  };
 
   const submit = () => {
+    const finalCategory = isNewCategory ? customCategory : form.categoria;
+
     if (!form.nombre.trim() || !form.articulo.trim()) {
       toast.error("Nombre y Código (Artículo) son obligatorios");
       return;
     }
+    if (!finalCategory.trim()) {
+      toast.error("La categoría es obligatoria");
+      return;
+    }
+
     addProduct({
       ...form,
+      categoria: finalCategory,
       cantidad: Number(form.cantidad) || 0,
       fecha_caducidad: new Date(form.fecha_caducidad).toISOString(),
     });
@@ -85,12 +105,33 @@ export function AddProductDialog() {
           </div>
           <div className="space-y-1.5">
             <Label>Categoría</Label>
-            <Select value={form.categoria} onValueChange={(v) => setForm({ ...form, categoria: v })}>
+            <Select 
+              value={isNewCategory ? "NEW" : form.categoria} 
+              onValueChange={(v) => {
+                if (v === "NEW") {
+                  setIsNewCategory(true);
+                  setForm({ ...form, categoria: "" });
+                } else {
+                  setIsNewCategory(false);
+                  setForm({ ...form, categoria: v });
+                }
+              }}
+            >
               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {CATEGORIAS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                {allCategorias.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+                <SelectItem value="NEW" className="font-semibold text-emerald-600">Crear nueva categoría...</SelectItem>
               </SelectContent>
             </Select>
+            {isNewCategory && (
+              <Input 
+                className="h-11 mt-2" 
+                placeholder="Escribe la nueva categoría" 
+                value={customCategory} 
+                onChange={(e) => setCustomCategory(e.target.value)} 
+                autoFocus
+              />
+            )}
           </div>
           <div className="space-y-1.5">
             <Label>Tienda</Label>
