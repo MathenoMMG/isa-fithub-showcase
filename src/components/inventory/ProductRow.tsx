@@ -193,8 +193,12 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                       <Button
                         onClick={async () => {
                           try {
-                            await undoSale(product.id, lote.id);
-                            toast.success("Venta deshecha");
+                            const success = await undoSale(product.id, lote.id);
+                            if (success) {
+                              toast.success("Venta deshecha");
+                            } else {
+                              toast.info("No hay ventas para deshacer en este lote");
+                            }
                           } catch (e) {
                             toast.error("No se pudo deshacer la venta");
                           }

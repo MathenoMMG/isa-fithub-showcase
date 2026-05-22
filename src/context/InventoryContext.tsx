@@ -13,7 +13,7 @@ interface InventoryContextValue {
   addLote: (productId: string, input: NewLoteInput) => Promise<void>;
   removeLote: (productId: string, loteId: string) => Promise<void>;
   sellFromLote: (productId: string, loteId: string, qty?: number) => Promise<void>;
-  undoSale: (productId: string, loteId: string) => Promise<void>;
+  undoSale: (productId: string, loteId: string) => Promise<boolean>;
   adjustLote: (productId: string, loteId: string, delta: number) => Promise<void>;
   updateProductCategories: (updates: Record<string, string>) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -154,7 +154,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     await fetchData();
   };
 
-  const undoSale = async (productId: string, loteId: string) => {
+  const undoSale = async (productId: string, loteId: string): Promise<boolean> => {
     // Buscar la última venta de este lote
     const { data: lastSale, error: fetchErr } = await supabase
       .from("ventas")
@@ -162,10 +162,10 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       .eq("lote_id", loteId)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (fetchErr && fetchErr.code !== 'PGRST116') throw fetchErr; // PGRST116 = no rows returned
-    if (!lastSale) return; // No hay venta que deshacer
+    if (fetchErr) throw fetchErr;
+    if (!lastSale) return false; // No hay venta que deshacer
 
     // Eliminar la venta
     const { error: delErr } = await supabase
@@ -189,6 +189,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
 
     await fetchData();
+    return true;
   };
 
   const adjustLote = async (_productId: string, loteId: string, delta: number) => {
