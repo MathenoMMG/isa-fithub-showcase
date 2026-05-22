@@ -83,58 +83,60 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
         </div>
 
         <div className="shrink-0 text-slate-400 ml-[4px]">
-          {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          <ChevronRight className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-90" : "rotate-0"}`} />
         </div>
       </div>
 
       {/* Lotes */}
-      {open && (
-        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 p-3 sm:p-4 space-y-2">
-          
-          {/* Sección de Notas */}
-          <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notas del Producto</span>
+      <div 
+        className={`grid transition-all duration-300 ease-in-out ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="overflow-hidden">
+          <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 p-3 sm:p-4 space-y-2">
+            
+            {/* Sección de Notas */}
+            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notas del Producto</span>
+                {!isEditingNotes ? (
+                  <button 
+                    onClick={() => { setNotesTemp(product.notas || ""); setIsEditingNotes(true); }}
+                    className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 flex items-center gap-1"
+                  >
+                    <Edit2 size={12} /> <span className="text-[10px] font-medium">Editar</span>
+                  </button>
+                ) : (
+                  <span className={`text-[10px] ${notesTemp.length > 150 ? 'text-red-500' : 'text-slate-400'}`}>
+                    {notesTemp.length}/150
+                  </span>
+                )}
+              </div>
+              
               {!isEditingNotes ? (
-                <button 
-                  onClick={() => { setNotesTemp(product.notas || ""); setIsEditingNotes(true); }}
-                  className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 flex items-center gap-1"
-                >
-                  <Edit2 size={12} /> <span className="text-[10px] font-medium">Editar</span>
-                </button>
+                <p className="text-sm text-slate-700 dark:text-slate-300 italic">
+                  {product.notas ? product.notas : <span className="text-slate-400 dark:text-slate-500">Sin notas. Haz clic en editar para agregar información...</span>}
+                </p>
               ) : (
-                <span className={`text-[10px] ${notesTemp.length > 150 ? 'text-red-500' : 'text-slate-400'}`}>
-                  {notesTemp.length}/150
-                </span>
+                <div className="flex gap-2">
+                  <Input 
+                    value={notesTemp} 
+                    onChange={(e) => {
+                      if (e.target.value.length <= 150) setNotesTemp(e.target.value);
+                    }}
+                    className="h-8 text-sm dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
+                    placeholder="Escribe hasta 150 caracteres..."
+                    autoFocus
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleSaveNotes(); }}
+                  />
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-600 dark:text-emerald-400" onClick={handleSaveNotes}>
+                    <Check size={16} />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 dark:text-slate-500" onClick={() => setIsEditingNotes(false)}>
+                    <X size={16} />
+                  </Button>
+                </div>
               )}
             </div>
-            
-            {!isEditingNotes ? (
-              <p className="text-sm text-slate-700 dark:text-slate-300 italic">
-                {product.notas ? product.notas : <span className="text-slate-400 dark:text-slate-500">Sin notas. Haz clic en editar para agregar información...</span>}
-              </p>
-            ) : (
-              <div className="flex gap-2">
-                <Input 
-                  value={notesTemp} 
-                  onChange={(e) => {
-                    if (e.target.value.length <= 150) setNotesTemp(e.target.value);
-                  }}
-                  className="h-8 text-sm dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
-                  placeholder="Escribe hasta 150 caracteres..."
-                  autoFocus
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleSaveNotes(); }}
-                />
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-emerald-600 dark:text-emerald-400" onClick={handleSaveNotes}>
-                  <Check size={16} />
-                </Button>
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 dark:text-slate-500" onClick={() => setIsEditingNotes(false)}>
-                  <X size={16} />
-                </Button>
-              </div>
-            )}
-          </div>
-
           {sortedLotes.length === 0 && (
             <div className="text-sm text-slate-500 dark:text-slate-400 italic px-2 py-3">Sin lotes en stock.</div>
           )}
@@ -310,8 +312,9 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
               </AlertDialogContent>
             </AlertDialog>
           </div>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

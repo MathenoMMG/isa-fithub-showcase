@@ -70,7 +70,7 @@ function LineaGroup({
     <section>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center gap-[8px] bg-[#F9FAF8] dark:bg-slate-900/80 border-l-[3px] border-l-[#1C4A2E] dark:border-l-emerald-500 rounded-r-md p-[10px_14px] text-left hover:brightness-95 transition-all outline-none"
+        className="w-full flex items-center gap-[8px] bg-[#F9FAF8] dark:bg-slate-900/80 border-l-[3px] border-l-[#1C4A2E] dark:border-l-emerald-500 rounded-[10px] p-[10px_14px] text-left hover:brightness-95 transition-all outline-none"
       >
         <span className="font-sans text-[14px] font-semibold text-[#1C4A2E] dark:text-emerald-400 leading-none">
           {linea}
@@ -79,16 +79,20 @@ function LineaGroup({
           {items.length}
         </span>
         <div className="ml-auto text-[#1C4A2E] dark:text-emerald-400">
-          {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          <ChevronRight size={16} className={`transition-transform duration-300 ${open ? "rotate-90" : "rotate-0"}`} />
         </div>
       </button>
-      {open && (
-        <div className="mt-2 space-y-2 ml-3 pl-3 border-l-[1.5px] border-slate-100 dark:border-slate-800">
-          {items.map((p) => (
-            <ProductRow key={p.id} product={p} />
-          ))}
+      <div 
+        className={`grid transition-all duration-300 ease-in-out ${open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"}`}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-2 ml-3 pl-3 border-l-[1.5px] border-slate-100 dark:border-slate-800 py-1">
+            {items.map((p) => (
+              <ProductRow key={p.id} product={p} />
+            ))}
+          </div>
         </div>
-      )}
+      </div>
     </section>
   );
 }
