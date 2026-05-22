@@ -458,19 +458,40 @@ function Informes() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Día específico:</span>
-            <Input 
-              type="date"
-              value={salesDateFilter}
-              onChange={(e) => setSalesDateFilter(e.target.value)}
-              className="h-9 w-[160px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
-            />
-            {salesDateFilter && (
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-red-500" onClick={() => setSalesDateFilter("")}>
-                <X className="h-4 w-4" />
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg mr-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`h-7 px-3 text-xs rounded-md transition-all ${range === 'semana' && !salesDateFilter ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-700 dark:text-emerald-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                onClick={() => { setRange("semana"); setSalesDateFilter(""); }}
+              >
+                Semana
               </Button>
-            )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className={`h-7 px-3 text-xs rounded-md transition-all ${range === 'mes' && !salesDateFilter ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-700 dark:text-emerald-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                onClick={() => { setRange("mes"); setSalesDateFilter(""); }}
+              >
+                Mes
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Día:</span>
+              <Input 
+                type="date"
+                value={salesDateFilter}
+                onChange={(e) => setSalesDateFilter(e.target.value)}
+                className="h-9 w-[150px] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
+              />
+              {salesDateFilter && (
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-red-500" onClick={() => setSalesDateFilter("")}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
