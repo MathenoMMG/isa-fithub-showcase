@@ -15,33 +15,33 @@ export function exportInventoryToExcel(items: InventoryItem[], filename?: string
   for (const item of items) {
     if (item.lotes.length === 0) {
       rows.push({
-        SKU: item.sku,
-        Producto: item.nombre,
-        "Sabor / Subcategoría": item.subcategoria_sabor,
-        Línea: item.linea_producto,
-        Tienda: item.id_tienda,
+        "Tienda": item.tienda_nombre,
+        "Categoría": item.categoria || "Otros",
+        "SKU / Sicol": item.sicol || "—",
+        "Código (Artículo)": item.articulo || "—",
+        "Producto": item.nombre,
         "Lote #": "—",
-        "ID Lote": "—",
-        Cantidad: 0,
+        "Cantidad": 0,
         "Fecha de Caducidad": "—",
-        Estado: "Sin stock",
-        Proveedor: item.proveedor,
+        "Estado": "Sin stock",
+        "Proveedor": item.proveedor_nombre || "—",
+        "Notas": item.notas || "—",
       });
       continue;
     }
     item.lotes.forEach((lote, idx) => {
       rows.push({
-        SKU: item.sku,
-        Producto: item.nombre,
-        "Sabor / Subcategoría": item.subcategoria_sabor,
-        Línea: item.linea_producto,
-        Tienda: item.id_tienda,
+        "Tienda": item.tienda_nombre,
+        "Categoría": item.categoria || "Otros",
+        "SKU / Sicol": item.sicol || "—",
+        "Código (Artículo)": item.articulo || "—",
+        "Producto": item.nombre,
         "Lote #": idx + 1,
-        "ID Lote": lote.id,
-        Cantidad: lote.cantidad,
+        "Cantidad": lote.cantidad,
         "Fecha de Caducidad": formatExpiryDate(lote.fecha_caducidad),
-        Estado: statusLabel[getExpiryStatus(lote.fecha_caducidad)],
-        Proveedor: item.proveedor,
+        "Estado": statusLabel[getExpiryStatus(lote.fecha_caducidad)],
+        "Proveedor": item.proveedor_nombre || "—",
+        "Notas": lote.notas || item.notas || "—",
       });
     });
   }
