@@ -25,8 +25,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { store } = useStore();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       // Fetch products with lotes
       const { data: productos, error: pErr } = await supabase
@@ -69,7 +69,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [fetchData]);
 
   const addProduct = async (
