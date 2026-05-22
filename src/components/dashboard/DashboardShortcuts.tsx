@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Plus, List, Download, BarChart2, ChevronRight } from "lucide-react";
+import { Plus, List, Download, BarChart2, ChevronRight, Clock } from "lucide-react";
 
 export function DashboardShortcuts() {
   const shortcuts = [
@@ -30,6 +30,13 @@ export function DashboardShortcuts() {
       title: "Ver analítica",
       desc: "Tendencias y comparativas",
       link: "/informes",
+    },
+    {
+      id: 5,
+      icon: Clock,
+      title: "Chequear el día",
+      desc: "Registro de entrada/salida",
+      link: "/horarios",
     },
   ];
 
