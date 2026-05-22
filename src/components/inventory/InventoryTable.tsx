@@ -70,23 +70,20 @@ function LineaGroup({
     <section>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60 rounded-xl p-3 sm:p-4 text-left hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all outline-none group"
+        className="w-full flex items-center gap-[8px] bg-[#F9FAF8] dark:bg-slate-900/80 border-l-[3px] border-l-[#1C4A2E] dark:border-l-emerald-500 rounded-r-md p-[10px_14px] text-left hover:brightness-95 transition-all outline-none"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-1.5 h-5 bg-emerald-600 dark:bg-emerald-500 rounded-full opacity-80" />
-          <span className="font-sans text-[16px] font-extrabold text-slate-700 dark:text-slate-200 tracking-tight uppercase">
-            {linea}
-          </span>
-          <span className="font-sans text-[11px] font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 px-2.5 py-0.5 rounded-full shadow-sm">
-            {items.length} {items.length === 1 ? 'ud' : 'uds'}
-          </span>
-        </div>
-        <div className="text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-lg shadow-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-          {open ? <ChevronDown size={16} strokeWidth={2.5} /> : <ChevronRight size={16} strokeWidth={2.5} />}
+        <span className="font-sans text-[14px] font-semibold text-[#1C4A2E] dark:text-emerald-400 leading-none">
+          {linea}
+        </span>
+        <span className="font-sans text-[11px] font-medium bg-[#EAF3DE] dark:bg-emerald-900/40 text-[#3B6D11] dark:text-emerald-400 px-[8px] py-[2px] rounded-full leading-none">
+          {items.length}
+        </span>
+        <div className="ml-auto text-[#1C4A2E] dark:text-emerald-400">
+          {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </div>
       </button>
       {open && (
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 space-y-2 ml-3 pl-3 border-l-[1.5px] border-slate-100 dark:border-slate-800">
           {items.map((p) => (
             <ProductRow key={p.id} product={p} />
           ))}
