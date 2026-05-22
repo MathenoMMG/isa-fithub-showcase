@@ -13,6 +13,7 @@ interface InventoryContextValue {
   removeLote: (productId: string, loteId: string) => Promise<void>;
   sellFromLote: (productId: string, loteId: string, qty?: number) => Promise<void>;
   adjustLote: (productId: string, loteId: string, delta: number) => Promise<void>;
+  updateProductCategories: (updates: Record<string, string>) => Promise<void>;
   refreshData: () => Promise<void>;
 }
 
@@ -162,6 +163,26 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateProductCategories = async (updates: Record<string, string>) => {
+    const promises = Object.entries(updates).map(([productId, newCategory]) =>
+      supabase
+        .from("productos")
+        .update({ categoria: newCategory })
+        .eq("id", productId)
+    );
+    
+    // Execute all updates in parallel
+    const results = await Promise.all(promises);
+    const errors = results.filter(r => r.error);
+    
+    if (errors.length > 0) {
+      console.error("Errors updating categories:", errors);
+      throw new Error("Ocurrió un error al actualizar algunas categorías.");
+    }
+    
+    await fetchData();
+  };
+
   const filteredItems = useMemo(
     () =>
       store === "Ambas"
@@ -182,6 +203,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         removeLote,
         sellFromLote,
         adjustLote,
+        updateProductCategories,
         refreshData: fetchData,
       }}
     >
