@@ -200,17 +200,33 @@ function InventarioPage() {
                 Próximo a vencer
               </DropdownMenuCheckboxItem>
               
-              {statusFilters.length > 0 && (
+              <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+              <DropdownMenuLabel className="font-semibold text-slate-800 dark:text-slate-200">Categorías</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+              <div className="max-h-48 overflow-y-auto">
+                {uniqueCategories.map(cat => (
+                  <DropdownMenuCheckboxItem 
+                    key={cat}
+                    checked={categoryFilters.includes(cat)}
+                    onCheckedChange={(c) => setCategoryFilters(prev => c ? [...prev, cat] : prev.filter(x => x !== cat))}
+                    className="dark:text-slate-300 dark:focus:bg-slate-800"
+                  >
+                    {cat}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </div>
+
+              {(statusFilters.length > 0 || categoryFilters.length > 0) && (
                 <>
                   <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
                   <div className="p-1">
                     <Button 
                       variant="ghost" 
                       className="w-full text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 justify-start"
-                      onClick={() => setStatusFilters([])}
+                      onClick={() => { setStatusFilters([]); setCategoryFilters([]); }}
                     >
                       <X className="mr-2 h-4 w-4" />
-                      Limpiar Filtro de Stock
+                      Limpiar Filtros
                     </Button>
                   </div>
                 </>
@@ -245,30 +261,6 @@ function InventarioPage() {
             Expandir todo
           </Button>
         </div>
-      </div>
-      
-      {/* Chips de Categorías */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
-        <Button
-          variant={categoryFilters.length === 0 ? "default" : "outline"}
-          className={`shrink-0 rounded-full h-8 text-xs font-semibold px-4 transition-all snap-start ${categoryFilters.length === 0 ? "bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800"}`}
-          onClick={() => setCategoryFilters([])}
-        >
-          Todas
-        </Button>
-        {uniqueCategories.map(cat => {
-          const isActive = categoryFilters.includes(cat);
-          return (
-            <Button
-              key={cat}
-              variant={isActive ? "default" : "outline"}
-              className={`shrink-0 rounded-full h-8 text-xs font-semibold px-4 transition-all snap-start ${isActive ? "bg-emerald-600 text-white dark:bg-emerald-500" : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-800 hover:text-emerald-700 dark:hover:text-emerald-400"}`}
-              onClick={() => setCategoryFilters(prev => isActive ? prev.filter(x => x !== cat) : [...prev, cat])}
-            >
-              {cat}
-            </Button>
-          );
-        })}
       </div>
 
       {loading ? (
