@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/informes")({
 const PIE_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
 
 function Informes() {
+  const navigate = useNavigate();
   const { items } = useInventory();
   const { store } = useStore();
   const { theme } = useProfile();
@@ -390,7 +391,11 @@ function Informes() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {criticos.length > 0 ? (
                 criticos.map((lote) => (
-                  <tr key={lote.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                  <tr 
+                    key={lote.id} 
+                    onClick={() => navigate({ to: "/inventario", search: { q: lote.nombre } })}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
+                  >
                     <td className="px-6 py-4">
                       {lote.estado === "vencido" ? (
                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">

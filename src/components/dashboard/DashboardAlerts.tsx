@@ -1,10 +1,11 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
 import { Package } from "lucide-react";
 import { BarChart, Bar, ResponsiveContainer, XAxis } from "recharts";
 
 export function DashboardAlerts() {
   const { filteredItems } = useInventory();
+  const navigate = useNavigate();
 
   // "Atención inmediata" top 6 urgent items (based on lotes expiration)
   const urgentLotes = filteredItems
@@ -69,7 +70,11 @@ export function DashboardAlerts() {
               const styles = getStatusStyles(status);
               
               return (
-                <div key={lote.id} className={`flex items-center gap-[10px] p-[9px_14px] border-b-[0.5px] border-[#F9FAFB] dark:border-slate-800 ${styles.bg}`}>
+                <div 
+                  key={lote.id} 
+                  onClick={() => navigate({ to: "/inventario", search: { q: lote.producto.nombre } })}
+                  className={`flex items-center gap-[10px] p-[9px_14px] border-b-[0.5px] border-[#F9FAFB] dark:border-slate-800 ${styles.bg} cursor-pointer hover:brightness-95 transition-all`}
+                >
                   <div className={`w-[8px] h-[8px] rounded-full shrink-0 ${styles.dot}`} />
                   <div className="flex-1 min-w-0">
                     <div className="font-sans text-[11px] font-medium text-[#111827] dark:text-slate-200 truncate">

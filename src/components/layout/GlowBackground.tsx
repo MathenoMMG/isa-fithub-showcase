@@ -9,12 +9,12 @@ export function GlowBackground() {
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
       {/* Esfera Esmeralda Superior Izquierda */}
       <div 
-        className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-80"
+        className="absolute -top-40 -left-40 w-[800px] h-[800px] rounded-full bg-emerald-500/20 dark:bg-emerald-500/25 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-100"
       />
       
       {/* Esfera Azul Inferior Derecha */}
       <div 
-        className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-blue-500/10 dark:bg-blue-500/15 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-80"
+        className="absolute -bottom-40 -right-40 w-[800px] h-[800px] rounded-full bg-blue-500/20 dark:bg-blue-500/25 blur-[120px] mix-blend-multiply dark:mix-blend-screen opacity-100"
       />
       
       {/* Capa de ruido sutil opcional (si quisieramos textura) */}

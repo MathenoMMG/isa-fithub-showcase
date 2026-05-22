@@ -11,7 +11,16 @@ import { useStore } from "@/context/StoreContext";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
+type ProductSearch = {
+  q?: string;
+};
+
 export const Route = createFileRoute("/inventario")({
+  validateSearch: (search: Record<string, unknown>): ProductSearch => {
+    return {
+      q: search.q as string | undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Inventario · FitHub" },
@@ -24,7 +33,8 @@ export const Route = createFileRoute("/inventario")({
 function InventarioPage() {
   const { filteredItems, loading } = useInventory();
   const { store } = useStore();
-  const [search, setSearch] = useState("");
+  const { q } = Route.useSearch();
+  const [search, setSearch] = useState(q || "");
 
   const visibleItems = useMemo(() => {
     if (!search.trim()) return filteredItems;
