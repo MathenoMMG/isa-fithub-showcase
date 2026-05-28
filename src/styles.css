@@ -173,12 +173,22 @@
 /* ------------------------------------------------------------------
    1. TIPOGRAFÍA PREMIUM
    ------------------------------------------------------------------ */
-.style-obsidian {
+.style-obsidian,
+.style-obsidian body,
+.style-obsidian button,
+.style-obsidian input,
+.style-obsidian select,
+.style-obsidian textarea {
   font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
 }
 
 /* 1.1 Preset Jakarta (Geométrica / Moderna) */
-.style-obsidian.font-jakarta {
+.style-obsidian.font-jakarta,
+.style-obsidian.font-jakarta body,
+.style-obsidian.font-jakarta button,
+.style-obsidian.font-jakarta input,
+.style-obsidian.font-jakarta select,
+.style-obsidian.font-jakarta textarea {
   font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
 }
 .style-obsidian.font-jakarta h1,
@@ -194,7 +204,12 @@
 }
 
 /* 1.2 Preset Sans (Clásica / Original) */
-.style-obsidian.font-sans-preset {
+.style-obsidian.font-sans-preset,
+.style-obsidian.font-sans-preset body,
+.style-obsidian.font-sans-preset button,
+.style-obsidian.font-sans-preset input,
+.style-obsidian.font-sans-preset select,
+.style-obsidian.font-sans-preset textarea {
   font-family: 'DM Sans', system-ui, sans-serif !important;
 }
 .style-obsidian.font-sans-preset h1,
@@ -210,7 +225,12 @@
 }
 
 /* 1.3 Preset Serif (Serif Elegante / Playfair) */
-.style-obsidian.font-serif-preset {
+.style-obsidian.font-serif-preset,
+.style-obsidian.font-serif-preset body,
+.style-obsidian.font-serif-preset button,
+.style-obsidian.font-serif-preset input,
+.style-obsidian.font-serif-preset select,
+.style-obsidian.font-serif-preset textarea {
   font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
 }
 .style-obsidian.font-serif-preset h1,
