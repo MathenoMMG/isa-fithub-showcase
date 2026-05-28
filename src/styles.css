@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&family=Playfair+Display:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -166,138 +166,464 @@
 }
 
 /* ==========================================================================
-   ESTILO OBSIDIAN (Premium Dark / Glassmorphism Bento Rework)
+   ESTILO PREMIUM — "Hermes Cream" (Claro) + "Omarchy Jade" (Oscuro)
+   Inspirado en hermes-agent.nousresearch.com y Omarchy Linux.
    ========================================================================== */
 
-/* Variables de color de diseño para Obsidian */
+/* ------------------------------------------------------------------
+   1. TIPOGRAFÍA PREMIUM
+   ------------------------------------------------------------------ */
 .style-obsidian {
-  /* Fondo obsidian ultra premium oscuro con matiz forestal */
-  --background: oklch(0.09 0.01 145) !important;
-  --foreground: oklch(0.96 0.01 145) !important;
-  
-  /* Tarjetas bento glassmorphic */
-  --card: oklch(0.13 0.02 145 / 55%) !important;
-  --card-foreground: oklch(0.96 0.01 145) !important;
-  
-  /* Popover glassmorphic */
-  --popover: oklch(0.12 0.02 145 / 85%) !important;
-  --popover-foreground: oklch(0.96 0.01 145) !important;
-  
-  /* Emerald brillante orgánico */
-  --primary: oklch(0.78 0.18 142) !important; 
-  --primary-foreground: oklch(0.09 0.01 145) !important;
-  
-  /* Bordes sutiles y relucientes */
-  --border: oklch(0.24 0.05 142 / 40%) !important;
-  --input: oklch(0.16 0.03 145 / 60%) !important;
-  --ring: oklch(0.78 0.18 142) !important;
-  
-  /* Sidebar premium glass forest */
-  --sidebar: oklch(0.11 0.02 145 / 90%) !important;
-  --sidebar-foreground: oklch(0.96 0.01 145) !important;
-  --sidebar-primary: oklch(0.78 0.18 142) !important;
-  --sidebar-primary-foreground: oklch(0.09 0.01 145) !important;
-  --sidebar-accent: oklch(0.16 0.04 142 / 50%) !important;
-  --sidebar-accent-foreground: oklch(0.85 0.12 142) !important;
-  --sidebar-border: oklch(0.2 0.04 142 / 30%) !important;
-  --sidebar-ring: oklch(0.78 0.18 142) !important;
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
 }
 
-/* Efectos visuales de Rework Premium en el preset Obsidian */
+.style-obsidian h1,
+.style-obsidian h2 {
+  font-family: 'Playfair Display', 'Georgia', serif !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
 
-/* Forzar el fondo oscuro forestal obsidian global */
+.style-obsidian h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.style-obsidian .font-mono-data,
+.style-obsidian code,
+.style-obsidian .font-mono {
+  font-family: 'JetBrains Mono', 'DM Mono', monospace !important;
+}
+
+/* Labels y texto pequeño: tracking amplio estilo Hermes */
+.style-obsidian .text-xs {
+  letter-spacing: 0.03em !important;
+}
+
+/* ------------------------------------------------------------------
+   2. GEOMETRÍA: Esquinas semi-sharp (6px)
+   ------------------------------------------------------------------ */
+.style-obsidian {
+  --radius: 0.375rem !important;
+}
+
+.style-obsidian .rounded-2xl { border-radius: 6px !important; }
+.style-obsidian .rounded-xl { border-radius: 6px !important; }
+.style-obsidian .rounded-lg { border-radius: 4px !important; }
+.style-obsidian .rounded-md { border-radius: 3px !important; }
+/* rounded-full se mantiene para avatares, badges, dots */
+
+/* ------------------------------------------------------------------
+   3. TOKENS — Modo Claro (Hermes Cream)
+   ------------------------------------------------------------------ */
+.style-obsidian {
+  --background: oklch(0.975 0.008 85) !important;
+  --foreground: oklch(0.18 0.02 180) !important;
+  --card: oklch(1 0 0) !important;
+  --card-foreground: oklch(0.18 0.02 180) !important;
+  --popover: oklch(1 0 0) !important;
+  --popover-foreground: oklch(0.18 0.02 180) !important;
+  --primary: oklch(0.35 0.08 160) !important;
+  --primary-foreground: oklch(0.98 0.005 85) !important;
+  --secondary: oklch(0.96 0.006 85) !important;
+  --secondary-foreground: oklch(0.25 0.03 180) !important;
+  --muted: oklch(0.955 0.005 85) !important;
+  --muted-foreground: oklch(0.50 0.02 180) !important;
+  --accent: oklch(0.96 0.006 85) !important;
+  --accent-foreground: oklch(0.25 0.03 180) !important;
+  --destructive: oklch(0.55 0.22 25) !important;
+  --destructive-foreground: oklch(0.98 0.005 85) !important;
+  --border: oklch(0.18 0.02 180 / 10%) !important;
+  --input: oklch(0.18 0.02 180 / 8%) !important;
+  --ring: oklch(0.35 0.08 160) !important;
+  --chart-1: oklch(0.55 0.15 160) !important;
+  --chart-2: oklch(0.65 0.10 200) !important;
+  --chart-3: oklch(0.50 0.08 250) !important;
+  --chart-4: oklch(0.75 0.12 85) !important;
+  --chart-5: oklch(0.60 0.18 30) !important;
+  --sidebar: oklch(0.97 0.005 85) !important;
+  --sidebar-foreground: oklch(0.18 0.02 180) !important;
+  --sidebar-primary: oklch(0.35 0.08 160) !important;
+  --sidebar-primary-foreground: oklch(0.98 0.005 85) !important;
+  --sidebar-accent: oklch(0.955 0.005 85) !important;
+  --sidebar-accent-foreground: oklch(0.25 0.03 180) !important;
+  --sidebar-border: oklch(0.18 0.02 180 / 8%) !important;
+  --sidebar-ring: oklch(0.35 0.08 160) !important;
+}
+
+/* ------------------------------------------------------------------
+   4. TOKENS — Modo Oscuro (Omarchy Jade)
+   ------------------------------------------------------------------ */
+.style-obsidian.dark {
+  --background: oklch(0.10 0.015 175) !important;
+  --foreground: oklch(0.93 0.01 85) !important;
+  --card: oklch(0.14 0.01 175 / 90%) !important;
+  --card-foreground: oklch(0.93 0.01 85) !important;
+  --popover: oklch(0.14 0.01 175 / 95%) !important;
+  --popover-foreground: oklch(0.93 0.01 85) !important;
+  --primary: oklch(0.72 0.14 170) !important;
+  --primary-foreground: oklch(0.10 0.015 175) !important;
+  --secondary: oklch(0.18 0.015 175) !important;
+  --secondary-foreground: oklch(0.93 0.01 85) !important;
+  --muted: oklch(0.18 0.015 175) !important;
+  --muted-foreground: oklch(0.60 0.02 175) !important;
+  --accent: oklch(0.18 0.02 175) !important;
+  --accent-foreground: oklch(0.93 0.01 85) !important;
+  --destructive: oklch(0.65 0.20 25) !important;
+  --destructive-foreground: oklch(0.98 0.005 85) !important;
+  --border: oklch(0.72 0.14 170 / 10%) !important;
+  --input: oklch(0.72 0.14 170 / 8%) !important;
+  --ring: oklch(0.72 0.14 170) !important;
+  --chart-1: oklch(0.65 0.14 170) !important;
+  --chart-2: oklch(0.60 0.10 200) !important;
+  --chart-3: oklch(0.55 0.12 250) !important;
+  --chart-4: oklch(0.75 0.10 85) !important;
+  --chart-5: oklch(0.65 0.16 30) !important;
+  --sidebar: oklch(0.11 0.015 175) !important;
+  --sidebar-foreground: oklch(0.93 0.01 85) !important;
+  --sidebar-primary: oklch(0.72 0.14 170) !important;
+  --sidebar-primary-foreground: oklch(0.10 0.015 175) !important;
+  --sidebar-accent: oklch(0.16 0.015 175) !important;
+  --sidebar-accent-foreground: oklch(0.80 0.08 170) !important;
+  --sidebar-border: oklch(0.72 0.14 170 / 8%) !important;
+  --sidebar-ring: oklch(0.72 0.14 170) !important;
+}
+
+/* ------------------------------------------------------------------
+   5. FONDOS GLOBALES
+   ------------------------------------------------------------------ */
 .style-obsidian,
 .style-obsidian body,
-.style-obsidian #root,
+.style-obsidian #root {
+  background-color: var(--background) !important;
+}
+
 .style-obsidian .bg-slate-50\/50,
 .style-obsidian .bg-slate-950\/50 {
-  background-color: oklch(0.09 0.01 145) !important;
+  background-color: var(--background) !important;
 }
 
-/* Tarjetas Bento Glassmorphic */
-.style-obsidian .card,
-.style-obsidian [role="card"],
-.style-obsidian Card,
+/* ------------------------------------------------------------------
+   6. TARJETAS BENTO — Formas refinadas
+   ------------------------------------------------------------------ */
+
+/* Modo Claro: tarjetas blancas con borde fino, sombra etérea */
 .style-obsidian .bg-white,
 .style-obsidian .bg-card {
-  background-color: oklch(0.13 0.02 145 / 55%) !important;
-  backdrop-filter: blur(20px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-  border: 1px solid oklch(0.78 0.18 142 / 20%) !important;
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 3%) !important;
+  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
 }
 
-/* Efecto de elevación e iluminación al pasar el mouse por tarjetas */
-.style-obsidian .card:hover,
-.style-obsidian [role="card"]:hover,
 .style-obsidian .bg-white:hover,
 .style-obsidian .bg-card:hover {
-  transform: translateY(-4px) scale(1.008) !important;
-  border-color: oklch(0.78 0.18 142 / 45%) !important;
-  box-shadow: 0 20px 48px 0 oklch(0.78 0.18 142 / 8%) !important;
+  border-color: oklch(0.35 0.08 160 / 22%) !important;
+  box-shadow: 0 3px 12px oklch(0 0 0 / 5%) !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Botones principales en Obsidian: Gradiente degradado brillante de esmeralda */
+/* Modo Oscuro: jade glass con backdrop-blur */
+.style-obsidian.dark .bg-white,
+.style-obsidian.dark .bg-card,
+.style-obsidian.dark .bg-slate-900 {
+  background-color: oklch(0.14 0.01 175 / 85%) !important;
+  backdrop-filter: blur(14px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(120%) !important;
+  border: 1px solid oklch(0.72 0.14 170 / 8%) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 12px oklch(0 0 0 / 20%) !important;
+  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+}
+
+.style-obsidian.dark .bg-white:hover,
+.style-obsidian.dark .bg-card:hover,
+.style-obsidian.dark .bg-slate-900:hover {
+  border-color: oklch(0.72 0.14 170 / 18%) !important;
+  box-shadow:
+    0 4px 20px oklch(0 0 0 / 30%),
+    0 0 0 1px oklch(0.72 0.14 170 / 6%) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ------------------------------------------------------------------
+   7. BOTONES PRIMARIOS — Planos, refinados, sin gradiente
+   ------------------------------------------------------------------ */
 .style-obsidian button.bg-\[\#1C4A2E\],
-.style-obsidian button.bg-emerald-600,
 .style-obsidian .bg-\[\#1C4A2E\],
+.style-obsidian button.bg-emerald-600,
 .style-obsidian .bg-emerald-600 {
-  background: linear-gradient(135deg, oklch(0.7 0.15 142), oklch(0.5 0.12 142)) !important;
-  box-shadow: 0 6px 20px 0 oklch(0.7 0.15 142 / 25%) !important;
-  border: none !important;
-  color: oklch(0.09 0.01 145) !important;
-  font-weight: 700 !important;
-  transition: all 0.3s ease !important;
+  background: oklch(0.35 0.08 160) !important;
+  border: 1px solid oklch(0.30 0.07 160) !important;
+  color: oklch(0.98 0.005 85) !important;
+  border-radius: 6px !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.015em !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease !important;
 }
 
 .style-obsidian button.bg-\[\#1C4A2E\]:hover,
-.style-obsidian button.bg-emerald-600:hover,
 .style-obsidian .bg-\[\#1C4A2E\]:hover,
+.style-obsidian button.bg-emerald-600:hover,
 .style-obsidian .bg-emerald-600:hover {
-  box-shadow: 0 8px 24px 0 oklch(0.7 0.15 142 / 40%) !important;
-  transform: translateY(-2px) !important;
-  filter: brightness(1.05) !important;
+  background: oklch(0.30 0.07 160) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 10px oklch(0.35 0.08 160 / 18%) !important;
 }
 
-/* Cabeceras de categorías y filas con matiz verde oliva oscuro */
-.style-obsidian .bg-slate-50,
-.style-obsidian .bg-slate-950\/50,
-.style-obsidian thead,
-.style-obsidian tr.bg-slate-50\/80 {
-  background-color: oklch(0.15 0.03 142 / 80%) !important;
+/* Dark mode buttons: jade brillante */
+.style-obsidian.dark button.bg-\[\#1C4A2E\],
+.style-obsidian.dark .bg-\[\#1C4A2E\],
+.style-obsidian.dark button.bg-emerald-600,
+.style-obsidian.dark .bg-emerald-600 {
+  background: oklch(0.72 0.14 170) !important;
+  border-color: oklch(0.65 0.13 170) !important;
+  color: oklch(0.10 0.015 175) !important;
 }
 
-/* Inputs y Selects */
+.style-obsidian.dark button.bg-\[\#1C4A2E\]:hover,
+.style-obsidian.dark .bg-\[\#1C4A2E\]:hover,
+.style-obsidian.dark button.bg-emerald-600:hover,
+.style-obsidian.dark .bg-emerald-600:hover {
+  background: oklch(0.68 0.13 170) !important;
+  box-shadow: 0 0 24px oklch(0.72 0.14 170 / 18%) !important;
+}
+
+/* ------------------------------------------------------------------
+   8. INPUTS & SELECTS — Mínimos, transparentes
+   ------------------------------------------------------------------ */
 .style-obsidian input,
 .style-obsidian select,
-.style-obsidian textarea,
-.style-obsidian .border-slate-300 {
-  border-color: oklch(0.24 0.05 142 / 40%) !important;
-  background-color: oklch(0.12 0.02 145) !important;
+.style-obsidian textarea {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  border-radius: 6px !important;
+  border-color: var(--border) !important;
+  background-color: transparent !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 .style-obsidian input:focus,
-.style-obsidian select:focus {
-  border-color: oklch(0.78 0.18 142) !important;
-  box-shadow: 0 0 0 2px oklch(0.78 0.18 142 / 20%) !important;
+.style-obsidian select:focus,
+.style-obsidian textarea:focus {
+  border-color: var(--ring) !important;
+  box-shadow: 0 0 0 2px oklch(0.35 0.08 160 / 10%) !important;
 }
 
-/* Tipografía de títulos */
-.style-obsidian h1,
-.style-obsidian h2,
-.style-obsidian h3 {
-  font-family: 'Inter', sans-serif !important;
-  letter-spacing: -0.025em !important;
+.style-obsidian.dark input,
+.style-obsidian.dark select,
+.style-obsidian.dark textarea {
+  background-color: oklch(0.12 0.01 175) !important;
+  border-color: oklch(0.72 0.14 170 / 10%) !important;
 }
 
-/* Sutil animación de pulso lento para el logotipo de la hoja en el sidebar */
-@keyframes softPulse {
-  0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 2px oklch(0.78 0.18 142 / 20%)); }
-  50% { transform: scale(1.05) rotate(3deg); filter: drop-shadow(0 0 8px oklch(0.78 0.18 142 / 50%)); }
+.style-obsidian.dark input:focus,
+.style-obsidian.dark select:focus,
+.style-obsidian.dark textarea:focus {
+  border-color: oklch(0.72 0.14 170) !important;
+  box-shadow: 0 0 0 2px oklch(0.72 0.14 170 / 10%) !important;
 }
 
-.style-obsidian .lucide-leaf, 
+/* ------------------------------------------------------------------
+   9. TABLAS — Grid afilado con headers uppercase
+   ------------------------------------------------------------------ */
+.style-obsidian thead,
+.style-obsidian .bg-slate-50,
+.style-obsidian .bg-slate-50\/80,
+.style-obsidian tr.bg-slate-50\/80 {
+  background-color: var(--muted) !important;
+}
+
+.style-obsidian.dark thead,
+.style-obsidian.dark .bg-slate-50,
+.style-obsidian.dark .bg-slate-50\/80 {
+  background-color: oklch(0.13 0.015 175 / 70%) !important;
+}
+
+.style-obsidian th {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  font-size: 0.6875rem !important;
+}
+
+.style-obsidian td {
+  border-color: var(--border) !important;
+}
+
+/* ------------------------------------------------------------------
+   10. SIDEBAR PREMIUM
+   ------------------------------------------------------------------ */
+.style-obsidian .bg-white\/70 {
+  background-color: oklch(0.97 0.005 85 / 88%) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+.style-obsidian.dark .bg-white\/70,
+.style-obsidian.dark .bg-slate-950\/70 {
+  background-color: oklch(0.11 0.015 175 / 92%) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* Override borders on slate */
+.style-obsidian .border-slate-200,
+.style-obsidian .border-slate-300 {
+  border-color: var(--border) !important;
+}
+
+.style-obsidian.dark .border-slate-800,
+.style-obsidian.dark .border-slate-700 {
+  border-color: oklch(0.72 0.14 170 / 8%) !important;
+}
+
+/* ------------------------------------------------------------------
+   11. GLOW BACKGROUND — Colores teal/jade
+   ------------------------------------------------------------------ */
+.style-obsidian .bg-emerald-500\/20 {
+  background-color: oklch(0.50 0.10 170 / 10%) !important;
+}
+
+.style-obsidian .bg-blue-500\/20 {
+  background-color: oklch(0.45 0.06 200 / 8%) !important;
+}
+
+.style-obsidian.dark .bg-emerald-500\/25 {
+  background-color: oklch(0.60 0.12 170 / 16%) !important;
+}
+
+.style-obsidian.dark .bg-blue-500\/25 {
+  background-color: oklch(0.50 0.08 200 / 12%) !important;
+}
+
+/* ------------------------------------------------------------------
+   12. BADGES DE ESTADO — Adaptar a las nuevas formas
+   ------------------------------------------------------------------ */
+.style-obsidian .rounded-full:not(img):not([class*="avatar"]):not([class*="h-2"]):not([class*="h-3"]) {
+  border-radius: 4px !important;
+}
+
+/* ------------------------------------------------------------------
+   13. SCROLLBAR PREMIUM (WebKit)
+   ------------------------------------------------------------------ */
+.style-obsidian ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.style-obsidian ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.style-obsidian ::-webkit-scrollbar-thumb {
+  background: oklch(0.18 0.02 180 / 12%);
+  border-radius: 3px;
+}
+
+.style-obsidian ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.18 0.02 180 / 22%);
+}
+
+.style-obsidian.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.72 0.14 170 / 12%);
+}
+
+.style-obsidian.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.72 0.14 170 / 22%);
+}
+
+/* ------------------------------------------------------------------
+   14. MICRO-ANIMACIONES PREMIUM
+   ------------------------------------------------------------------ */
+@keyframes premiumPulse {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px oklch(0.35 0.08 160 / 0%)); }
+  50% { opacity: 0.85; filter: drop-shadow(0 0 6px oklch(0.35 0.08 160 / 30%)); }
+}
+
+@keyframes premiumPulseDark {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px oklch(0.72 0.14 170 / 0%)); }
+  50% { opacity: 0.85; filter: drop-shadow(0 0 8px oklch(0.72 0.14 170 / 35%)); }
+}
+
+.style-obsidian .lucide-leaf,
 .style-obsidian .sidebar-header svg {
-  animation: softPulse 4s ease-in-out infinite;
+  animation: premiumPulse 5s ease-in-out infinite;
+}
+
+.style-obsidian.dark .lucide-leaf,
+.style-obsidian.dark .sidebar-header svg {
+  animation: premiumPulseDark 5s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------
+   15. TOPBAR — Override glassmorphism
+   ------------------------------------------------------------------ */
+.style-obsidian header .backdrop-blur-xl,
+.style-obsidian .backdrop-blur-xl {
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+}
+
+.style-obsidian.dark header .backdrop-blur-xl,
+.style-obsidian.dark .backdrop-blur-xl {
+  backdrop-filter: blur(20px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(110%) !important;
+}
+
+/* ------------------------------------------------------------------
+   16. DARK MODE OVERRIDES — Cohesión monocromática Omarchy
+   ------------------------------------------------------------------ */
+.style-obsidian.dark .bg-slate-50 {
+  background-color: oklch(0.14 0.01 175) !important;
+}
+
+.style-obsidian.dark .bg-slate-100 {
+  background-color: oklch(0.15 0.01 175) !important;
+}
+
+.style-obsidian.dark .bg-slate-950 {
+  background-color: oklch(0.10 0.015 175) !important;
+}
+
+.style-obsidian.dark .text-slate-900 {
+  color: oklch(0.93 0.01 85) !important;
+}
+
+.style-obsidian.dark .text-slate-50,
+.style-obsidian.dark .text-slate-100 {
+  color: oklch(0.93 0.01 85) !important;
+}
+
+.style-obsidian.dark .text-slate-500,
+.style-obsidian.dark .text-slate-400 {
+  color: oklch(0.58 0.02 175) !important;
+}
+
+/* Emerald → Jade coherente */
+.style-obsidian.dark .text-emerald-400 {
+  color: oklch(0.72 0.14 170) !important;
+}
+
+.style-obsidian.dark .text-emerald-300 {
+  color: oklch(0.78 0.12 170) !important;
+}
+
+.style-obsidian.dark .bg-emerald-600 {
+  background-color: oklch(0.72 0.14 170) !important;
+}
+
+.style-obsidian.dark .bg-emerald-900\/30,
+.style-obsidian.dark .bg-emerald-900\/50,
+.style-obsidian.dark .bg-emerald-950\/20 {
+  background-color: oklch(0.20 0.04 170 / 35%) !important;
+}
+
+.style-obsidian.dark .border-emerald-200,
+.style-obsidian.dark .border-emerald-700\/30 {
+  border-color: oklch(0.72 0.14 170 / 12%) !important;
 }
