@@ -9,6 +9,7 @@ interface Profile {
   soundEnabled: boolean;
   glowEnabled: boolean;
   stylePreset?: "classic" | "obsidian";
+  fontPreset?: "jakarta" | "sans" | "serif";
 }
 
 interface ProfileContextValue {
@@ -26,6 +27,7 @@ const defaultProfile: Profile = {
   soundEnabled: true,
   glowEnabled: true,
   stylePreset: "classic",
+  fontPreset: "jakarta",
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -46,8 +48,21 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     // Sincronizar clase global de estilo preferencial en el elemento html raíz
     if (typeof window !== "undefined") {
       const root = window.document.documentElement;
+      
+      // Limpiar clases de tipografía previas
+      root.classList.remove("font-jakarta", "font-sans-preset", "font-serif-preset");
+      
       if (profile.stylePreset === "obsidian") {
         root.classList.add("style-obsidian");
+        
+        const font = profile.fontPreset || "jakarta";
+        if (font === "jakarta") {
+          root.classList.add("font-jakarta");
+        } else if (font === "sans") {
+          root.classList.add("font-sans-preset");
+        } else if (font === "serif") {
+          root.classList.add("font-serif-preset");
+        }
       } else {
         root.classList.remove("style-obsidian");
       }

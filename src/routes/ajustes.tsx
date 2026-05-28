@@ -262,6 +262,40 @@ function AjustesPage() {
             </div>
           </Card>
 
+          {/* Tipografía Premium - Solo visible en modo Premium (obsidian) */}
+          {profile.stylePreset === "obsidian" && (
+            <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md animate-in fade-in slide-in-from-top-2 duration-300">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 transition-colors">Tipografía Premium</h3>
+              <p className="text-sm text-slate-505 dark:text-slate-400 mb-4 transition-colors">Personaliza la fuente de letras en el modo Premium.</p>
+              
+              <div className="grid grid-cols-3 gap-2">
+                <button 
+                  onClick={() => updateProfile({ fontPreset: "jakarta" })}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer ${profile.fontPreset === "jakarta" || !profile.fontPreset ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400"}`}
+                >
+                  <span className="text-xs uppercase">Moderna</span>
+                  <span className="text-[10px] opacity-60 font-mono mt-0.5">Jakarta</span>
+                </button>
+                
+                <button 
+                  onClick={() => updateProfile({ fontPreset: "sans" })}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer ${profile.fontPreset === "sans" ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400"}`}
+                >
+                  <span className="text-xs uppercase">Clásica</span>
+                  <span className="text-[10px] opacity-60 font-mono mt-0.5">DM Sans</span>
+                </button>
+                
+                <button 
+                  onClick={() => updateProfile({ fontPreset: "serif" })}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer ${profile.fontPreset === "serif" ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400"}`}
+                >
+                  <span className="text-xs uppercase">Elegante</span>
+                  <span className="text-[10px] opacity-60 font-mono mt-0.5">Serif</span>
+                </button>
+              </div>
+            </Card>
+          )}
+
           {/* Tienda Predeterminada */}
           <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 transition-colors">Tienda predeterminada</h3>

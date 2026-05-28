@@ -177,14 +177,49 @@
   font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
 }
 
-.style-obsidian h1,
-.style-obsidian h2 {
+/* 1.1 Preset Jakarta (Geométrica / Moderna) */
+.style-obsidian.font-jakarta {
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
+}
+.style-obsidian.font-jakarta h1,
+.style-obsidian.font-jakarta h2 {
   font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
   letter-spacing: -0.02em !important;
   font-weight: 700 !important;
 }
+.style-obsidian.font-jakarta h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
 
-.style-obsidian h3 {
+/* 1.2 Preset Sans (Clásica / Original) */
+.style-obsidian.font-sans-preset {
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+}
+.style-obsidian.font-sans-preset h1,
+.style-obsidian.font-sans-preset h2 {
+  font-family: 'DM Sans', sans-serif !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+.style-obsidian.font-sans-preset h3 {
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* 1.3 Preset Serif (Serif Elegante / Playfair) */
+.style-obsidian.font-serif-preset {
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
+}
+.style-obsidian.font-serif-preset h1,
+.style-obsidian.font-serif-preset h2 {
+  font-family: 'Playfair Display', 'Georgia', serif !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+.style-obsidian.font-serif-preset h3 {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
