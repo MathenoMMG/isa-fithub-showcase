@@ -34,7 +34,7 @@ const rowStyles: Record<ReturnType<typeof getWorstStatus>, { bg: string; dot: st
 };
 
 export function ProductRow({ product, defaultOpen = false }: Props) {
-  const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct } = useInventory();
+  const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct, restoreProduct } = useInventory();
   const [open, setOpen] = useState(defaultOpen);
   const { profile } = useProfile();
   
@@ -322,7 +322,19 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                     className="bg-red-600 hover:bg-red-700"
                     onClick={() => {
                       removeProduct(product.id);
-                      toast.success(`Producto "${product.nombre}" eliminado`);
+                      toast.success(`Producto "${product.nombre}" eliminado`, {
+                        action: {
+                          label: "Deshacer",
+                          onClick: () => {
+                            toast.promise(restoreProduct(product.id), {
+                              loading: "Restaurando...",
+                              success: "Producto restaurado",
+                              error: "Error al restaurar",
+                            });
+                          }
+                        },
+                        duration: 10000
+                      });
                     }}
                   >
                     Eliminar

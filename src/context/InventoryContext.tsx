@@ -1,9 +1,14 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput } from "@/types/inventory";
+import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
 import { addPendingOp } from "@/lib/offline";
 import { toast } from "sonner";
+
+export interface DeletedProduct {
+  deletedAt: string;
+  product: ProductoConLotes;
+}
 
 interface InventoryContextValue {
   items: ProductoConLotes[];
@@ -12,6 +17,9 @@ interface InventoryContextValue {
   addProduct: (input: NewProductInput & { cantidad: number; fecha_caducidad: string | null }) => Promise<void>;
   updateProduct: (productId: string, updates: Partial<ProductoConLotes>) => Promise<void>;
   removeProduct: (productId: string) => Promise<void>;
+  restoreProduct: (productId: string) => Promise<void>;
+  clearTrashBin: () => void;
+  trashBin: DeletedProduct[];
   addLote: (productId: string, input: NewLoteInput) => Promise<void>;
   removeLote: (productId: string, loteId: string) => Promise<void>;
   sellFromLote: (productId: string, loteId: string, qty?: number) => Promise<void>;
@@ -29,6 +37,24 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ProductoConLotes[]>([]);
   const [loading, setLoading] = useState(true);
   const { store } = useStore();
+  const [trashBin, setTrashBin] = useState<DeletedProduct[]>(() => {
+    try {
+      const stored = localStorage.getItem("fithub_trash_bin");
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Error parsing trash bin:", e);
+      return [];
+    }
+  });
+
+  const saveTrashBin = (newTrash: DeletedProduct[]) => {
+    setTrashBin(newTrash);
+    try {
+      localStorage.setItem("fithub_trash_bin", JSON.stringify(newTrash));
+    } catch (e) {
+      console.error("Error saving trash bin:", e);
+    }
+  };
 
   const fetchData = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
@@ -120,9 +146,75 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   };
 
   const removeProduct = async (productId: string) => {
+    const productToDelete = items.find((item) => item.id === productId);
+    if (productToDelete) {
+      const deletedItem: DeletedProduct = {
+        deletedAt: new Date().toISOString(),
+        product: productToDelete,
+      };
+      const updatedTrash = [deletedItem, ...trashBin.filter(t => t.product.id !== productId)].slice(0, 50);
+      saveTrashBin(updatedTrash);
+    }
+
     const { error } = await supabase.from("productos").delete().eq("id", productId);
     if (error) throw error;
     await fetchData();
+  };
+
+  const restoreProduct = async (productId: string) => {
+    const deletedEntry = trashBin.find((t) => t.product.id === productId);
+    if (!deletedEntry) {
+      throw new Error("Producto no encontrado en la papelera");
+    }
+
+    const { product } = deletedEntry;
+
+    try {
+      const { error: pErr } = await supabase
+        .from("productos")
+        .insert({
+          id: product.id,
+          tienda_id: product.tienda_id,
+          articulo: product.articulo,
+          sicol: product.sicol,
+          nombre: product.nombre,
+          categoria: product.categoria,
+          proveedor_nombre: product.proveedor_nombre,
+          proveedor_codigo: product.proveedor_codigo,
+          notas: product.notas,
+        });
+
+      if (pErr) throw pErr;
+
+      if (product.lotes && product.lotes.length > 0) {
+        const lotesToInsert = product.lotes.map((l) => ({
+          id: l.id,
+          producto_id: product.id,
+          cantidad: l.cantidad,
+          fecha_caducidad: l.fecha_caducidad,
+          fecha_ingreso: l.fecha_ingreso,
+          notas: l.notas,
+        }));
+
+        const { error: lErr } = await supabase.from("lotes").insert(lotesToInsert);
+        if (lErr) throw lErr;
+      }
+
+      const updatedTrash = trashBin.filter((t) => t.product.id !== productId);
+      saveTrashBin(updatedTrash);
+
+      await fetchData();
+      toast.success(`Producto "${product.nombre}" restaurado exitosamente.`);
+    } catch (err) {
+      console.error("Error restoring product:", err);
+      toast.error(`Error al restaurar "${product.nombre}": ` + (err as Error).message);
+      throw err;
+    }
+  };
+
+  const clearTrashBin = () => {
+    saveTrashBin([]);
+    toast.success("Papelera de reciclaje vaciada.");
   };
 
   const updateProduct = async (productId: string, updates: Partial<Producto>) => {
@@ -316,6 +408,9 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         addProduct,
         updateProduct,
         removeProduct,
+        restoreProduct,
+        clearTrashBin,
+        trashBin,
         addLote,
         removeLote,
         sellFromLote,
