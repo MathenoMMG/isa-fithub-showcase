@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatInBogota } from "./date-utils";
 import type { Venta, ProductoConLotes } from "@/types/inventory";
 import { getExpiryStatus } from "./expiry";
 import html2canvas from "html2canvas";
@@ -15,7 +16,7 @@ interface ReportOptions {
 
 export async function generatePdfReport({ store, range, ventas, inventory }: ReportOptions) {
   const doc = new jsPDF();
-  const dateStr = format(new Date(), "dd 'de' MMMM, yyyy", { locale: es });
+  const dateStr = formatInBogota(new Date(), "dd 'de' MMMM, yyyy");
   
   // -- HEADER --
   doc.setFillColor(5, 150, 105); // emerald-600
@@ -127,6 +128,36 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
   
   currentY = (doc as any).lastAutoTable.finalY + 15;
 
+  // -- HISTORIAL DETALLADO DE VENTAS --
+  if (currentY > 230) {
+    doc.addPage();
+    currentY = 20;
+  }
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Historial Detallado de Ventas (Día y Hora)", 14, currentY);
+
+  // Ordenar cronológicamente las ventas (más recientes primero)
+  const cronVent = [...ventas].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  autoTable(doc, {
+    startY: currentY + 5,
+    head: [["Fecha y Hora", "Categoría", "Producto", "Tienda", "Cantidad"]],
+    body: cronVent.map(v => {
+      const dateFormatted = formatInBogota(v.created_at, "dd/MM/yyyy HH:mm");
+      const cat = v.productos?.categoria || "Otros";
+      const prodName = v.productos?.nombre || "Producto desconocido";
+      const tiendaStr = v.productos?.tienda_id === 1 ? "Norte" : v.productos?.tienda_id === 2 ? "Sur" : "N/A";
+      return [dateFormatted, cat, prodName, tiendaStr, `+${v.cantidad}`];
+    }),
+    headStyles: { fillColor: [5, 150, 105] },
+    theme: "striped",
+    styles: { fontSize: 8 },
+  });
+
+  currentY = (doc as any).lastAutoTable.finalY + 15;
+
   // -- STOCK CRÍTICO --
   if (currentY > 250) {
     doc.addPage();
@@ -171,7 +202,7 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
     autoTable(doc, {
       startY: currentY + 5,
       head: [["Estado", "Fecha Cad.", "Tienda", "Articulo", "Producto", "Uds"]],
-      body: criticos.map(c => [c.estado, format(new Date(c.caducidad), "dd/MM/yyyy"), c.tienda, c.articulo, c.nombre, c.loteQty.toString()]),
+      body: criticos.map(c => [c.estado, formatInBogota(c.caducidad, "dd/MM/yyyy"), c.tienda, c.articulo, c.nombre, c.loteQty.toString()]),
       headStyles: { fillColor: [220, 38, 38] }, // Red header for critical
       theme: "striped",
       styles: { fontSize: 8 },

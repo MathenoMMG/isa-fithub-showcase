@@ -51,7 +51,7 @@ export function AddLoteDialog({ productId, productName }: Props) {
         <div className="grid grid-cols-2 gap-3 py-2">
           <div className="space-y-1.5">
             <Label>Cantidad</Label>
-            <Input className="h-11" type="number" min={1} value={cantidad} onChange={(e) => setCantidad(Number(e.target.value))} />
+            <Input className="h-11" type="number" min={1} inputMode="numeric" pattern="[0-9]*" value={cantidad} onChange={(e) => setCantidad(Number(e.target.value))} />
           </div>
           <div className="space-y-1.5">
             <Label>Caducidad</Label>

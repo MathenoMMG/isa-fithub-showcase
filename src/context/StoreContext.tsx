@@ -30,20 +30,12 @@ const DATE_KEY = "fithub.lastStoreDate";
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [store, setStoreState] = useState<StoreFilter>(() => {
     if (typeof window === "undefined") return getRotativeStore();
-    const today = new Date().toISOString().slice(0, 10);
-    const lastDate = localStorage.getItem(DATE_KEY);
     const saved = localStorage.getItem(STORAGE_KEY) as StoreFilter;
-    
-    if (lastDate !== today) {
-      return getRotativeStore();
-    }
     return saved && (saved === "Sur" || saved === "Norte" || saved === "Ambas") ? saved : getRotativeStore();
   });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const today = new Date().toISOString().slice(0, 10);
-      localStorage.setItem(DATE_KEY, today);
       localStorage.setItem(STORAGE_KEY, store);
     }
   }, [store]);

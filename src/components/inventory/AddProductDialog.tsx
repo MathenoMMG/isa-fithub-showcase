@@ -153,7 +153,7 @@ export function AddProductDialog({ customTrigger }: { customTrigger?: React.Reac
           </div>
           <div className="space-y-1.5">
             <Label>Cantidad inicial</Label>
-            <Input className="h-11" type="number" min={0} value={form.cantidad} onChange={(e) => setForm({ ...form, cantidad: Number(e.target.value) })} />
+            <Input className="h-11" type="number" min={0} inputMode="numeric" pattern="[0-9]*" value={form.cantidad} onChange={(e) => setForm({ ...form, cantidad: Number(e.target.value) })} />
           </div>
           <div className="space-y-1.5">
             <Label>Caducidad (lote inicial)</Label>

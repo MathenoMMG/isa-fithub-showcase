@@ -1,6 +1,8 @@
 import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
 import type { Visita } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
+import { addPendingOp } from "@/lib/offline";
+import { toast } from "sonner";
 
 interface VisitContextValue {
   visitas: Visita[];
@@ -15,8 +17,8 @@ export function VisitProvider({ children }: { children: ReactNode }) {
   const [visitas, setVisitas] = useState<Visita[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchVisitas = useCallback(async () => {
-    setLoading(true);
+  const fetchVisitas = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const { data, error } = await supabase
         .from("visitas")
@@ -28,28 +30,55 @@ export function VisitProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error("Error fetching visitas:", err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchVisitas();
+    // Carga inicial
+    fetchVisitas(true);
+
+    // Polling silencioso cada 15 segundos para mantener registros de visitas sincronizados
+    const interval = setInterval(() => {
+      fetchVisitas(false);
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, [fetchVisitas]);
 
   const registrarVisita = async (tienda_id: number, fecha: string, notas?: string) => {
-    const { error } = await supabase.from("visitas").insert({
-      tienda_id,
-      fecha,
-      notas: notas || null,
-    });
-    
-    // Ignorar el error de duplicado (si la impulsadora ya marcó visita este día para esta tienda)
-    // El índice UNIQUE(tienda_id, fecha) protege esto en BD.
-    if (error && error.code !== "23505") { 
-      throw error;
+    try {
+      if (!window.navigator.onLine) {
+        throw new Error("offline");
+      }
+      const { error } = await supabase.from("visitas").insert({
+        tienda_id,
+        fecha,
+        notas: notas || null,
+      });
+      
+      // Ignorar el error de duplicado (si la impulsadora ya marcó visita este día para esta tienda)
+      // El índice UNIQUE(tienda_id, fecha) protege esto en BD.
+      if (error && error.code !== "23505") { 
+        throw error;
+      }
+      
+      await fetchVisitas();
+    } catch (err) {
+      console.warn("Error registering visit, saving offline:", err);
+      addPendingOp('visit', { tienda_id, fecha, notas });
+      toast.warning("Sin conexión: Visita registrada localmente en cola.");
+      
+      // Optimistic UI Update
+      const fakeVisit: Visita = {
+        id: Math.random().toString(36).substring(2, 9),
+        tienda_id,
+        fecha,
+        notas: notas || null,
+        created_at: new Date().toISOString()
+      };
+      setVisitas(prev => [fakeVisit, ...prev]);
     }
-    
-    await fetchVisitas();
   };
 
   return (

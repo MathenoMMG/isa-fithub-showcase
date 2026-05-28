@@ -15,6 +15,7 @@ import { generatePdfReport } from "@/lib/generate-report-pdf";
 import { getExpiryStatus } from "@/lib/expiry";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatInBogota } from "@/lib/date-utils";
 
 import {
   StockOutPredictionCard,
@@ -437,7 +438,7 @@ function Informes() {
                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-200">{lote.nombre}</td>
                     <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{lote.tienda}</td>
                     <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">
-                      {format(new Date(lote.caducidad), "dd/MM/yyyy")}
+                      {formatInBogota(lote.caducidad, "dd/MM/yyyy")}
                     </td>
                     <td className="px-6 py-4 text-right font-bold text-slate-900 dark:text-slate-200">
                       {lote.cantidad}
@@ -519,9 +520,13 @@ function Informes() {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {filteredSalesTable.length > 0 ? (
                 filteredSalesTable.map((v) => (
-                  <tr key={v.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+                  <tr 
+                    key={v.id} 
+                    onClick={() => v.productos?.nombre && navigate({ to: "/inventario", search: { q: v.productos.nombre } })}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
+                  >
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                      {format(new Date(v.created_at), "dd/MM/yyyy HH:mm", { locale: es })}
+                      {formatInBogota(v.created_at, "dd/MM/yyyy HH:mm")}
                     </td>
                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-200">
                       {v.productos?.nombre || "Producto desconocido"}

@@ -2,6 +2,8 @@ import { createContext, useContext, useCallback, useEffect, useMemo, useState, t
 import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
+import { addPendingOp } from "@/lib/offline";
+import { toast } from "sonner";
 
 interface InventoryContextValue {
   items: ProductoConLotes[];
@@ -72,32 +74,49 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Carga inicial
     fetchData(true);
+
+    // Polling cada 10 segundos para mantener sincronizadas las sesiones en tiempo real
+    const interval = setInterval(() => {
+      fetchData(false);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   const addProduct = async (
     input: NewProductInput & { cantidad: number; fecha_caducidad: string | null },
   ) => {
-    const { cantidad, fecha_caducidad, ...productData } = input;
+    try {
+      if (!window.navigator.onLine) {
+        throw new Error("offline");
+      }
+      
+      const { cantidad, fecha_caducidad, ...productData } = input;
+      const { data: product, error: pErr } = await supabase
+        .from("productos")
+        .insert(productData)
+        .select()
+        .single();
 
-    const { data: product, error: pErr } = await supabase
-      .from("productos")
-      .insert(productData)
-      .select()
-      .single();
+      if (pErr) throw pErr;
 
-    if (pErr) throw pErr;
+      if (cantidad > 0) {
+        const { error: lErr } = await supabase.from("lotes").insert({
+          producto_id: product.id,
+          cantidad,
+          fecha_caducidad: fecha_caducidad || null,
+        });
+        if (lErr) throw lErr;
+      }
 
-    if (cantidad > 0) {
-      const { error: lErr } = await supabase.from("lotes").insert({
-        producto_id: product.id,
-        cantidad,
-        fecha_caducidad: fecha_caducidad || null,
-      });
-      if (lErr) throw lErr;
+      await fetchData();
+    } catch (err) {
+      console.warn("Error adding product, saving offline:", err);
+      addPendingOp('add_product', input);
+      toast.warning("Sin conexión: Producto guardado localmente en cola.");
     }
-
-    await fetchData();
   };
 
   const removeProduct = async (productId: string) => {
@@ -113,13 +132,22 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   };
 
   const addLote = async (productId: string, input: NewLoteInput) => {
-    const { error } = await supabase.from("lotes").insert({
-      producto_id: productId,
-      cantidad: input.cantidad,
-      fecha_caducidad: input.fecha_caducidad || null,
-    });
-    if (error) throw error;
-    await fetchData();
+    try {
+      if (!window.navigator.onLine) {
+        throw new Error("offline");
+      }
+      const { error } = await supabase.from("lotes").insert({
+        producto_id: productId,
+        cantidad: input.cantidad,
+        fecha_caducidad: input.fecha_caducidad || null,
+      });
+      if (error) throw error;
+      await fetchData();
+    } catch (err) {
+      console.warn("Error adding lote, saving offline:", err);
+      addPendingOp('add_lote', { producto_id: productId, cantidad: input.cantidad, fecha_caducidad: input.fecha_caducidad });
+      toast.warning("Sin conexión: Nuevo lote guardado localmente en cola.");
+    }
   };
 
   const removeLote = async (_productId: string, loteId: string) => {
@@ -129,29 +157,50 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   };
 
   const sellFromLote = async (productId: string, loteId: string, qty = 1) => {
-    // Record the sale
-    const { error: vErr } = await supabase.from("ventas").insert({
-      producto_id: productId,
-      lote_id: loteId,
-      cantidad: qty,
-    });
-    if (vErr) throw vErr;
+    try {
+      if (!window.navigator.onLine) {
+        throw new Error("offline");
+      }
+      // Record the sale
+      const { error: vErr } = await supabase.from("ventas").insert({
+        producto_id: productId,
+        lote_id: loteId,
+        cantidad: qty,
+      });
+      if (vErr) throw vErr;
 
-    // Decrement lote quantity
-    const lote = items
-      .find((p) => p.id === productId)
-      ?.lotes.find((l) => l.id === loteId);
+      // Decrement lote quantity
+      const lote = items
+        .find((p) => p.id === productId)
+        ?.lotes.find((l) => l.id === loteId);
 
-    if (lote) {
-      const newQty = Math.max(0, lote.cantidad - qty);
-      const { error: lErr } = await supabase
-        .from("lotes")
-        .update({ cantidad: newQty })
-        .eq("id", loteId);
-      if (lErr) throw lErr;
+      if (lote) {
+        const newQty = Math.max(0, lote.cantidad - qty);
+        const { error: lErr } = await supabase
+          .from("lotes")
+          .update({ cantidad: newQty })
+          .eq("id", loteId);
+        if (lErr) throw lErr;
+      }
+
+      await fetchData();
+    } catch (err) {
+      console.warn("Error registering sale, saving offline:", err);
+      addPendingOp('sell', { producto_id: productId, lote_id: loteId, cantidad: qty });
+      toast.warning("Sin conexión: Venta guardada localmente.");
+      
+      // Optimistic UI Update
+      setItems(prev => prev.map(p => {
+        if (p.id !== productId) return p;
+        return {
+          ...p,
+          lotes: p.lotes.map(l => {
+            if (l.id !== loteId) return l;
+            return { ...l, cantidad: Math.max(0, l.cantidad - qty) };
+          })
+        };
+      }));
     }
-
-    await fetchData();
   };
 
   const undoSale = async (productId: string, loteId: string): Promise<boolean> => {
@@ -192,20 +241,41 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     return true;
   };
 
-  const adjustLote = async (_productId: string, loteId: string, delta: number) => {
-    // Find current quantity
-    const currentLote = items
-      .flatMap((p) => p.lotes)
-      .find((l) => l.id === loteId);
+  const adjustLote = async (productId: string, loteId: string, delta: number) => {
+    try {
+      if (!window.navigator.onLine) {
+        throw new Error("offline");
+      }
+      // Find current quantity
+      const currentLote = items
+        .flatMap((p) => p.lotes)
+        .find((l) => l.id === loteId);
 
-    if (currentLote) {
-      const newQty = Math.max(0, currentLote.cantidad + delta);
-      const { error } = await supabase
-        .from("lotes")
-        .update({ cantidad: newQty })
-        .eq("id", loteId);
-      if (error) throw error;
-      await fetchData();
+      if (currentLote) {
+        const newQty = Math.max(0, currentLote.cantidad + delta);
+        const { error } = await supabase
+          .from("lotes")
+          .update({ cantidad: newQty })
+          .eq("id", loteId);
+        if (error) throw error;
+        await fetchData();
+      }
+    } catch (err) {
+      console.warn("Error adjusting stock, saving offline:", err);
+      addPendingOp('adjust', { lote_id: loteId, delta });
+      toast.warning("Sin conexión: Ajuste guardado localmente.");
+
+      // Optimistic UI Update
+      setItems(prev => prev.map(p => {
+        if (p.id !== productId) return p;
+        return {
+          ...p,
+          lotes: p.lotes.map(l => {
+            if (l.id !== loteId) return l;
+            return { ...l, cantidad: Math.max(0, l.cantidad + delta) };
+          })
+        };
+      }));
     }
   };
 

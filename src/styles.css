@@ -143,6 +143,22 @@
     color: var(--color-foreground);
     font-family: 'DM Sans', sans-serif;
   }
+
+  /* Deshabilitar selección global de texto para evitar copiado */
+  html, body, #root {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Mantener selección habilitada en campos de entrada y texto */
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
 }
 
 @utility font-mono-data {

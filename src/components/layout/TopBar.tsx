@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { useRouterState, Link } from "@tanstack/react-router";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { StoreSelector } from "./StoreSelector";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatInBogota } from "@/lib/date-utils";
 import { useProfile } from "@/context/ProfileContext";
+import { Button } from "@/components/ui/button";
+import { Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { getPendingOps, processPendingOp, removePendingOp, type PendingOp } from "@/lib/offline";
+import { toast } from "sonner";
 
 const titles: Record<string, string> = {
   "/": "Dashboard",
@@ -20,10 +23,76 @@ export function TopBar() {
   const { profile } = useProfile();
 
   const [now, setNow] = useState(new Date());
+  const [isOnline, setIsOnline] = useState(true);
+  const [pendingOps, setPendingOps] = useState<PendingOp[]>([]);
+  const [isSyncing, setIsSyncing] = useState(false);
+
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    setIsOnline(window.navigator.onLine);
+    setPendingOps(getPendingOps());
+
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast.success("¡Conexión de red restaurada! Ya puedes guardar tus cambios pendientes.");
+    };
+    
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.error("Sin conexión a internet. Los cambios se guardarán localmente.");
+    };
+
+    const handleOpsChanged = () => {
+      setPendingOps(getPendingOps());
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("fithub_pending_ops_changed", handleOpsChanged);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("fithub_pending_ops_changed", handleOpsChanged);
+    };
+  }, []);
+
+  const handleSync = async () => {
+    if (pendingOps.length === 0 || isSyncing) return;
+    setIsSyncing(true);
+    
+    const toastId = toast.loading(`Sincronizando ${pendingOps.length} cambios pendientes...`);
+    const opsToSync = [...pendingOps];
+    let successCount = 0;
+
+    for (const op of opsToSync) {
+      try {
+        await processPendingOp(op);
+        removePendingOp(op.id);
+        successCount++;
+      } catch (err) {
+        console.error("Error syncing pending operation:", op, err);
+      }
+    }
+
+    setIsSyncing(false);
+    
+    if (successCount === opsToSync.length) {
+      toast.success("¡Todos los cambios se han guardado con éxito!", { id: toastId });
+      // Recargar la página para rehidratar todo el estado limpio desde Supabase
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else {
+      toast.error(`Sincronización parcial: ${successCount} de ${opsToSync.length} cambios guardados.`, { id: toastId });
+    }
+  };
 
   const initials = profile.name ? profile.name.substring(0, 2).toUpperCase() : "FH";
 
@@ -33,6 +102,26 @@ export function TopBar() {
       <div className="flex-1 min-w-0">
         <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-slate-50 truncate">{title}</h1>
       </div>
+
+      {/* Indicador de conexión */}
+      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shrink-0">
+        <span className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-red-500 animate-pulse'}`} />
+        <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 hidden sm:inline">
+          {isOnline ? 'En línea' : 'Sin red'}
+        </span>
+      </div>
+
+      {/* Botón de sincronización cuando vuelve el internet */}
+      {isOnline && pendingOps.length > 0 && (
+        <Button
+          onClick={handleSync}
+          disabled={isSyncing}
+          className="h-10 px-4 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold gap-2 rounded-xl shadow-md animate-bounce cursor-pointer shrink-0"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+          <span>Guardar Cambios ({pendingOps.length})</span>
+        </Button>
+      )}
       
       <StoreSelector />
       
@@ -52,7 +141,7 @@ export function TopBar() {
             {profile.subtitle}
           </div>
           <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
-            {format(now, "d MMM · HH:mm", { locale: es })}
+            {formatInBogota(now, "d MMM · HH:mm")}
           </div>
         </div>
       </Link>

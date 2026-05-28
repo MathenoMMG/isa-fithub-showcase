@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,19 @@ function InventarioPage() {
   // State for collapse/expand all
   const [collapseCounter, setCollapseCounter] = useState(0);
   const [expandCounter, setExpandCounter] = useState(0);
+
+  // Sincronizar el estado local con los parámetros de búsqueda de la ruta
+  useEffect(() => {
+    setSearch(q || "");
+  }, [q]);
+
+  useEffect(() => {
+    setStatusFilters(status ? [status] : []);
+  }, [status]);
+
+  useEffect(() => {
+    setCategoryFilters(category ? [category] : []);
+  }, [category]);
 
   // Funciones para filtros rápidos desde KpiCards
   const onFilterStock = () => {
@@ -168,8 +181,18 @@ function InventarioPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por artículo, nombre o categoría…"
-              className="h-12 pl-11 text-base rounded-xl border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 dark:text-slate-200 transition-colors"
+              className="h-12 pl-11 pr-10 text-base rounded-xl border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 dark:text-slate-200 transition-colors"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                aria-label="Limpiar búsqueda"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
           
           <DropdownMenu>

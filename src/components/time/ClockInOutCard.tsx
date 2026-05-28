@@ -4,8 +4,9 @@ import { Card } from "@/components/ui/card";
 import { useTimeLog } from "@/context/TimeLogContext";
 import { useStore, getRotativeStore } from "@/context/StoreContext";
 import { useProfile } from "@/context/ProfileContext";
-import { format, isToday, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatInBogota, getBogotaDate, isTodayInBogota } from "@/lib/date-utils";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -21,7 +22,7 @@ export function ClockInOutCard() {
   }, []);
 
   const todayLogs = logs
-    .filter((l) => isToday(parseISO(l.created_at)))
+    .filter((l) => isTodayInBogota(l.created_at))
     .sort((a, b) => a.created_at.localeCompare(b.created_at));
   const last = todayLogs[todayLogs.length - 1];
   const canEntrar = !last || last.tipo === "salida";
@@ -48,13 +49,13 @@ export function ClockInOutCard() {
     }
   };
 
-  const horarioHoy = getHorarioEsperado(now.getDay());
+  const horarioHoy = getHorarioEsperado(getBogotaDate(now).getDay());
 
   return (
     <Card className="p-6 md:p-8 rounded-2xl border-slate-200 bg-white shadow-sm dark:bg-slate-900 dark:border-slate-800 transition-colors">
       <div className="text-center mb-6">
-        <div className="text-sm text-slate-500 uppercase tracking-wide font-medium">{format(now, "EEEE d 'de' MMMM", { locale: es })}</div>
-        <div className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-50 tabular-nums mt-2">{format(now, "HH:mm:ss")}</div>
+        <div className="text-sm text-slate-500 uppercase tracking-wide font-medium">{formatInBogota(now, "EEEE d 'de' MMMM")}</div>
+        <div className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-50 tabular-nums mt-2">{formatInBogota(now, "HH:mm:ss")}</div>
         <div className="text-sm text-slate-500 mt-2">
           Tienda activa: <span className="font-semibold text-emerald-700 dark:text-emerald-500">{tiendaName}</span>
           {store === "Ambas" && <span className="text-slate-400"> (por rotación)</span>}
@@ -100,7 +101,7 @@ export function ClockInOutCard() {
                   <span className="font-medium capitalize dark:text-slate-200">{l.tipo}</span>
                   <span className="text-slate-500">· {l.tienda_id === 2 ? "Sur" : "Norte"}</span>
                 </span>
-                <span className="tabular-nums text-slate-700 dark:text-slate-300 font-medium">{format(parseISO(l.created_at), "HH:mm:ss")}</span>
+                <span className="tabular-nums text-slate-700 dark:text-slate-300 font-medium">{formatInBogota(l.created_at, "HH:mm:ss")}</span>
               </li>
             ))}
           </ul>

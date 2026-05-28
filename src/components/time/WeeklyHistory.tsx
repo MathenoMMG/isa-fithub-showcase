@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useTimeLog } from "@/context/TimeLogContext";
 import { differenceInMinutes, eachDayOfInterval, format, parseISO, startOfWeek, endOfWeek, isSameDay } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatInBogota, getBogotaDate, isSameDayInBogota } from "@/lib/date-utils";
 import { MoreHorizontal, Trash2, Edit2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import type { RegistroHorario } from "@/types/inventory";
 
 export function WeeklyHistory() {
   const { logs, deleteLog, updateLog } = useTimeLog();
-  const now = new Date();
+  const now = getBogotaDate(new Date());
   const days = eachDayOfInterval({
     start: startOfWeek(now, { weekStartsOn: 1 }),
     end: endOfWeek(now, { weekStartsOn: 1 }),
@@ -67,7 +68,7 @@ export function WeeklyHistory() {
         <TableBody>
           {days.map((day) => {
             const dayLogs = logs
-              .filter((l) => isSameDay(parseISO(l.created_at), day))
+              .filter((l) => isSameDayInBogota(l.created_at, day))
               .sort((a, b) => a.created_at.localeCompare(b.created_at));
               
             const entrada = dayLogs.find((l) => l.tipo === "entrada");
@@ -85,7 +86,7 @@ export function WeeklyHistory() {
             return (
               <TableRow key={day.toISOString()} className="border-t border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                 <TableCell className="py-4 font-medium capitalize dark:text-slate-200">
-                  {format(day, "EEE d MMM", { locale: es })}
+                  {formatInBogota(day, "EEE d MMM")}
                 </TableCell>
                 <TableCell className="py-4 font-medium text-slate-500 dark:text-slate-400">
                   {storeName}
@@ -93,7 +94,7 @@ export function WeeklyHistory() {
                 <TableCell className="py-4 tabular-nums">
                   {entrada ? (
                     <div className="flex items-center gap-2 group">
-                      <span className="dark:text-slate-300">{format(parseISO(entrada.created_at), "HH:mm")}</span>
+                      <span className="dark:text-slate-300">{formatInBogota(entrada.created_at, "HH:mm")}</span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100">
@@ -117,7 +118,7 @@ export function WeeklyHistory() {
                 <TableCell className="py-4 tabular-nums">
                   {salida ? (
                     <div className="flex items-center gap-2 group">
-                      <span className="dark:text-slate-300">{format(parseISO(salida.created_at), "HH:mm")}</span>
+                      <span className="dark:text-slate-300">{formatInBogota(salida.created_at, "HH:mm")}</span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100">
