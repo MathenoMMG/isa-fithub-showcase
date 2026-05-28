@@ -2,9 +2,12 @@ import { AlertCircle, Clock, CheckCircle, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
 import { countLotesByStatus } from "@/lib/expiry";
+import { useProfile } from "@/context/ProfileContext";
 
 export function DashboardBanners() {
   const { filteredItems } = useInventory();
+  const { profile } = useProfile();
+  
   const allLotes = filteredItems.flatMap((i) => i.lotes);
   const { proximos, vencidos } = countLotesByStatus(allLotes);
 
@@ -20,6 +23,61 @@ export function DashboardBanners() {
     const days = (new Date(l.fecha_caducidad).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
     return days >= 0 && days <= 30;
   }));
+
+  const isPremium = profile.stylePreset === "obsidian";
+
+  if (isPremium) {
+    if (vencidos > 0) {
+      const primerNombre = vencidosItems[0]?.nombre || "Producto";
+      const masStr = vencidos > 1 ? `y ${vencidos - 1} más` : "";
+      return (
+        <Link to="/inventario" search={{ q: primerNombre }} className="block w-full">
+          <div className="flex flex-row items-center gap-[10px] bg-red-500/5 dark:bg-red-500/10 border border-red-500/20 border-l-[4px] border-l-red-500 py-[10px] px-[14px] min-h-[48px] cursor-pointer hover:bg-red-500/10 dark:hover:bg-red-500/15 transition-all rounded-[3px]">
+            <AlertCircle size={14} className="text-red-600 dark:text-red-400 shrink-0" />
+            <div className="flex-1 flex flex-col justify-center text-left">
+              <span className="font-mono text-[11px] font-bold text-red-700 dark:text-red-400 uppercase tracking-wide">
+                SYSTEM_ALERT: {vencidos} VENCIDOS — RETIRAR DE GÓNDOLA HOY
+              </span>
+              <span className="font-mono text-[9px] text-red-600/80 dark:text-red-400/80 mt-0.5 uppercase">
+                CRITICAL_TARGETS: {primerNombre} {masStr}
+              </span>
+            </div>
+            <ChevronRight size={14} className="text-red-500 shrink-0 opacity-60" />
+          </div>
+        </Link>
+      );
+    }
+
+    if (proximos > 0) {
+      const primerNombre = proximosItems[0]?.nombre || "Producto";
+      const masStr = proximos > 1 ? `y ${proximos - 1} más` : "";
+      return (
+        <Link to="/inventario" search={{ q: primerNombre }} className="block w-full">
+          <div className="flex flex-row items-center gap-[10px] bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 border-l-[4px] border-l-amber-500 py-[10px] px-[14px] min-h-[48px] cursor-pointer hover:bg-amber-500/10 dark:hover:bg-amber-500/15 transition-all rounded-[3px]">
+            <Clock size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
+            <div className="flex-1 flex flex-col justify-center text-left">
+              <span className="font-mono text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+                WARNING_TICKER: {proximos} PRÓXIMOS A VENCER (≤ 30 DÍAS)
+              </span>
+              <span className="font-mono text-[9px] text-amber-600/80 dark:text-amber-400/80 mt-0.5 uppercase">
+                DECAY_WARNING: {primerNombre} {masStr}
+              </span>
+            </div>
+            <ChevronRight size={14} className="text-amber-500 shrink-0 opacity-60" />
+          </div>
+        </Link>
+      );
+    }
+
+    return (
+      <div className="flex flex-row items-center gap-[10px] bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 border-l-[4px] border-l-emerald-500 py-[10px] px-[14px] min-h-[48px] rounded-[3px] text-left">
+        <CheckCircle size={14} className="text-emerald-600 dark:text-emerald-400 shrink-0 animate-pulse" />
+        <span className="font-mono text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide flex-1">
+          SYS_STATUS: ALL OPERATIONAL DATA NOMINAL // NO CRITICAL EXPIRATIONS
+        </span>
+      </div>
+    );
+  }
 
   if (vencidos > 0) {
     const primerNombre = vencidosItems[0]?.nombre || "Producto";

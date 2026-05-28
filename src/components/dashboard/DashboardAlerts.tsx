@@ -2,9 +2,11 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
 import { Package } from "lucide-react";
 import { BarChart, Bar, ResponsiveContainer, XAxis } from "recharts";
+import { useProfile } from "@/context/ProfileContext";
 
 export function DashboardAlerts() {
   const { filteredItems } = useInventory();
+  const { profile } = useProfile();
   const navigate = useNavigate();
 
   // "Atención inmediata" top 6 urgent items (based on lotes expiration)
@@ -49,6 +51,105 @@ export function DashboardAlerts() {
     { name: "S", vencidos: 0 },
     { name: "D", vencidos: 0 },
   ];
+
+  const isPremium = profile.stylePreset === "obsidian";
+
+  if (isPremium) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[16px]">
+        {/* Panel "Atención inmediata" Premium */}
+        <div className="border border-border dark:border-emerald-500/10 rounded-[6px] bg-card/40 dark:bg-slate-900/40 flex flex-col justify-between overflow-hidden">
+          <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-emerald-500/10 bg-slate-50/50 dark:bg-slate-950/20">
+            <h3 className="font-mono text-[10px] font-bold text-slate-800 dark:text-slate-200 tracking-wider">
+              [ TELEMETRY // ATENCIÓN INMEDIATA ]
+            </h3>
+            <Link to="/inventario" className="font-mono text-[10px] text-primary dark:text-emerald-400 cursor-pointer hover:underline">
+              VER TODO :: READ_ALL
+            </Link>
+          </div>
+          
+          <div className="flex-1 flex flex-col divide-y divide-border/60 dark:divide-emerald-500/5">
+            {urgentLotes.length > 0 ? (
+              urgentLotes.map((lote) => {
+                const status = getStatus(lote.fecha_caducidad);
+                
+                return (
+                  <div 
+                    key={lote.id} 
+                    onClick={() => navigate({ to: "/inventario", search: { q: lote.producto.nombre } })}
+                    className="flex items-center gap-3 p-[10px_14px] hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center justify-center shrink-0 w-4">
+                      <span className={`w-1.5 h-1.5 rounded-full ${status === "vencido" ? "bg-red-500 animate-pulse" : "bg-amber-500"}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-mono text-[11px] font-medium text-slate-950 dark:text-slate-200 truncate">
+                        {lote.producto.nombre}
+                      </div>
+                      <div className="font-mono text-[9px] text-muted-foreground/70 mt-0.5 uppercase">
+                        {lote.producto.categoria} // {lote.producto.tienda_nombre}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 font-mono">
+                      <div className="text-[10px] text-muted-foreground">
+                        {lote.fecha_caducidad ? new Date(lote.fecha_caducidad).toLocaleDateString("es-CO", { day: '2-digit', month: '2-digit' }) : "—"}
+                      </div>
+                      <div className={`mt-0.5 text-[9px] font-semibold uppercase ${status === "vencido" ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-400"}`}>
+                        {lote.fecha_caducidad ? getDaysLabel(lote.fecha_caducidad) : "Sin fecha"}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="p-[24px] text-center flex flex-col items-center justify-center flex-1">
+                <Package size={24} className="mb-2 text-muted-foreground/40" />
+                <div className="font-mono text-[11px] text-muted-foreground uppercase">[ REGISTRO VACÍO ]</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Panel "Tendencia semanal" Premium */}
+        <div className="border border-border dark:border-emerald-500/10 rounded-[6px] bg-card/40 dark:bg-slate-900/40 flex flex-col justify-between overflow-hidden">
+          <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-emerald-500/10 bg-slate-50/50 dark:bg-slate-950/20">
+            <h3 className="font-mono text-[10px] font-bold text-slate-800 dark:text-slate-200 tracking-wider">
+              [ METRICS // TENDENCIA SEMANAL ]
+            </h3>
+            <span className="font-mono text-[9px] text-muted-foreground uppercase">
+              VENCIMIENTOS_HISTORIC
+            </span>
+          </div>
+
+          <div className="p-[14px_14px_10px_14px] h-[72px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={trendData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                <XAxis dataKey="name" fontSize={8} fill="currentColor" className="text-muted-foreground/60 font-mono" tickLine={false} axisLine={false} />
+                <Bar dataKey="vencidos" fill="var(--color-primary)" opacity={0.35} radius={[1, 1, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="border-t border-border dark:border-emerald-500/10 p-[12px_14px] flex divide-x divide-border dark:divide-emerald-500/10 bg-slate-50/20 dark:bg-slate-950/10">
+            <div className="flex-1 text-center pr-2">
+              <p className="font-mono text-[18px] font-semibold text-emerald-700 dark:text-emerald-400 m-0">0</p>
+              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">ESTA SEMANA</p>
+            </div>
+            <div className="flex-1 text-center px-2">
+              <p className="font-mono text-[18px] font-semibold text-amber-700 dark:text-amber-400 m-0">0</p>
+              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">RETIROS_REG</p>
+            </div>
+            <div className="flex-1 text-center pl-2">
+              <p className="font-mono text-[18px] font-semibold text-slate-800 dark:text-slate-200 m-0">
+                {new Set(filteredItems.map(i => i.categoria)).size}
+              </p>
+              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">LÍNEAS ACT</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-[10px]">

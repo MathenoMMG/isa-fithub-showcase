@@ -4,10 +4,12 @@ import { useTimeLog } from "@/context/TimeLogContext";
 import { useStore } from "@/context/StoreContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { useProfile } from "@/context/ProfileContext";
 
 export function DashboardShortcuts() {
   const { logs, refreshLogs } = useTimeLog();
   const { store } = useStore();
+  const { profile } = useProfile();
 
   const storeId = store === "Sur" ? 2 : 1;
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -96,6 +98,50 @@ export function DashboardShortcuts() {
       disabled: hasEntrada,
     },
   ];
+
+  const isPremium = profile.stylePreset === "obsidian";
+
+  if (isPremium) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 border border-border dark:border-emerald-500/10 divide-x divide-y divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+        {shortcuts.map((s, idx) => {
+          const indexStr = `[0${idx + 1}]`;
+          const content = (
+            <div className={`p-[16px_14px] flex flex-col justify-between gap-4 cursor-pointer transition-colors duration-150 hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 h-full text-left w-full outline-none ${s.disabled ? "opacity-35 grayscale pointer-events-none cursor-not-allowed" : ""}`}>
+              <div className="flex justify-between items-start w-full">
+                <span className="font-mono text-[9px] text-muted-foreground tracking-wider">{indexStr}</span>
+                <div className={`w-[24px] h-[24px] rounded-[4px] border border-border dark:border-emerald-500/10 flex items-center justify-center shrink-0 bg-slate-500/5`}>
+                  <s.icon size={12} className={!s.disabled ? "text-primary dark:text-emerald-400" : "text-muted-foreground"} />
+                </div>
+              </div>
+              <div className="mt-2 flex-1">
+                <div className="font-mono text-[11px] font-bold text-slate-905 dark:text-slate-100 uppercase tracking-wide">
+                  {s.title}
+                </div>
+                <div className="font-mono text-[9px] text-muted-foreground/85 mt-1 uppercase leading-snug">
+                  {s.desc}
+                </div>
+              </div>
+            </div>
+          );
+
+          if (s.link) {
+            return (
+              <Link key={s.id} to={s.link} className={`block outline-none h-full ${s.disabled ? "pointer-events-none" : ""}`}>
+                {content}
+              </Link>
+            );
+          }
+
+          return (
+            <button key={s.id} onClick={s.action} disabled={s.disabled} className={`block outline-none h-full text-left w-full ${s.disabled ? "cursor-not-allowed" : ""}`}>
+              {content}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">

@@ -1,17 +1,84 @@
 import { Link } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
 import { countLotesByStatus } from "@/lib/expiry";
+import { useProfile } from "@/context/ProfileContext";
 
 export function DashboardStats() {
   const { filteredItems } = useInventory();
+  const { profile } = useProfile();
+  
   const allLotes = filteredItems.flatMap((i) => i.lotes);
   const { proximos, vencidos } = countLotesByStatus(allLotes);
 
   // Vigentes: total lotes - proximos - vencidos
   const vigentes = allLotes.length - proximos - vencidos;
   
-  // We don't have historical counts, so trend will always be "—" or static if 0.
-  
+  const isPremium = profile.stylePreset === "obsidian";
+
+  if (isPremium) {
+    return (
+      <div className="grid grid-cols-3 border border-border dark:border-emerald-500/10 divide-x divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+        {/* Vigentes */}
+        <Link to="/inventario" className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px]">
+          <div className="flex flex-col h-full justify-between gap-2 text-left">
+            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+              [01 // VIGENTES]
+            </div>
+            <div>
+              <div className="font-mono text-[32px] font-semibold text-emerald-700 dark:text-emerald-400 leading-none">
+                {vigentes}
+              </div>
+            </div>
+            <div className="font-mono text-[9px] text-muted-foreground/60 uppercase">
+              STATUS: NOMINAL
+            </div>
+          </div>
+        </Link>
+
+        {/* Próximos */}
+        <Link to="/inventario" className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px]">
+          <div className="flex flex-col h-full justify-between gap-2 text-left">
+            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block" />
+              [02 // PRÓXIMOS]
+            </div>
+            <div>
+              <div className="font-mono text-[32px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
+                {proximos}
+              </div>
+            </div>
+            <div className="font-mono text-[9px] text-amber-700/80 dark:text-amber-400/80 uppercase">
+              LIMIT: ≤ 30 DAYS
+            </div>
+          </div>
+        </Link>
+
+        {/* Vencidos */}
+        <Link to="/inventario" className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px]">
+          <div className="flex flex-col h-full justify-between gap-2 text-left">
+            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+              <span className={`w-1.5 h-1.5 rounded-full inline-block ${vencidos > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
+              [03 // VENCIDOS]
+            </div>
+            <div>
+              <div className="font-mono text-[32px] font-semibold text-red-600 dark:text-red-400 leading-none">
+                {vencidos}
+              </div>
+            </div>
+            <div className="font-mono text-[9px] uppercase">
+              {vencidos > 0 ? (
+                <span className="text-red-600 dark:text-red-400">CRITICAL: DISPOSE</span>
+              ) : (
+                <span className="text-muted-foreground/60">SYS: CLEAR</span>
+              )}
+            </div>
+          </div>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-3 gap-[10px]">
       {/* Card 1 — Vigentes */}

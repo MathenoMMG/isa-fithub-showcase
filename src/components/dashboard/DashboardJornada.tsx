@@ -3,10 +3,12 @@ import { Link } from "@tanstack/react-router";
 import { useTimeLog } from "@/context/TimeLogContext";
 import { useStore } from "@/context/StoreContext";
 import { useEffect, useState } from "react";
+import { useProfile } from "@/context/ProfileContext";
 
 export function DashboardJornada() {
   const { logs } = useTimeLog();
   const { store } = useStore();
+  const { profile } = useProfile();
   
   const [now, setNow] = useState(new Date());
 
@@ -118,6 +120,116 @@ export function DashboardJornada() {
   };
 
   const progress = getProgressPercentage();
+  const isPremium = profile.stylePreset === "obsidian";
+
+  if (isPremium) {
+    return (
+      <div className="border border-border dark:border-emerald-500/10 rounded-[6px] bg-card/40 dark:bg-slate-900/40 overflow-hidden shadow-sm flex flex-col">
+        <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-emerald-500/10 bg-slate-50/50 dark:bg-slate-950/20">
+          <div className="flex items-center gap-2">
+            <Clock size={14} className="text-primary dark:text-emerald-400 animate-pulse" />
+            <h3 className="font-mono text-[10px] font-bold text-slate-800 dark:text-slate-200 tracking-wider">
+              [ OPERATIONAL TELEMETRY // SHIFT LOG ]
+            </h3>
+            <span className={`font-mono text-[8px] font-bold tracking-widest uppercase px-1.5 py-0.5 rounded border ${
+              estado === "Completada" 
+                ? "border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5" 
+                : estado === "Activa" 
+                ? "border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/5 animate-pulse" 
+                : "border-slate-500/30 text-muted-foreground bg-slate-500/5"
+            }`}>
+              {estado === "Sin registrar" ? "OFFLINE" : estado === "Activa" ? "TRANSMITTING" : "COMPLETED"}
+            </span>
+          </div>
+          <Link to="/horarios" className="font-mono text-[10px] text-primary dark:text-emerald-400 cursor-pointer hover:underline">
+            HISTORY :: READ_LOGS →
+          </Link>
+        </div>
+
+        {estado === "Sin registrar" && (
+          <div className="p-6 text-center flex flex-col items-center gap-3">
+            <p className="font-mono text-[11px] text-muted-foreground uppercase">
+              [ NO ACTIVE SHIFT TELEMETRY DETECTED FOR TODAY ]
+            </p>
+            <Link to="/horarios">
+              <button className="bg-primary hover:bg-primary/95 text-primary-foreground font-mono text-[10px] font-bold tracking-wider uppercase px-5 py-2.5 rounded-[4px] cursor-pointer transition-colors border border-primary/20">
+                INITIALIZE_LOG_TRANSMISSION →
+              </button>
+            </Link>
+          </div>
+        )}
+
+        {(estado === "Activa" || estado === "Completada") && (
+          <div className="p-[16px_20px] flex flex-col lg:flex-row items-center gap-6 justify-between">
+            <div className="flex items-center gap-6 w-full lg:w-auto justify-between lg:justify-start">
+              <div className="text-left font-mono">
+                <p className="text-[9px] text-muted-foreground uppercase tracking-wider">[ SHIFT_IN ]</p>
+                <p className="text-[20px] font-semibold text-slate-900 dark:text-slate-100 my-0.5 leading-none">
+                  {getEntradaLabel()}
+                </p>
+                <p className="text-[9px] text-muted-foreground/60 mt-1">
+                  {getPassedHoursText()}
+                </p>
+              </div>
+
+              <div className="h-8 w-[1px] bg-border dark:bg-emerald-500/10 hidden lg:block" />
+
+              <div className={`text-left font-mono ${estado === "Activa" ? "opacity-60" : ""}`}>
+                <p className="text-[9px] text-muted-foreground uppercase tracking-wider">
+                  {estado === "Activa" ? "[ TARGET_OUT ]" : "[ SHIFT_OUT ]"}
+                </p>
+                <p className={`text-[20px] font-semibold my-0.5 leading-none ${estado === "Completada" ? "text-slate-900 dark:text-slate-100" : "text-muted-foreground"}`}>
+                  {getSalidaLabel()}
+                </p>
+                <p className="text-[9px] text-muted-foreground/60 mt-1">
+                  {estado === "Activa" ? "EXPECTED" : "COMPLETED"}
+                </p>
+              </div>
+            </div>
+
+            {/* High-fidelity linear gauge */}
+            <div className="flex-1 w-full flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-[8px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+                <span>0% (START)</span>
+                {estado === "Completada" ? (
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{getWorkedHours()}</span>
+                ) : (
+                  <span>TELEMETRY: {Math.round(progress)}% ELAPSED</span>
+                )}
+                <span>100% (TARGET)</span>
+              </div>
+              
+              <div className="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-[2px] relative overflow-hidden">
+                <div 
+                  className="absolute top-0 bottom-0 left-0 bg-primary/40 dark:bg-emerald-500/40 transition-all duration-1000 ease-in-out"
+                  style={{ width: `${progress}%` }}
+                />
+                {estado === "Activa" && (
+                  <div 
+                    className="absolute top-0 bottom-0 w-2 bg-primary dark:bg-emerald-400 animate-pulse transition-all duration-1000 ease-in-out" 
+                    style={{ left: `calc(${progress}% - 4px)` }}
+                  />
+                )}
+              </div>
+            </div>
+
+            {estado === "Activa" && (
+              <div className="flex flex-col items-end gap-1 shrink-0 w-full lg:w-auto">
+                <Link to="/horarios" className="w-full lg:w-auto">
+                  <button className="w-full lg:w-auto bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-mono text-[10px] font-bold tracking-wider uppercase px-4 py-2.5 rounded-[4px] border border-border transition-colors cursor-pointer whitespace-nowrap">
+                    REGISTER_EXIT_LOG
+                  </button>
+                </Link>
+                <span className="font-mono text-[9px] text-muted-foreground/70 uppercase hidden lg:inline">
+                  LOC: {store === "Ambas" ? "MNG/BCG" : store}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-slate-900 border-[0.5px] border-[#E5E7EB] dark:border-slate-800 rounded-[10px] overflow-hidden shadow-sm">
