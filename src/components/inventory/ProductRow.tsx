@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,7 @@ const rowStyles: Record<ReturnType<typeof getWorstStatus>, { bg: string; dot: st
 export function ProductRow({ product, defaultOpen = false }: Props) {
   const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct, restoreProduct } = useInventory();
   const [open, setOpen] = useState(defaultOpen);
+  const [showPreviousLotes, setShowPreviousLotes] = useState(false);
   const { profile } = useProfile();
   
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -47,6 +48,9 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   const sortedLotes = [...product.lotes].sort(
     (a, b) => new Date(a.fecha_caducidad).getTime() - new Date(b.fecha_caducidad).getTime(),
   );
+
+  const activeLotes = sortedLotes.filter((l) => l.cantidad > 0);
+  const previousLotes = sortedLotes.filter((l) => l.cantidad === 0);
 
   const styles = rowStyles[worst];
   const isPremium = profile.stylePreset === "obsidian";
@@ -84,9 +88,23 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           </span>
         </div>
 
-        <div className="text-right shrink-0">
-          <div className={`${isPremium ? "font-mono text-[20px]" : "font-mono-data text-[18px]"} font-semibold text-[#111827] dark:text-slate-100`}>{total}</div>
-          <div className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]"}>unidades</div>
+        <div className="flex items-center gap-3 md:gap-4 shrink-0 text-right">
+          <div className="shrink-0">
+            <div className={`${isPremium ? "font-mono text-[18px]" : "font-mono-data text-[16px]"} font-semibold text-[#111827] dark:text-slate-100`}>
+              {total}
+            </div>
+            <div className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]"}>
+              disponibles
+            </div>
+          </div>
+          <div className="shrink-0 border-l border-slate-200 dark:border-slate-800 pl-3 md:pl-4">
+            <div className={`${isPremium ? "font-mono text-[18px]" : "font-mono-data text-[16px]"} font-semibold text-emerald-600 dark:text-emerald-400`}>
+              {product.vendidos_total || 0}
+            </div>
+            <div className={isPremium ? "font-mono text-[8px] text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-wider" : "font-sans text-[9px] text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.05em]"}>
+              vendidos
+            </div>
+          </div>
         </div>
 
         <div className="shrink-0 text-slate-400 ml-[4px]">
@@ -148,11 +166,11 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                 </div>
               )}
             </div>
-          {sortedLotes.length === 0 && (
-            <div className="text-sm text-slate-500 dark:text-slate-400 italic px-2 py-3">Sin lotes en stock.</div>
+          {activeLotes.length === 0 && (
+            <div className="text-sm text-slate-500 dark:text-slate-400 italic px-2 py-3">Sin lotes activos en stock.</div>
           )}
 
-          {sortedLotes.map((lote, idx) => {
+          {activeLotes.map((lote, idx) => {
             const status = getExpiryStatus(lote.fecha_caducidad);
             return (
               <div
@@ -293,6 +311,123 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
               </div>
             );
           })}
+
+          {previousLotes.length > 0 && (
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPreviousLotes((prev) => !prev)}
+                className="h-9 gap-1.5 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 font-mono text-[10px] uppercase tracking-wider rounded-[4px]"
+              >
+                <History className={`h-3.5 w-3.5 transition-transform ${showPreviousLotes ? "rotate-180" : ""}`} />
+                <span>{showPreviousLotes ? "Ocultar lotes anteriores" : `Ver lotes anteriores (${previousLotes.length})`}</span>
+              </Button>
+              
+              {showPreviousLotes && (
+                <div className="mt-2 space-y-2 pl-2 border-l border-slate-200 dark:border-slate-800 animate-in fade-in duration-200">
+                  {previousLotes.map((lote, idx) => {
+                    return (
+                      <div
+                        key={lote.id}
+                        className={
+                          isPremium
+                            ? "bg-slate-500/5 dark:bg-slate-950/20 rounded-[4px] border border-dashed border-border p-3 flex flex-col md:flex-row md:items-center gap-3 opacity-60 hover:opacity-100 transition-opacity"
+                            : "bg-slate-50/50 dark:bg-slate-900/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-800/80 p-3 flex flex-col md:flex-row md:items-center gap-3 opacity-70 hover:opacity-100 transition-opacity"
+                        }
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={
+                            isPremium
+                              ? "h-8 w-8 rounded-[3px] border border-border bg-slate-500/5 text-slate-500 font-mono text-xs font-bold flex items-center justify-center shrink-0"
+                              : "h-10 w-10 rounded-lg bg-slate-100 text-slate-500 font-bold flex items-center justify-center shrink-0"
+                          }>
+                            {isPremium ? `[A${idx + 1}]` : `A${idx + 1}`}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-mono-data font-medium text-slate-600 dark:text-slate-400 text-sm">
+                              {formatExpiryDate(lote.fecha_caducidad)}
+                            </div>
+                            <div className="mt-1">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                Agotado
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-sm font-semibold text-slate-400 dark:text-slate-500 tabular-nums px-3">
+                            0 unidades
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0 md:ml-auto">
+                          <Button
+                            onClick={async () => {
+                              try {
+                                const success = await undoSale(product.id, lote.id);
+                                if (success) {
+                                  toast.success("Venta deshecha, lote reactivado.");
+                                } else {
+                                  toast.warning("No hay ventas registradas para este lote");
+                                }
+                              } catch (e) {
+                                toast.error("Error al deshacer la venta");
+                              }
+                            }}
+                            className={
+                              isPremium
+                                ? "h-7 px-2 font-mono text-[9px] uppercase tracking-wider rounded-[3px] border border-emerald-500/20 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                                : "h-8 px-2.5 text-xs rounded-lg border border-emerald-100 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/10"
+                            }
+                            variant="outline"
+                          >
+                            Deshacer venta
+                          </Button>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-9 w-9 rounded-lg border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600"
+                                aria-label="Eliminar lote agotado"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Eliminar lote agotado</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Se eliminará permanentemente este lote agotado con caducidad{" "}
+                                  {formatExpiryDate(lote.fecha_caducidad)} del historial. Esta acción no se puede deshacer.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-red-600 hover:bg-red-700"
+                                  onClick={() => {
+                                    removeLote(product.id, lote.id);
+                                    toast.success("Lote eliminado");
+                                  }}
+                                >
+                                  Eliminar
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Footer acciones del producto */}
           <div className="flex flex-wrap items-center gap-2 pt-2">

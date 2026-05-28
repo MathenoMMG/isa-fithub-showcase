@@ -119,7 +119,9 @@ export function AppSidebar() {
               }
             >
               <Plus className="h-4 w-4" />
-              <span className="group-data-[collapsible=icon]:hidden">NEW_PRODUCT</span>
+              <span className="group-data-[collapsible=icon]:hidden">
+                {isPremium ? "NUEVO_PRODUCTO" : "Nuevo Producto"}
+              </span>
             </Button>
           }
         />
@@ -133,7 +135,9 @@ export function AppSidebar() {
         >
           <Link to="/horarios">
             <LogIn className="h-4 w-4" />
-            <span className="group-data-[collapsible=icon]:hidden">SHIFT_CLOCK</span>
+            <span className="group-data-[collapsible=icon]:hidden">
+              {isPremium ? "REGISTRO_TURNO" : "Registrar Turno"}
+            </span>
           </Link>
         </Button>
       </SidebarFooter>
