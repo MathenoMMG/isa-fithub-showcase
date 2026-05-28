@@ -20,6 +20,7 @@ import { useInventory } from "@/context/InventoryContext";
 import { ExpiryBadge } from "./ExpiryBadge";
 import { AddLoteDialog } from "./AddLoteDialog";
 import { formatExpiryDate, getEarliestExpiry, getExpiryStatus, getTotalQty, getWorstStatus } from "@/lib/expiry";
+import { useProfile } from "@/context/ProfileContext";
 
 interface Props {
   product: ProductoConLotes;
@@ -35,6 +36,7 @@ const rowStyles: Record<ReturnType<typeof getWorstStatus>, { bg: string; dot: st
 export function ProductRow({ product, defaultOpen = false }: Props) {
   const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct } = useInventory();
   const [open, setOpen] = useState(defaultOpen);
+  const { profile } = useProfile();
   
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notesTemp, setNotesTemp] = useState(product.notas || "");
@@ -47,6 +49,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   );
 
   const styles = rowStyles[worst];
+  const isPremium = profile.stylePreset === "obsidian";
 
   const handleSaveNotes = async () => {
     try {
@@ -59,27 +62,31 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   };
 
   return (
-    <div className={`group rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${styles.bg}`}>
+    <div className={
+      isPremium
+        ? `group rounded-[6px] border border-border dark:border-emerald-500/10 shadow-none overflow-hidden transition-all duration-200 hover:border-primary/30 dark:hover:border-emerald-500/30 ${styles.bg}`
+        : `group rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${styles.bg}`
+    }>
       {/* Header */}
       <div 
-        className="flex items-center gap-[10px] p-[9px_14px] cursor-pointer hover:brightness-95 transition-all"
+        className="flex items-center gap-[10px] p-[10px_14px] cursor-pointer hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-all"
         onClick={() => setOpen((o) => !o)}
       >
-        <div className={`w-[8px] h-[8px] rounded-full shrink-0 ${styles.dot}`} />
+        <div className={`w-[8px] h-[8px] rounded-full shrink-0 ${styles.dot} ${isPremium ? "rounded-none w-1.5 h-1.5 animate-pulse" : ""}`} />
         
         <div className="flex-1 min-w-0 flex items-center gap-[8px] flex-wrap">
-          <span className="font-sans text-[13px] font-medium text-[#111827] dark:text-slate-100 truncate">{product.nombre}</span>
-          <span className="font-sans text-[9px] text-[#9CA3AF]">
-            {product.categoria || "Otros"} · {product.tienda_nombre}
+          <span className={`${isPremium ? "font-mono text-[11px] font-bold uppercase tracking-wide" : "font-sans text-[13px] font-medium text-[#111827] dark:text-slate-100"} truncate`}>{product.nombre}</span>
+          <span className={isPremium ? "font-mono text-[9px] text-muted-foreground uppercase" : "font-sans text-[9px] text-[#9CA3AF]"}>
+            {product.categoria || "Otros"} // {product.tienda_nombre}
           </span>
-          <span className="font-mono-data text-[10px] text-[#6B7280]">
+          <span className={isPremium ? "font-mono text-[9px] text-muted-foreground/60" : "font-mono-data text-[10px] text-[#6B7280]"}>
             SKU: {product.articulo}
           </span>
         </div>
 
         <div className="text-right shrink-0">
-          <div className="font-mono-data text-[18px] font-semibold text-[#111827] dark:text-slate-100">{total}</div>
-          <div className="font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]">unidades</div>
+          <div className={`${isPremium ? "font-mono text-[20px]" : "font-mono-data text-[18px]"} font-semibold text-[#111827] dark:text-slate-100`}>{total}</div>
+          <div className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]"}>unidades</div>
         </div>
 
         <div className="shrink-0 text-slate-400 ml-[4px]">
@@ -95,15 +102,19 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/50 p-3 sm:p-4 space-y-2">
             
             {/* Sección de Notas */}
-            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4">
+            <div className={
+              isPremium 
+                ? "bg-slate-500/5 dark:bg-slate-950/20 rounded-[4px] border border-border dark:border-emerald-500/10 p-3 mb-4 font-mono text-[11px]"
+                : "bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4"
+            }>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notas del Producto</span>
+                <span className={isPremium ? "text-[9px] font-bold text-muted-foreground uppercase tracking-wider" : "text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"}>Notas del Producto</span>
                 {!isEditingNotes ? (
                   <button 
-                    onClick={() => { setNotesTemp(product.notas || ""); setIsEditingNotes(true); }}
-                    className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 flex items-center gap-1"
+                    onClick={() => { setNotesTemp(product.notes || ""); setIsEditingNotes(true); }}
+                    className={`${isPremium ? "text-[9px] uppercase tracking-wider font-bold" : "text-[10px] font-medium"} text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 flex items-center gap-1`}
                   >
-                    <Edit2 size={12} /> <span className="text-[10px] font-medium">Editar</span>
+                    <Edit2 size={10} /> <span>{isPremium ? "EDITAR" : "Editar"}</span>
                   </button>
                 ) : (
                   <span className={`text-[10px] ${notesTemp.length > 150 ? 'text-red-500' : 'text-slate-400'}`}>
@@ -146,12 +157,20 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
             return (
               <div
                 key={lote.id}
-                className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex flex-col md:flex-row md:items-center gap-3"
+                className={
+                  isPremium
+                    ? "bg-card/60 dark:bg-slate-950/40 rounded-[4px] border border-border dark:border-emerald-500/10 p-3 flex flex-col md:flex-row md:items-center gap-3"
+                    : "bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex flex-col md:flex-row md:items-center gap-3"
+                }
               >
                 {/* índice + caducidad */}
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="h-10 w-10 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 tabular-nums">
-                    #{idx + 1}
+                  <div className={
+                    isPremium
+                      ? "h-8 w-8 rounded-[3px] border border-border dark:border-emerald-500/10 bg-slate-500/5 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold flex items-center justify-center shrink-0"
+                      : "h-10 w-10 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 tabular-nums"
+                  }>
+                    {isPremium ? `[0${idx + 1}]` : `#${idx + 1}`}
                   </div>
                   <div className="min-w-0">
                     <div className="font-mono-data font-medium text-slate-800">

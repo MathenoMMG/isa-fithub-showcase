@@ -38,7 +38,7 @@ function Informes() {
   const navigate = useNavigate();
   const { items } = useInventory();
   const { store } = useStore();
-  const { theme } = useProfile();
+  const { theme, profile } = useProfile();
   const [range, setRange] = useState("semana");
   const [isGenerating, setIsGenerating] = useState(false);
   const [salesDateFilter, setSalesDateFilter] = useState<string>("");
@@ -231,54 +231,125 @@ function Informes() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
-        <Card 
-          className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
-          onClick={() => {
-            document.getElementById('registro-ventas')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          <div className="flex items-center gap-[12px]">
-            <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-              <TrendingUp size={16} className="text-[#1C4A2E] dark:text-emerald-400" />
+      {profile.stylePreset === "obsidian" ? (
+        <div className="grid grid-cols-3 border border-border dark:border-emerald-500/10 divide-x divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+          {/* Total vendidos */}
+          <div 
+            onClick={() => document.getElementById('registro-ventas')?.scrollIntoView({ behavior: 'smooth' })}
+            className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px] cursor-pointer text-left"
+          >
+            <div className="flex flex-col h-full justify-between gap-2 text-left">
+              <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                [01 // TOTAL VENDIDOS]
+              </div>
+              <div>
+                <div className="font-mono text-[32px] font-semibold text-emerald-700 dark:text-emerald-400 leading-none">
+                  {loadingSales ? "-" : totalUnits} <span className="text-[12px] font-normal text-muted-foreground">uds</span>
+                </div>
+              </div>
+              <div className="font-mono text-[9px] text-muted-foreground/60 uppercase">
+                LOG RANGE: {range.toUpperCase()}
+              </div>
             </div>
-            <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Total Vendidos</p>
           </div>
-          <h4 className="font-mono-data text-[24px] font-semibold text-[#111827] dark:text-slate-50 mt-auto">
-            {loadingSales ? "-" : totalUnits} <span className="font-sans text-[14px] text-[#6B7280] font-normal">uds</span>
-          </h4>
-        </Card>
-        
-        <Card 
-          className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
-          onClick={() => topCategory !== "N/A" ? navigate({ to: '/inventario', search: { category: topCategory } }) : navigate({ to: '/inventario' })}
-        >
-          <div className="flex items-center gap-[12px]">
-            <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-              <PackageOpen size={16} className="text-[#1C4A2E] dark:text-emerald-400" />
-            </div>
-            <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Categoría Estrella</p>
-          </div>
-          <h4 className="font-sans text-[20px] font-semibold text-[#111827] dark:text-slate-50 mt-auto truncate">
-            {loadingSales ? "-" : topCategory}
-          </h4>
-        </Card>
 
-        <Card 
-          className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
-          onClick={() => navigate({ to: '/inventario', search: { status: 'vencido' } })}
-        >
-          <div className="flex items-center gap-[12px]">
-            <div className="w-[32px] h-[32px] rounded-[6px] bg-[#FCEBEB] dark:bg-red-900/30 flex items-center justify-center shrink-0">
-              <AlertTriangle size={16} className="text-[#A32D2D] dark:text-red-400" />
+          {/* Categoría Estrella */}
+          <div 
+            onClick={() => topCategory !== "N/A" ? navigate({ to: '/inventario', search: { category: topCategory } }) : navigate({ to: '/inventario' })}
+            className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px] cursor-pointer text-left"
+          >
+            <div className="flex flex-col h-full justify-between gap-2 text-left">
+              <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                [02 // CATEGORÍA ESTRELLA]
+              </div>
+              <div>
+                <div className="font-mono text-[20px] font-semibold text-slate-900 dark:text-slate-100 leading-none truncate">
+                  {loadingSales ? "-" : topCategory}
+                </div>
+              </div>
+              <div className="font-mono text-[9px] text-muted-foreground/60 uppercase">
+                TOP_PERFORMING_PATH
+              </div>
             </div>
-            <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Lotes Críticos</p>
           </div>
-          <h4 className="font-mono-data text-[24px] font-semibold text-[#A32D2D] dark:text-red-400 mt-auto">
-            {criticos.length} <span className="font-sans text-[14px] text-[#A32D2D]/70 font-normal">alertas</span>
-          </h4>
-        </Card>
-      </div>
+
+          {/* Lotes Críticos */}
+          <div 
+            onClick={() => navigate({ to: '/inventario', search: { status: 'vencido' } })}
+            className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px] cursor-pointer text-left"
+          >
+            <div className="flex flex-col h-full justify-between gap-2 text-left">
+              <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full inline-block ${criticos.length > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
+                [03 // LOTES CRÍTICOS]
+              </div>
+              <div>
+                <div className="font-mono text-[32px] font-semibold text-red-600 dark:text-red-400 leading-none">
+                  {criticos.length} <span className="text-[12px] font-normal text-muted-foreground">alertas</span>
+                </div>
+              </div>
+              <div className="font-mono text-[9px] uppercase">
+                {criticos.length > 0 ? (
+                  <span className="text-red-600 dark:text-red-400 font-bold">WARNING: REVIEW</span>
+                ) : (
+                  <span className="text-muted-foreground/60">SYS: OPERATIONAL</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-[10px]">
+          <Card 
+            className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+            onClick={() => {
+              document.getElementById('registro-ventas')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <div className="flex items-center gap-[12px]">
+              <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                <TrendingUp size={16} className="text-[#1C4A2E] dark:text-emerald-400" />
+              </div>
+              <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Total Vendidos</p>
+            </div>
+            <h4 className="font-mono-data text-[24px] font-semibold text-[#111827] dark:text-slate-50 mt-auto">
+              {loadingSales ? "-" : totalUnits} <span className="font-sans text-[14px] text-[#6B7280] font-normal">uds</span>
+            </h4>
+          </Card>
+          
+          <Card 
+            className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+            onClick={() => topCategory !== "N/A" ? navigate({ to: '/inventario', search: { category: topCategory } }) : navigate({ to: '/inventario' })}
+          >
+            <div className="flex items-center gap-[12px]">
+              <div className="w-[32px] h-[32px] rounded-[6px] bg-[#EAF3DE] dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                <PackageOpen size={16} className="text-[#1C4A2E] dark:text-emerald-400" />
+              </div>
+              <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Categoría Estrella</p>
+            </div>
+            <h4 className="font-sans text-[20px] font-semibold text-[#111827] dark:text-slate-50 mt-auto truncate">
+              {loadingSales ? "-" : topCategory}
+            </h4>
+          </Card>
+
+          <Card 
+            className="p-[16px_20px] rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all flex flex-col justify-between h-[100px] cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+            onClick={() => navigate({ to: '/inventario', search: { status: 'vencido' } })}
+          >
+            <div className="flex items-center gap-[12px]">
+              <div className="w-[32px] h-[32px] rounded-[6px] bg-[#FCEBEB] dark:bg-red-900/30 flex items-center justify-center shrink-0">
+                <AlertTriangle size={16} className="text-[#A32D2D] dark:text-red-400" />
+              </div>
+              <p className="font-sans text-[10px] uppercase tracking-[0.05em] font-medium text-[#9CA3AF]">Lotes Críticos</p>
+            </div>
+            <h4 className="font-mono-data text-[24px] font-semibold text-[#A32D2D] dark:text-red-400 mt-auto">
+              {criticos.length} <span className="font-sans text-[14px] text-[#A32D2D]/70 font-normal">alertas</span>
+            </h4>
+          </Card>
+        </div>
+      )}
 
       {/* Favoritos */}
       {favoriteCards.length > 0 && (

@@ -179,7 +179,7 @@
 
 .style-obsidian h1,
 .style-obsidian h2 {
-  font-family: 'Playfair Display', 'Georgia', serif !important;
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
   letter-spacing: -0.02em !important;
   font-weight: 700 !important;
 }
