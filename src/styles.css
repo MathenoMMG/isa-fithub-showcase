@@ -164,3 +164,140 @@
 @utility font-mono-data {
   font-family: 'DM Mono', monospace;
 }
+
+/* ==========================================================================
+   ESTILO OBSIDIAN (Premium Dark / Glassmorphism Bento Rework)
+   ========================================================================== */
+
+/* Variables de color de diseño para Obsidian */
+.style-obsidian {
+  /* Fondo obsidian ultra premium oscuro con matiz forestal */
+  --background: oklch(0.09 0.01 145) !important;
+  --foreground: oklch(0.96 0.01 145) !important;
+  
+  /* Tarjetas bento glassmorphic */
+  --card: oklch(0.13 0.02 145 / 55%) !important;
+  --card-foreground: oklch(0.96 0.01 145) !important;
+  
+  /* Popover glassmorphic */
+  --popover: oklch(0.12 0.02 145 / 85%) !important;
+  --popover-foreground: oklch(0.96 0.01 145) !important;
+  
+  /* Emerald brillante orgánico */
+  --primary: oklch(0.78 0.18 142) !important; 
+  --primary-foreground: oklch(0.09 0.01 145) !important;
+  
+  /* Bordes sutiles y relucientes */
+  --border: oklch(0.24 0.05 142 / 40%) !important;
+  --input: oklch(0.16 0.03 145 / 60%) !important;
+  --ring: oklch(0.78 0.18 142) !important;
+  
+  /* Sidebar premium glass forest */
+  --sidebar: oklch(0.11 0.02 145 / 90%) !important;
+  --sidebar-foreground: oklch(0.96 0.01 145) !important;
+  --sidebar-primary: oklch(0.78 0.18 142) !important;
+  --sidebar-primary-foreground: oklch(0.09 0.01 145) !important;
+  --sidebar-accent: oklch(0.16 0.04 142 / 50%) !important;
+  --sidebar-accent-foreground: oklch(0.85 0.12 142) !important;
+  --sidebar-border: oklch(0.2 0.04 142 / 30%) !important;
+  --sidebar-ring: oklch(0.78 0.18 142) !important;
+}
+
+/* Efectos visuales de Rework Premium en el preset Obsidian */
+
+/* Forzar el fondo oscuro forestal obsidian global */
+.style-obsidian,
+.style-obsidian body,
+.style-obsidian #root,
+.style-obsidian .bg-slate-50\/50,
+.style-obsidian .bg-slate-950\/50 {
+  background-color: oklch(0.09 0.01 145) !important;
+}
+
+/* Tarjetas Bento Glassmorphic */
+.style-obsidian .card,
+.style-obsidian [role="card"],
+.style-obsidian Card,
+.style-obsidian .bg-white,
+.style-obsidian .bg-card {
+  background-color: oklch(0.13 0.02 145 / 55%) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  border: 1px solid oklch(0.78 0.18 142 / 20%) !important;
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Efecto de elevación e iluminación al pasar el mouse por tarjetas */
+.style-obsidian .card:hover,
+.style-obsidian [role="card"]:hover,
+.style-obsidian .bg-white:hover,
+.style-obsidian .bg-card:hover {
+  transform: translateY(-4px) scale(1.008) !important;
+  border-color: oklch(0.78 0.18 142 / 45%) !important;
+  box-shadow: 0 20px 48px 0 oklch(0.78 0.18 142 / 8%) !important;
+}
+
+/* Botones principales en Obsidian: Gradiente degradado brillante de esmeralda */
+.style-obsidian button.bg-\[\#1C4A2E\],
+.style-obsidian button.bg-emerald-600,
+.style-obsidian .bg-\[\#1C4A2E\],
+.style-obsidian .bg-emerald-600 {
+  background: linear-gradient(135deg, oklch(0.7 0.15 142), oklch(0.5 0.12 142)) !important;
+  box-shadow: 0 6px 20px 0 oklch(0.7 0.15 142 / 25%) !important;
+  border: none !important;
+  color: oklch(0.09 0.01 145) !important;
+  font-weight: 700 !important;
+  transition: all 0.3s ease !important;
+}
+
+.style-obsidian button.bg-\[\#1C4A2E\]:hover,
+.style-obsidian button.bg-emerald-600:hover,
+.style-obsidian .bg-\[\#1C4A2E\]:hover,
+.style-obsidian .bg-emerald-600:hover {
+  box-shadow: 0 8px 24px 0 oklch(0.7 0.15 142 / 40%) !important;
+  transform: translateY(-2px) !important;
+  filter: brightness(1.05) !important;
+}
+
+/* Cabeceras de categorías y filas con matiz verde oliva oscuro */
+.style-obsidian .bg-slate-50,
+.style-obsidian .bg-slate-950\/50,
+.style-obsidian thead,
+.style-obsidian tr.bg-slate-50\/80 {
+  background-color: oklch(0.15 0.03 142 / 80%) !important;
+}
+
+/* Inputs y Selects */
+.style-obsidian input,
+.style-obsidian select,
+.style-obsidian textarea,
+.style-obsidian .border-slate-300 {
+  border-color: oklch(0.24 0.05 142 / 40%) !important;
+  background-color: oklch(0.12 0.02 145) !important;
+}
+
+.style-obsidian input:focus,
+.style-obsidian select:focus {
+  border-color: oklch(0.78 0.18 142) !important;
+  box-shadow: 0 0 0 2px oklch(0.78 0.18 142 / 20%) !important;
+}
+
+/* Tipografía de títulos */
+.style-obsidian h1,
+.style-obsidian h2,
+.style-obsidian h3 {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* Sutil animación de pulso lento para el logotipo de la hoja en el sidebar */
+@keyframes softPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 2px oklch(0.78 0.18 142 / 20%)); }
+  50% { transform: scale(1.05) rotate(3deg); filter: drop-shadow(0 0 8px oklch(0.78 0.18 142 / 50%)); }
+}
+
+.style-obsidian .lucide-leaf, 
+.style-obsidian .sidebar-header svg {
+  animation: softPulse 4s ease-in-out infinite;
+}

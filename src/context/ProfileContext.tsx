@@ -8,6 +8,7 @@ interface Profile {
   avatar: string; // Base64 image
   soundEnabled: boolean;
   glowEnabled: boolean;
+  stylePreset?: "classic" | "obsidian";
 }
 
 interface ProfileContextValue {
@@ -24,6 +25,7 @@ const defaultProfile: Profile = {
   avatar: "",
   soundEnabled: true,
   glowEnabled: true,
+  stylePreset: "classic",
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -40,6 +42,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem("fithub-profile", JSON.stringify(profile));
+    
+    // Sincronizar clase global de estilo preferencial en el elemento html raíz
+    if (typeof window !== "undefined") {
+      const root = window.document.documentElement;
+      if (profile.stylePreset === "obsidian") {
+        root.classList.add("style-obsidian");
+      } else {
+        root.classList.remove("style-obsidian");
+      }
+    }
   }, [profile]);
 
   useEffect(() => {

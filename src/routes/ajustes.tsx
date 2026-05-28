@@ -238,6 +238,30 @@ function AjustesPage() {
             </div>
           </Card>
 
+          {/* Estilo Visual */}
+          <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 transition-colors">Estilos</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 transition-colors">Elige tu preset estético preferido para toda la interfaz.</p>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => updateProfile({ stylePreset: "classic" })}
+                className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer ${profile.stylePreset === "classic" || !profile.stylePreset ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400"}`}
+              >
+                <div className="h-6 w-6 mb-2 flex items-center justify-center rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-700 dark:text-slate-300">CLA</div>
+                <span className="text-sm">Classic</span>
+              </button>
+              
+              <button 
+                onClick={() => updateProfile({ stylePreset: "obsidian" })}
+                className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer ${profile.stylePreset === "obsidian" ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 font-bold" : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400"}`}
+              >
+                <Sparkles className="h-6 w-6 mb-2 text-emerald-500 dark:text-emerald-400 animate-pulse" />
+                <span className="text-sm">Obsidian</span>
+              </button>
+            </div>
+          </Card>
+
           {/* Tienda Predeterminada */}
           <Card className="p-6 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md">
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 transition-colors">Tienda predeterminada</h3>
