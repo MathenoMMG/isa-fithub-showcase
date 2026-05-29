@@ -10,7 +10,7 @@ export function Gatekeeper({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const isGranted = localStorage.getItem("fithub_auth_granted_v2");
+    const isGranted = localStorage.getItem("fithub_auth_granted_v3");
     if (isGranted === "true") {
       setGranted(true);
     }
@@ -20,7 +20,7 @@ export function Gatekeeper({ children }: { children: React.ReactNode }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === "Isapro123@") {
-      localStorage.setItem("fithub_auth_granted_v2", "true");
+      localStorage.setItem("fithub_auth_granted_v3", "true");
       setGranted(true);
       setError(false);
     } else {
