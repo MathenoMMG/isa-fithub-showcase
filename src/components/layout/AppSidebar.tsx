@@ -33,7 +33,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-r-slate-200 dark:border-r-slate-800">
-      <SidebarHeader className={`p-4 group-data-[collapsible=icon]:p-2 transition-all ${isPremium ? "border-b border-border dark:border-emerald-500/10" : "border-b border-sidebar-border"}`}>
+      <SidebarHeader className={`p-4 group-data-[collapsible=icon]:p-2 transition-all ${isPremium ? "border-b border-border dark:border-primary/5" : "border-b border-sidebar-border"}`}>
         <Link to="/" className="flex items-center gap-3 justify-start hover:opacity-80 transition-opacity px-2">
           <div className="h-10 w-10 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 flex items-center justify-center shrink-0 overflow-hidden rounded-xl transition-all">
             <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain" />
@@ -64,7 +64,7 @@ export function AppSidebar() {
                       isPremium 
                         ? `font-mono text-xs uppercase tracking-wider rounded-[3px] ${
                             active 
-                              ? "bg-slate-500/5 dark:bg-emerald-500/5 text-primary dark:text-emerald-400 border-l-[3px] border-l-primary dark:border-l-emerald-400 pl-2.5 font-bold" 
+                              ? "bg-muted/40 dark:bg-primary/3 text-primary dark:text-emerald-400 border-l-[3px] border-l-primary dark:border-l-emerald-400 pl-2.5 font-bold" 
                               : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 pl-3"
                           }`
                         : active 
@@ -90,7 +90,7 @@ export function AppSidebar() {
 
         {isPremium && (
           <div className="mt-auto p-4 group-data-[collapsible=icon]:hidden">
-            <div className="border border-border dark:border-emerald-500/10 bg-slate-500/5 rounded-[4px] p-2.5 font-mono text-[8px] text-muted-foreground uppercase space-y-1">
+            <div className="border border-border dark:border-primary/5 bg-muted/40 rounded-[3px] p-2.5 font-mono text-[8px] text-muted-foreground uppercase space-y-1">
               <div className="flex justify-between">
                 <span>SYSTEM_STATUS:</span>
                 <span className="text-emerald-500 font-bold">ONLINE</span>
@@ -108,13 +108,13 @@ export function AppSidebar() {
         )}
       </SidebarContent>
 
-      <SidebarFooter className={`p-3 flex flex-col gap-2 ${isPremium ? "border-t border-border dark:border-emerald-500/10" : "border-t border-slate-200"}`}>
+      <SidebarFooter className={`p-3 flex flex-col gap-2 ${isPremium ? "border-t border-border dark:border-primary/5" : "border-t border-slate-200"}`}>
         <AddProductDialog 
           customTrigger={
             <Button
               className={
                 isPremium 
-                  ? "h-10 bg-transparent hover:bg-slate-500/5 text-primary dark:text-emerald-400 border border-border dark:border-emerald-500/10 font-mono text-[10px] font-bold uppercase tracking-wider rounded-[4px] gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
+                  ? "h-10 bg-transparent hover:bg-muted/40 text-primary dark:text-emerald-400 border border-border dark:border-primary/5 font-mono text-[10px] font-bold uppercase tracking-wider rounded-[3px] gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
                   : "h-12 bg-white hover:bg-slate-50 text-emerald-600 border border-emerald-200 font-semibold rounded-xl gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
               }
             >
@@ -129,7 +129,7 @@ export function AppSidebar() {
           asChild
           className={
             isPremium
-              ? "h-10 bg-primary hover:bg-primary/95 text-primary-foreground font-mono text-[10px] font-bold uppercase tracking-wider rounded-[4px] gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
+              ? "h-10 bg-primary hover:bg-primary/95 text-primary-foreground font-mono text-[10px] font-bold uppercase tracking-wider rounded-[3px] gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
               : "h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
           }
         >

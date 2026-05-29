@@ -68,7 +68,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   return (
     <div className={
       isPremium
-        ? `group rounded-[6px] border border-border dark:border-emerald-500/10 shadow-none overflow-hidden transition-all duration-200 hover:border-primary/30 dark:hover:border-emerald-500/30 ${styles.bg}`
+        ? `group rounded-[3px] border border-border dark:border-primary/5 shadow-none overflow-hidden transition-all duration-300 hover:border-primary/20 dark:hover:border-primary/20 ${styles.bg}`
         : `group rounded-[10px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${styles.bg}`
     }>
       {/* Header */}
@@ -76,7 +76,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
         className="flex items-center gap-[10px] p-[10px_14px] cursor-pointer hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-all"
         onClick={() => setOpen((o) => !o)}
       >
-        <div className={`w-[8px] h-[8px] rounded-full shrink-0 ${styles.dot} ${isPremium ? "rounded-none w-1.5 h-1.5 animate-pulse" : ""}`} />
+        <div className={`w-[8px] h-[8px] rounded-full shrink-0 ${styles.dot} ${isPremium ? "rounded-none w-1 h-1 animate-pulse" : ""}`} />
         
         <div className="flex-1 min-w-0 flex items-center gap-[8px] flex-wrap">
           <span className={`${isPremium ? "font-mono text-[11px] font-bold uppercase tracking-wide" : "font-sans text-[13px] font-medium text-[#111827] dark:text-slate-100"} truncate`}>{product.nombre}</span>
@@ -123,7 +123,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
             {/* Sección de Notas */}
             <div className={
               isPremium 
-                ? "bg-slate-500/5 dark:bg-slate-950/20 rounded-[4px] border border-border dark:border-emerald-500/10 p-3 mb-4 font-mono text-[11px]"
+                ? "bg-muted/40 dark:bg-slate-950/30 rounded-[2px] border border-border dark:border-primary/5 p-3 mb-4 font-mono text-[11px]"
                 : "bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 mb-4"
             }>
               <div className="flex items-center justify-between mb-1">
@@ -178,7 +178,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                 key={lote.id}
                 className={
                   isPremium
-                    ? "bg-card/60 dark:bg-slate-950/40 rounded-[4px] border border-border dark:border-emerald-500/10 p-3 flex flex-col md:flex-row md:items-center gap-3"
+                    ? "bg-card/30 dark:bg-slate-950/20 rounded-[2px] border border-border dark:border-primary/5 p-3 flex flex-col md:flex-row md:items-center gap-3"
                     : "bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 p-3 flex flex-col md:flex-row md:items-center gap-3"
                 }
               >
@@ -186,7 +186,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className={
                     isPremium
-                      ? "h-8 w-8 rounded-[3px] border border-border dark:border-emerald-500/10 bg-slate-500/5 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold flex items-center justify-center shrink-0"
+                      ? "h-8 w-8 rounded-[2px] border border-border dark:border-primary/5 bg-muted/40 text-slate-700 dark:text-slate-300 font-mono text-xs font-bold flex items-center justify-center shrink-0"
                       : "h-10 w-10 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 tabular-nums"
                   }>
                     {isPremium ? `[0${idx + 1}]` : `#${idx + 1}`}
@@ -206,19 +206,19 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-11 w-11 rounded-full border-slate-300"
+                    className={`h-11 w-11 border-slate-300 ${isPremium ? "rounded-[2px] border-border dark:border-primary/5 dark:bg-slate-800/20" : "rounded-full"}`}
                     onClick={() => adjustLote(product.id, lote.id, -1)}
                     aria-label="Disminuir (ajuste)"
                   >
                     <Minus className="h-5 w-5" />
                   </Button>
-                  <span className="min-w-[3rem] text-center text-xl font-bold tabular-nums">
+                  <span className={`min-w-[3rem] text-center text-xl font-bold tabular-nums ${isPremium ? "font-mono text-lg" : ""}`}>
                     {lote.cantidad}
                   </span>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-11 w-11 rounded-full border-slate-300"
+                    className={`h-11 w-11 border-slate-300 ${isPremium ? "rounded-[2px] border-border dark:border-primary/5 dark:bg-slate-800/20" : "rounded-full"}`}
                     onClick={() => adjustLote(product.id, lote.id, 1)}
                     aria-label="Aumentar (ajuste)"
                   >
@@ -245,7 +245,9 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                         }}
                         variant="outline"
                         size="icon"
-                        className="h-11 w-11 rounded-xl border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                        className={`h-11 w-11 border-slate-300 text-slate-500 hover:text-slate-700 hover:bg-slate-100 ${
+                          isPremium ? "rounded-[2px] border-border dark:border-primary/5 dark:bg-slate-800/40 dark:hover:bg-slate-800/80" : "rounded-xl"
+                        }`}
                         title="Deshacer última venta"
                       >
                         <Undo2 className="h-5 w-5" />
@@ -260,7 +262,9 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                           sellFromLote(product.id, lote.id, 1);
                           toast.success(`Venta registrada · ${product.nombre} (lote #${idx + 1})`);
                         }}
-                        className={`h-11 px-4 gap-2 font-semibold rounded-xl text-white ${
+                        className={`h-11 px-4 gap-2 font-semibold text-white ${
+                          isPremium ? "rounded-[2px] font-mono text-[11px] tracking-wider uppercase border border-primary/10" : "rounded-xl"
+                        } ${
                           status === "vencido" ? "bg-slate-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700"
                         }`}
                       >
@@ -280,7 +284,9 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-11 w-11 rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className={`h-11 w-11 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 ${
+                          isPremium ? "rounded-[2px] dark:border-red-950/20" : "rounded-xl"
+                        }`}
                         aria-label="Eliminar lote"
                       >
                         <Trash2 className="h-5 w-5" />
@@ -334,15 +340,15 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                         key={lote.id}
                         className={
                           isPremium
-                            ? "bg-slate-500/5 dark:bg-slate-950/20 rounded-[4px] border border-dashed border-border p-3 flex flex-col md:flex-row md:items-center gap-3 opacity-60 hover:opacity-100 transition-opacity"
+                            ? "bg-muted/40 dark:bg-slate-950/20 rounded-[2px] border border-dashed border-border p-3 flex flex-col md:flex-row md:items-center gap-3 opacity-60 hover:opacity-100 transition-all duration-300"
                             : "bg-slate-50/50 dark:bg-slate-900/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-800/80 p-3 flex flex-col md:flex-row md:items-center gap-3 opacity-70 hover:opacity-100 transition-opacity"
                         }
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className={
                             isPremium
-                              ? "h-8 w-8 rounded-[3px] border border-border bg-slate-500/5 text-slate-500 font-mono text-xs font-bold flex items-center justify-center shrink-0"
-                              : "h-10 w-10 rounded-lg bg-slate-100 text-slate-500 font-bold flex items-center justify-center shrink-0"
+                              ? "h-8 w-8 rounded-[2px] border border-border bg-muted/40 text-slate-505 font-mono text-xs font-bold flex items-center justify-center shrink-0"
+                              : "h-10 w-10 rounded-lg bg-slate-100 text-slate-505 font-bold flex items-center justify-center shrink-0"
                           }>
                             {isPremium ? `[A${idx + 1}]` : `A${idx + 1}`}
                           </div>
@@ -383,7 +389,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                             }}
                             className={
                               isPremium
-                                ? "h-7 px-2 font-mono text-[9px] uppercase tracking-wider rounded-[3px] border border-emerald-500/20 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                                ? "h-7 px-2 font-mono text-[9px] uppercase tracking-wider rounded-[2px] border border-emerald-500/20 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
                                 : "h-8 px-2.5 text-xs rounded-lg border border-emerald-100 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/10"
                             }
                             variant="outline"

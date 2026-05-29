@@ -166,12 +166,12 @@
 }
 
 /* ==========================================================================
-   ESTILO PREMIUM — "Hermes Cream" (Claro) + "Omarchy Jade" (Oscuro)
-   Inspirado en hermes-agent.nousresearch.com y Omarchy Linux.
+   ESTILO PREMIUM V3 — "Ivory Marble" (Claro) + "Carbon Jade" (Oscuro)
+   Taste Skill Anti-Slop · Soft-Skill · Minimalist-Skill
    ========================================================================== */
 
 /* ------------------------------------------------------------------
-   1. TIPOGRAFÍA PREMIUM
+   1. TIPOGRAFÍA DE PRECISIÓN
    ------------------------------------------------------------------ */
 .style-obsidian,
 .style-obsidian body,
@@ -194,13 +194,13 @@
 .style-obsidian.font-jakarta h1,
 .style-obsidian.font-jakarta h2 {
   font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.035em !important;
   font-weight: 700 !important;
 }
 .style-obsidian.font-jakarta h3 {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: -0.02em !important;
 }
 
 /* 1.2 Preset Sans (Clásica / Original) */
@@ -215,13 +215,13 @@
 .style-obsidian.font-sans-preset h1,
 .style-obsidian.font-sans-preset h2 {
   font-family: 'DM Sans', sans-serif !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.035em !important;
   font-weight: 700 !important;
 }
 .style-obsidian.font-sans-preset h3 {
   font-family: 'DM Sans', sans-serif !important;
   font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: -0.02em !important;
 }
 
 /* 1.3 Preset Serif (Serif Elegante / Playfair) */
@@ -236,113 +236,114 @@
 .style-obsidian.font-serif-preset h1,
 .style-obsidian.font-serif-preset h2 {
   font-family: 'Playfair Display', 'Georgia', serif !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.03em !important;
   font-weight: 700 !important;
 }
 .style-obsidian.font-serif-preset h3 {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: -0.02em !important;
 }
 
+/* 1.4 Monospace — JetBrains for all data metrics */
 .style-obsidian .font-mono-data,
 .style-obsidian code,
 .style-obsidian .font-mono {
   font-family: 'JetBrains Mono', 'DM Mono', monospace !important;
 }
 
-/* Labels y texto pequeño: tracking amplio estilo Hermes */
+/* 1.5 Label styling — tracked uppercase micro-text */
 .style-obsidian .text-xs {
-  letter-spacing: 0.03em !important;
+  letter-spacing: 0.04em !important;
 }
 
 /* ------------------------------------------------------------------
-   2. GEOMETRÍA: Esquinas semi-sharp (6px)
+   2. GEOMETRÍA: Esquinas afiladas (3-4px)
    ------------------------------------------------------------------ */
 .style-obsidian {
-  --radius: 0.375rem !important;
+  --radius: 0.25rem !important;
 }
 
-.style-obsidian .rounded-2xl { border-radius: 6px !important; }
-.style-obsidian .rounded-xl { border-radius: 6px !important; }
-.style-obsidian .rounded-lg { border-radius: 4px !important; }
-.style-obsidian .rounded-md { border-radius: 3px !important; }
+.style-obsidian .rounded-2xl { border-radius: 4px !important; }
+.style-obsidian .rounded-xl { border-radius: 4px !important; }
+.style-obsidian .rounded-lg { border-radius: 3px !important; }
+.style-obsidian .rounded-md { border-radius: 2px !important; }
 /* rounded-full se mantiene para avatares, badges, dots */
 
 /* ------------------------------------------------------------------
-   3. TOKENS — Modo Claro (Hermes Cream)
+   3. TOKENS — Modo Claro (Ivory Marble)
    ------------------------------------------------------------------ */
 .style-obsidian {
-  --background: oklch(0.975 0.008 85) !important;
-  --foreground: oklch(0.18 0.02 180) !important;
-  --card: oklch(1 0 0) !important;
-  --card-foreground: oklch(0.18 0.02 180) !important;
-  --popover: oklch(1 0 0) !important;
-  --popover-foreground: oklch(0.18 0.02 180) !important;
-  --primary: oklch(0.35 0.08 160) !important;
-  --primary-foreground: oklch(0.98 0.005 85) !important;
-  --secondary: oklch(0.96 0.006 85) !important;
-  --secondary-foreground: oklch(0.25 0.03 180) !important;
-  --muted: oklch(0.955 0.005 85) !important;
-  --muted-foreground: oklch(0.50 0.02 180) !important;
-  --accent: oklch(0.96 0.006 85) !important;
-  --accent-foreground: oklch(0.25 0.03 180) !important;
-  --destructive: oklch(0.55 0.22 25) !important;
-  --destructive-foreground: oklch(0.98 0.005 85) !important;
-  --border: oklch(0.18 0.02 180 / 10%) !important;
-  --input: oklch(0.18 0.02 180 / 8%) !important;
-  --ring: oklch(0.35 0.08 160) !important;
-  --chart-1: oklch(0.55 0.15 160) !important;
-  --chart-2: oklch(0.65 0.10 200) !important;
-  --chart-3: oklch(0.50 0.08 250) !important;
-  --chart-4: oklch(0.75 0.12 85) !important;
-  --chart-5: oklch(0.60 0.18 30) !important;
-  --sidebar: oklch(0.97 0.005 85) !important;
-  --sidebar-foreground: oklch(0.18 0.02 180) !important;
-  --sidebar-primary: oklch(0.35 0.08 160) !important;
-  --sidebar-primary-foreground: oklch(0.98 0.005 85) !important;
-  --sidebar-accent: oklch(0.955 0.005 85) !important;
-  --sidebar-accent-foreground: oklch(0.25 0.03 180) !important;
-  --sidebar-border: oklch(0.18 0.02 180 / 8%) !important;
-  --sidebar-ring: oklch(0.35 0.08 160) !important;
+  --background: oklch(0.982 0.003 80) !important;
+  --foreground: oklch(0.14 0.01 160) !important;
+  --card: oklch(0.995 0.001 80) !important;
+  --card-foreground: oklch(0.14 0.01 160) !important;
+  --popover: oklch(0.995 0.001 80) !important;
+  --popover-foreground: oklch(0.14 0.01 160) !important;
+  --primary: oklch(0.28 0.06 160) !important;
+  --primary-foreground: oklch(0.985 0.003 80) !important;
+  --secondary: oklch(0.965 0.004 80) !important;
+  --secondary-foreground: oklch(0.22 0.02 160) !important;
+  --muted: oklch(0.960 0.003 80) !important;
+  --muted-foreground: oklch(0.46 0.015 160) !important;
+  --accent: oklch(0.965 0.004 80) !important;
+  --accent-foreground: oklch(0.22 0.02 160) !important;
+  --destructive: oklch(0.53 0.20 25) !important;
+  --destructive-foreground: oklch(0.985 0.003 80) !important;
+  --border: oklch(0.14 0.01 160 / 7%) !important;
+  --input: oklch(0.14 0.01 160 / 5%) !important;
+  --ring: oklch(0.28 0.06 160) !important;
+  --chart-1: oklch(0.50 0.12 160) !important;
+  --chart-2: oklch(0.58 0.08 200) !important;
+  --chart-3: oklch(0.45 0.06 250) !important;
+  --chart-4: oklch(0.70 0.10 85) !important;
+  --chart-5: oklch(0.55 0.15 30) !important;
+  --sidebar: oklch(0.978 0.003 80) !important;
+  --sidebar-foreground: oklch(0.14 0.01 160) !important;
+  --sidebar-primary: oklch(0.28 0.06 160) !important;
+  --sidebar-primary-foreground: oklch(0.985 0.003 80) !important;
+  --sidebar-accent: oklch(0.960 0.003 80) !important;
+  --sidebar-accent-foreground: oklch(0.22 0.02 160) !important;
+  --sidebar-border: oklch(0.14 0.01 160 / 6%) !important;
+  --sidebar-ring: oklch(0.28 0.06 160) !important;
 }
 
 /* ------------------------------------------------------------------
-   4. TOKENS — Modo Oscuro (Omarchy Jade)
+   4. TOKENS — Modo Oscuro (Carbon Jade)
    ------------------------------------------------------------------ */
 .style-obsidian.dark {
-  --background: oklch(0.10 0.015 175) !important;
-  --foreground: oklch(0.93 0.01 85) !important;
-  --card: oklch(0.14 0.01 175 / 90%) !important;
-  --card-foreground: oklch(0.93 0.01 85) !important;
-  --popover: oklch(0.14 0.01 175 / 95%) !important;
-  --popover-foreground: oklch(0.93 0.01 85) !important;
-  --primary: oklch(0.72 0.14 170) !important;
-  --primary-foreground: oklch(0.10 0.015 175) !important;
-  --secondary: oklch(0.18 0.015 175) !important;
-  --secondary-foreground: oklch(0.93 0.01 85) !important;
-  --muted: oklch(0.18 0.015 175) !important;
-  --muted-foreground: oklch(0.60 0.02 175) !important;
-  --accent: oklch(0.18 0.02 175) !important;
-  --accent-foreground: oklch(0.93 0.01 85) !important;
-  --destructive: oklch(0.65 0.20 25) !important;
-  --destructive-foreground: oklch(0.98 0.005 85) !important;
-  --border: oklch(0.72 0.14 170 / 10%) !important;
-  --input: oklch(0.72 0.14 170 / 8%) !important;
-  --ring: oklch(0.72 0.14 170) !important;
-  --chart-1: oklch(0.65 0.14 170) !important;
-  --chart-2: oklch(0.60 0.10 200) !important;
-  --chart-3: oklch(0.55 0.12 250) !important;
-  --chart-4: oklch(0.75 0.10 85) !important;
-  --chart-5: oklch(0.65 0.16 30) !important;
-  --sidebar: oklch(0.11 0.015 175) !important;
-  --sidebar-foreground: oklch(0.93 0.01 85) !important;
-  --sidebar-primary: oklch(0.72 0.14 170) !important;
-  --sidebar-primary-foreground: oklch(0.10 0.015 175) !important;
-  --sidebar-accent: oklch(0.16 0.015 175) !important;
-  --sidebar-accent-foreground: oklch(0.80 0.08 170) !important;
-  --sidebar-border: oklch(0.72 0.14 170 / 8%) !important;
-  --sidebar-ring: oklch(0.72 0.14 170) !important;
+  --background: oklch(0.075 0.008 160) !important;
+  --foreground: oklch(0.92 0.008 85) !important;
+  --card: oklch(0.11 0.008 160 / 80%) !important;
+  --card-foreground: oklch(0.92 0.008 85) !important;
+  --popover: oklch(0.11 0.008 160 / 90%) !important;
+  --popover-foreground: oklch(0.92 0.008 85) !important;
+  --primary: oklch(0.82 0.16 160) !important;
+  --primary-foreground: oklch(0.075 0.008 160) !important;
+  --secondary: oklch(0.14 0.01 160) !important;
+  --secondary-foreground: oklch(0.92 0.008 85) !important;
+  --muted: oklch(0.14 0.01 160) !important;
+  --muted-foreground: oklch(0.55 0.015 160) !important;
+  --accent: oklch(0.14 0.012 160) !important;
+  --accent-foreground: oklch(0.92 0.008 85) !important;
+  --destructive: oklch(0.62 0.18 25) !important;
+  --destructive-foreground: oklch(0.985 0.003 80) !important;
+  --border: oklch(0.82 0.16 160 / 7%) !important;
+  --input: oklch(0.82 0.16 160 / 5%) !important;
+  --ring: oklch(0.82 0.16 160) !important;
+  --chart-1: oklch(0.72 0.14 160) !important;
+  --chart-2: oklch(0.58 0.08 200) !important;
+  --chart-3: oklch(0.50 0.10 250) !important;
+  --chart-4: oklch(0.70 0.08 85) !important;
+  --chart-5: oklch(0.60 0.14 30) !important;
+  --sidebar: oklch(0.085 0.008 160) !important;
+  --sidebar-foreground: oklch(0.92 0.008 85) !important;
+  --sidebar-primary: oklch(0.82 0.16 160) !important;
+  --sidebar-primary-foreground: oklch(0.075 0.008 160) !important;
+  --sidebar-accent: oklch(0.12 0.01 160) !important;
+  --sidebar-accent-foreground: oklch(0.78 0.10 160) !important;
+  --sidebar-border: oklch(0.82 0.16 160 / 5%) !important;
+  --sidebar-ring: oklch(0.82 0.16 160) !important;
 }
 
 /* ------------------------------------------------------------------
@@ -360,74 +361,91 @@
 }
 
 /* ------------------------------------------------------------------
-   6. TARJETAS BENTO — Formas refinadas
+   6. TARJETAS — Vidrio Ahumado Ultra-fino
    ------------------------------------------------------------------ */
 
-/* Modo Claro: tarjetas blancas con borde fino, sombra etérea */
+/* Modo Claro: marfil puro con borde 0.5px y sombra etérea */
 .style-obsidian .bg-white,
 .style-obsidian .bg-card {
   background-color: var(--card) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 1px 2px oklch(0 0 0 / 3%) !important;
-  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+  border: 0.5px solid oklch(0.28 0.06 160 / 8%) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px oklch(0 0 0 / 2%), 0 0 0 0.5px oklch(0.28 0.06 160 / 4%) !important;
+  transition:
+    border-color 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .style-obsidian .bg-white:hover,
 .style-obsidian .bg-card:hover {
-  border-color: oklch(0.35 0.08 160 / 22%) !important;
-  box-shadow: 0 3px 12px oklch(0 0 0 / 5%) !important;
+  border-color: oklch(0.28 0.06 160 / 16%) !important;
+  box-shadow:
+    0 4px 16px oklch(0 0 0 / 4%),
+    0 0 0 0.5px oklch(0.28 0.06 160 / 8%) !important;
   transform: translateY(-1px) !important;
 }
 
-/* Modo Oscuro: jade glass con backdrop-blur */
+/* Modo Oscuro: vidrio ahumado jade con backdrop-blur intenso */
 .style-obsidian.dark .bg-white,
 .style-obsidian.dark .bg-card,
 .style-obsidian.dark .bg-slate-900 {
-  background-color: oklch(0.14 0.01 175 / 85%) !important;
-  backdrop-filter: blur(14px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(120%) !important;
-  border: 1px solid oklch(0.72 0.14 170 / 8%) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 2px 12px oklch(0 0 0 / 20%) !important;
-  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+  background-color: oklch(0.11 0.008 160 / 70%) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 0.5px solid oklch(0.82 0.16 160 / 6%) !important;
+  border-radius: 4px !important;
+  box-shadow:
+    0 2px 8px oklch(0 0 0 / 25%),
+    inset 0 0.5px 0 oklch(0.82 0.16 160 / 4%) !important;
+  transition:
+    border-color 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .style-obsidian.dark .bg-white:hover,
 .style-obsidian.dark .bg-card:hover,
 .style-obsidian.dark .bg-slate-900:hover {
-  border-color: oklch(0.72 0.14 170 / 18%) !important;
+  border-color: oklch(0.82 0.16 160 / 14%) !important;
   box-shadow:
-    0 4px 20px oklch(0 0 0 / 30%),
-    0 0 0 1px oklch(0.72 0.14 170 / 6%) !important;
+    0 6px 24px oklch(0 0 0 / 35%),
+    0 0 32px oklch(0.82 0.16 160 / 4%),
+    inset 0 0.5px 0 oklch(0.82 0.16 160 / 6%) !important;
   transform: translateY(-1px) !important;
 }
 
 /* ------------------------------------------------------------------
-   7. BOTONES PRIMARIOS — Planos, refinados, sin gradiente
+   7. BOTONES PRIMARIOS — Planos, border-double, refinados
    ------------------------------------------------------------------ */
 .style-obsidian button.bg-\[\#1C4A2E\],
 .style-obsidian .bg-\[\#1C4A2E\],
 .style-obsidian button.bg-emerald-600,
 .style-obsidian .bg-emerald-600 {
-  background: oklch(0.35 0.08 160) !important;
-  border: 1px solid oklch(0.30 0.07 160) !important;
-  color: oklch(0.98 0.005 85) !important;
-  border-radius: 6px !important;
+  background: oklch(0.28 0.06 160) !important;
+  border: 0.5px solid oklch(0.22 0.05 160) !important;
+  color: oklch(0.985 0.003 80) !important;
+  border-radius: 3px !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 600 !important;
-  letter-spacing: 0.015em !important;
-  box-shadow: none !important;
-  transition: all 0.15s ease !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 8%), inset 0 0.5px 0 oklch(1 0 0 / 6%) !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .style-obsidian button.bg-\[\#1C4A2E\]:hover,
 .style-obsidian .bg-\[\#1C4A2E\]:hover,
 .style-obsidian button.bg-emerald-600:hover,
 .style-obsidian .bg-emerald-600:hover {
-  background: oklch(0.30 0.07 160) !important;
+  background: oklch(0.24 0.05 160) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 10px oklch(0.35 0.08 160 / 18%) !important;
+  box-shadow: 0 4px 12px oklch(0.28 0.06 160 / 20%), inset 0 0.5px 0 oklch(1 0 0 / 8%) !important;
+}
+
+.style-obsidian button.bg-\[\#1C4A2E\]:active,
+.style-obsidian button.bg-emerald-600:active {
+  transform: translateY(0px) scale(0.98) !important;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 10%) !important;
 }
 
 /* Dark mode buttons: jade brillante */
@@ -435,55 +453,57 @@
 .style-obsidian.dark .bg-\[\#1C4A2E\],
 .style-obsidian.dark button.bg-emerald-600,
 .style-obsidian.dark .bg-emerald-600 {
-  background: oklch(0.72 0.14 170) !important;
-  border-color: oklch(0.65 0.13 170) !important;
-  color: oklch(0.10 0.015 175) !important;
+  background: oklch(0.82 0.16 160) !important;
+  border-color: oklch(0.75 0.14 160) !important;
+  color: oklch(0.075 0.008 160) !important;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 30%), 0 0 16px oklch(0.82 0.16 160 / 8%) !important;
 }
 
 .style-obsidian.dark button.bg-\[\#1C4A2E\]:hover,
 .style-obsidian.dark .bg-\[\#1C4A2E\]:hover,
 .style-obsidian.dark button.bg-emerald-600:hover,
 .style-obsidian.dark .bg-emerald-600:hover {
-  background: oklch(0.68 0.13 170) !important;
-  box-shadow: 0 0 24px oklch(0.72 0.14 170 / 18%) !important;
+  background: oklch(0.78 0.15 160) !important;
+  box-shadow: 0 4px 20px oklch(0.82 0.16 160 / 22%), 0 0 28px oklch(0.82 0.16 160 / 10%) !important;
 }
 
 /* ------------------------------------------------------------------
-   8. INPUTS & SELECTS — Mínimos, transparentes
+   8. INPUTS & SELECTS — Transparentes, border-accent mínimo
    ------------------------------------------------------------------ */
 .style-obsidian input,
 .style-obsidian select,
 .style-obsidian textarea {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  border-radius: 6px !important;
-  border-color: var(--border) !important;
+  border-radius: 3px !important;
+  border: 0.5px solid var(--border) !important;
   background-color: transparent !important;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .style-obsidian input:focus,
 .style-obsidian select:focus,
 .style-obsidian textarea:focus {
   border-color: var(--ring) !important;
-  box-shadow: 0 0 0 2px oklch(0.35 0.08 160 / 10%) !important;
+  box-shadow: 0 0 0 2px oklch(0.28 0.06 160 / 8%) !important;
+  outline: none !important;
 }
 
 .style-obsidian.dark input,
 .style-obsidian.dark select,
 .style-obsidian.dark textarea {
-  background-color: oklch(0.12 0.01 175) !important;
-  border-color: oklch(0.72 0.14 170 / 10%) !important;
+  background-color: oklch(0.09 0.006 160 / 60%) !important;
+  border-color: oklch(0.82 0.16 160 / 8%) !important;
 }
 
 .style-obsidian.dark input:focus,
 .style-obsidian.dark select:focus,
 .style-obsidian.dark textarea:focus {
-  border-color: oklch(0.72 0.14 170) !important;
-  box-shadow: 0 0 0 2px oklch(0.72 0.14 170 / 10%) !important;
+  border-color: oklch(0.82 0.16 160 / 50%) !important;
+  box-shadow: 0 0 0 2px oklch(0.82 0.16 160 / 8%) !important;
 }
 
 /* ------------------------------------------------------------------
-   9. TABLAS — Grid afilado con headers uppercase
+   9. TABLAS — Grid técnico con headers monoespaciados
    ------------------------------------------------------------------ */
 .style-obsidian thead,
 .style-obsidian .bg-slate-50,
@@ -495,35 +515,48 @@
 .style-obsidian.dark thead,
 .style-obsidian.dark .bg-slate-50,
 .style-obsidian.dark .bg-slate-50\/80 {
-  background-color: oklch(0.13 0.015 175 / 70%) !important;
+  background-color: oklch(0.09 0.008 160 / 60%) !important;
 }
 
 .style-obsidian th {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.06em !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
-  font-size: 0.6875rem !important;
+  font-size: 0.625rem !important;
+  color: var(--muted-foreground) !important;
 }
 
 .style-obsidian td {
   border-color: var(--border) !important;
 }
 
+.style-obsidian tbody tr {
+  transition: background-color 0.2s ease !important;
+}
+
+.style-obsidian tbody tr:hover {
+  background-color: oklch(0.28 0.06 160 / 3%) !important;
+}
+
+.style-obsidian.dark tbody tr:hover {
+  background-color: oklch(0.82 0.16 160 / 3%) !important;
+}
+
 /* ------------------------------------------------------------------
-   10. SIDEBAR PREMIUM
+   10. SIDEBAR PREMIUM — Vidrio esmerilado
    ------------------------------------------------------------------ */
 .style-obsidian .bg-white\/70 {
-  background-color: oklch(0.97 0.005 85 / 88%) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background-color: oklch(0.978 0.003 80 / 85%) !important;
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
 }
 
 .style-obsidian.dark .bg-white\/70,
 .style-obsidian.dark .bg-slate-950\/70 {
-  background-color: oklch(0.11 0.015 175 / 92%) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background-color: oklch(0.085 0.008 160 / 88%) !important;
+  backdrop-filter: blur(20px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(120%) !important;
 }
 
 /* Override borders on slate */
@@ -534,41 +567,41 @@
 
 .style-obsidian.dark .border-slate-800,
 .style-obsidian.dark .border-slate-700 {
-  border-color: oklch(0.72 0.14 170 / 8%) !important;
+  border-color: oklch(0.82 0.16 160 / 6%) !important;
 }
 
 /* ------------------------------------------------------------------
-   11. GLOW BACKGROUND — Colores teal/jade
+   11. GLOW BACKGROUNDS — Jade atmosphérico
    ------------------------------------------------------------------ */
 .style-obsidian .bg-emerald-500\/20 {
-  background-color: oklch(0.50 0.10 170 / 10%) !important;
+  background-color: oklch(0.45 0.08 160 / 6%) !important;
 }
 
 .style-obsidian .bg-blue-500\/20 {
-  background-color: oklch(0.45 0.06 200 / 8%) !important;
+  background-color: oklch(0.42 0.04 200 / 5%) !important;
 }
 
 .style-obsidian.dark .bg-emerald-500\/25 {
-  background-color: oklch(0.60 0.12 170 / 16%) !important;
+  background-color: oklch(0.65 0.14 160 / 8%) !important;
 }
 
 .style-obsidian.dark .bg-blue-500\/25 {
-  background-color: oklch(0.50 0.08 200 / 12%) !important;
+  background-color: oklch(0.45 0.06 200 / 6%) !important;
 }
 
 /* ------------------------------------------------------------------
-   12. BADGES DE ESTADO — Adaptar a las nuevas formas
+   12. BADGES — Rectángulos técnicos monoespaciados
    ------------------------------------------------------------------ */
-.style-obsidian .rounded-full:not(img):not([class*="avatar"]):not([class*="h-2"]):not([class*="h-3"]) {
-  border-radius: 4px !important;
+.style-obsidian .rounded-full:not(img):not([class*="avatar"]):not([class*="h-2"]):not([class*="h-3"]):not([class*="h-1"]):not([class*="w-1"]):not([class*="w-2"]) {
+  border-radius: 3px !important;
 }
 
 /* ------------------------------------------------------------------
-   13. SCROLLBAR PREMIUM (WebKit)
+   13. SCROLLBAR — Ultra-delgada, jade accent
    ------------------------------------------------------------------ */
 .style-obsidian ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
 }
 
 .style-obsidian ::-webkit-scrollbar-track {
@@ -576,109 +609,164 @@
 }
 
 .style-obsidian ::-webkit-scrollbar-thumb {
-  background: oklch(0.18 0.02 180 / 12%);
-  border-radius: 3px;
+  background: oklch(0.14 0.01 160 / 10%);
+  border-radius: 2px;
 }
 
 .style-obsidian ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.18 0.02 180 / 22%);
+  background: oklch(0.14 0.01 160 / 20%);
 }
 
 .style-obsidian.dark ::-webkit-scrollbar-thumb {
-  background: oklch(0.72 0.14 170 / 12%);
+  background: oklch(0.82 0.16 160 / 10%);
 }
 
 .style-obsidian.dark ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.72 0.14 170 / 22%);
+  background: oklch(0.82 0.16 160 / 20%);
 }
 
 /* ------------------------------------------------------------------
-   14. MICRO-ANIMACIONES PREMIUM
+   14. MICRO-ANIMACIONES — Spring physics & glow pulses
    ------------------------------------------------------------------ */
 @keyframes premiumPulse {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px oklch(0.35 0.08 160 / 0%)); }
-  50% { opacity: 0.85; filter: drop-shadow(0 0 6px oklch(0.35 0.08 160 / 30%)); }
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px oklch(0.28 0.06 160 / 0%)); }
+  50% { opacity: 0.8; filter: drop-shadow(0 0 4px oklch(0.28 0.06 160 / 20%)); }
 }
 
 @keyframes premiumPulseDark {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px oklch(0.72 0.14 170 / 0%)); }
-  50% { opacity: 0.85; filter: drop-shadow(0 0 8px oklch(0.72 0.14 170 / 35%)); }
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0px oklch(0.82 0.16 160 / 0%)); }
+  50% { opacity: 0.8; filter: drop-shadow(0 0 8px oklch(0.82 0.16 160 / 30%)); }
+}
+
+@keyframes jadeGlow {
+  0%, 100% { box-shadow: 0 0 0px oklch(0.82 0.16 160 / 0%); }
+  50% { box-shadow: 0 0 12px oklch(0.82 0.16 160 / 12%); }
 }
 
 .style-obsidian .lucide-leaf,
 .style-obsidian .sidebar-header svg {
-  animation: premiumPulse 5s ease-in-out infinite;
+  animation: premiumPulse 6s ease-in-out infinite;
 }
 
 .style-obsidian.dark .lucide-leaf,
 .style-obsidian.dark .sidebar-header svg {
-  animation: premiumPulseDark 5s ease-in-out infinite;
+  animation: premiumPulseDark 6s ease-in-out infinite;
+}
+
+/* Spring-based hover transitions for interactive elements */
+.style-obsidian button {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.style-obsidian button:active {
+  transform: scale(0.97) !important;
 }
 
 /* ------------------------------------------------------------------
-   15. TOPBAR — Override glassmorphism
+   15. TOPBAR — Glassmorphism refinado
    ------------------------------------------------------------------ */
 .style-obsidian header .backdrop-blur-xl,
 .style-obsidian .backdrop-blur-xl {
-  backdrop-filter: blur(20px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
 }
 
 .style-obsidian.dark header .backdrop-blur-xl,
 .style-obsidian.dark .backdrop-blur-xl {
-  backdrop-filter: blur(20px) saturate(110%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(110%) !important;
+  backdrop-filter: blur(24px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(120%) !important;
 }
 
 /* ------------------------------------------------------------------
-   16. DARK MODE OVERRIDES — Cohesión monocromática Omarchy
+   16. DARK MODE COHESIÓN — Monocromática Carbon-Jade
    ------------------------------------------------------------------ */
 .style-obsidian.dark .bg-slate-50 {
-  background-color: oklch(0.14 0.01 175) !important;
+  background-color: oklch(0.10 0.008 160) !important;
 }
 
 .style-obsidian.dark .bg-slate-100 {
-  background-color: oklch(0.15 0.01 175) !important;
+  background-color: oklch(0.11 0.008 160) !important;
 }
 
 .style-obsidian.dark .bg-slate-950 {
-  background-color: oklch(0.10 0.015 175) !important;
+  background-color: oklch(0.075 0.008 160) !important;
 }
 
 .style-obsidian.dark .text-slate-900 {
-  color: oklch(0.93 0.01 85) !important;
+  color: oklch(0.92 0.008 85) !important;
 }
 
 .style-obsidian.dark .text-slate-50,
 .style-obsidian.dark .text-slate-100 {
-  color: oklch(0.93 0.01 85) !important;
+  color: oklch(0.92 0.008 85) !important;
 }
 
 .style-obsidian.dark .text-slate-500,
 .style-obsidian.dark .text-slate-400 {
-  color: oklch(0.58 0.02 175) !important;
+  color: oklch(0.52 0.015 160) !important;
 }
 
-/* Emerald → Jade coherente */
+/* Emerald → Jade V3 coherente */
 .style-obsidian.dark .text-emerald-400 {
-  color: oklch(0.72 0.14 170) !important;
+  color: oklch(0.82 0.16 160) !important;
 }
 
 .style-obsidian.dark .text-emerald-300 {
-  color: oklch(0.78 0.12 170) !important;
+  color: oklch(0.85 0.14 160) !important;
 }
 
 .style-obsidian.dark .bg-emerald-600 {
-  background-color: oklch(0.72 0.14 170) !important;
+  background-color: oklch(0.82 0.16 160) !important;
 }
 
 .style-obsidian.dark .bg-emerald-900\/30,
 .style-obsidian.dark .bg-emerald-900\/50,
 .style-obsidian.dark .bg-emerald-950\/20 {
-  background-color: oklch(0.20 0.04 170 / 35%) !important;
+  background-color: oklch(0.18 0.03 160 / 30%) !important;
 }
 
 .style-obsidian.dark .border-emerald-200,
 .style-obsidian.dark .border-emerald-700\/30 {
-  border-color: oklch(0.72 0.14 170 / 12%) !important;
+  border-color: oklch(0.82 0.16 160 / 8%) !important;
 }
+
+/* ------------------------------------------------------------------
+   17. DIVIDERS — Dashed grid lines estilo técnico
+   ------------------------------------------------------------------ */
+.style-obsidian .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.style-obsidian .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-style: dashed !important;
+  border-color: oklch(0.28 0.06 160 / 6%) !important;
+}
+
+.style-obsidian.dark .divide-slate-800 > :not([hidden]) ~ :not([hidden]),
+.style-obsidian.dark .divide-slate-700 > :not([hidden]) ~ :not([hidden]) {
+  border-style: dashed !important;
+  border-color: oklch(0.82 0.16 160 / 6%) !important;
+}
+
+/* ------------------------------------------------------------------
+   18. SELECTION & FOCUS — Jade accent
+   ------------------------------------------------------------------ */
+.style-obsidian ::selection {
+  background-color: oklch(0.28 0.06 160 / 15%);
+  color: oklch(0.14 0.01 160);
+}
+
+.style-obsidian.dark ::selection {
+  background-color: oklch(0.82 0.16 160 / 20%);
+  color: oklch(0.92 0.008 85);
+}
+
+/* ------------------------------------------------------------------
+   19. SPRING TRANSITIONS — Smooth accordion & expand
+   ------------------------------------------------------------------ */
+.style-obsidian .transition-all {
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.style-obsidian .transition-colors {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  transition-duration: 0.25s !important;
+}
+

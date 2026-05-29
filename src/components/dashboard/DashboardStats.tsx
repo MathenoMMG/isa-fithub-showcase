@@ -17,13 +17,13 @@ export function DashboardStats() {
 
   if (isPremium) {
     return (
-      <div className="grid grid-cols-3 border border-border dark:border-emerald-500/10 divide-x divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+      <div className="grid grid-cols-3 border border-border dark:border-primary/6 divide-x divide-border dark:divide-primary/6 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%]">
         {/* Vigentes */}
-        <Link to="/inventario" className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px]">
+        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px]">
           <div className="flex flex-col h-full justify-between gap-2 text-left">
             <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
-              [01 // VIGENTES]
+              <span className="w-1 h-1 rounded-none bg-emerald-500 inline-block animate-pulse" />
+              VIGENTES
             </div>
             <div>
               <div className="font-mono text-[32px] font-semibold text-emerald-700 dark:text-emerald-400 leading-none">
@@ -37,11 +37,11 @@ export function DashboardStats() {
         </Link>
 
         {/* Próximos */}
-        <Link to="/inventario" className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px]">
+        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px]">
           <div className="flex flex-col h-full justify-between gap-2 text-left">
             <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block" />
-              [02 // PRÓXIMOS]
+              <span className="w-1 h-1 rounded-none bg-amber-500 inline-block" />
+              PRÓXIMOS
             </div>
             <div>
               <div className="font-mono text-[32px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
@@ -55,11 +55,11 @@ export function DashboardStats() {
         </Link>
 
         {/* Vencidos */}
-        <Link to="/inventario" className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px]">
+        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px]">
           <div className="flex flex-col h-full justify-between gap-2 text-left">
             <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-              <span className={`w-1.5 h-1.5 rounded-full inline-block ${vencidos > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
-              [03 // VENCIDOS]
+              <span className={`w-1 h-1 rounded-none inline-block ${vencidos > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
+              VENCIDOS
             </div>
             <div>
               <div className="font-mono text-[32px] font-semibold text-red-600 dark:text-red-400 leading-none">

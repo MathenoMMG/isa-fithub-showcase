@@ -103,19 +103,19 @@ export function DashboardShortcuts() {
 
   if (isPremium) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 border border-border dark:border-emerald-500/10 divide-x divide-y divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 border border-border dark:border-primary/6 divide-x divide-y divide-border dark:divide-primary/6 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%] dark:shadow-[inset_0_0.5px_0_oklch(0.82_0.16_160/4%)]">
         {shortcuts.map((s, idx) => {
-          const indexStr = `[0${idx + 1}]`;
+          const indexStr = `0${idx + 1}`;
           const content = (
-            <div className={`p-[16px_14px] flex flex-col justify-between gap-4 cursor-pointer transition-colors duration-150 hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 h-full text-left w-full outline-none ${s.disabled ? "opacity-35 grayscale pointer-events-none cursor-not-allowed" : ""}`}>
+            <div className={`p-[16px_14px] flex flex-col justify-between gap-4 cursor-pointer transition-all duration-300 hover:bg-muted/40 dark:hover:bg-primary/3 h-full text-left w-full outline-none active:scale-[0.97] ${s.disabled ? "opacity-35 grayscale pointer-events-none cursor-not-allowed" : ""}`}>
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-muted-foreground tracking-wider">{indexStr}</span>
-                <div className={`w-[24px] h-[24px] rounded-[4px] border border-border dark:border-emerald-500/10 flex items-center justify-center shrink-0 bg-slate-500/5`}>
+                <div className={`w-[24px] h-[24px] rounded-[2px] border border-border dark:border-primary/6 flex items-center justify-center shrink-0 bg-muted/40`}>
                   <s.icon size={12} className={!s.disabled ? "text-primary dark:text-emerald-400" : "text-muted-foreground"} />
                 </div>
               </div>
               <div className="mt-2 flex-1">
-                <div className="font-mono text-[11px] font-bold text-slate-905 dark:text-slate-100 uppercase tracking-wide">
+                <div className="font-mono text-[11px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
                   {s.title}
                 </div>
                 <div className="font-mono text-[9px] text-muted-foreground/85 mt-1 uppercase leading-snug">

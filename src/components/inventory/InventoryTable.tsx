@@ -31,7 +31,7 @@ export function InventoryTable({ data, collapseCounter, expandCounter }: Props) 
     return (
       <div className={
         isPremium
-          ? "rounded-[6px] border border-border dark:border-emerald-500/10 bg-card/40 dark:bg-slate-900/40 p-12 text-center text-slate-500 dark:text-slate-400 font-mono text-xs uppercase tracking-wider"
+          ? "rounded-[3px] border border-border dark:border-primary/5 bg-card/30 dark:bg-slate-900/30 p-12 text-center text-slate-500 dark:text-slate-400 font-mono text-xs uppercase tracking-wider"
           : "rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center text-slate-500 dark:text-slate-400 transition-colors"
       }>
         No hay productos que coincidan con la búsqueda.
@@ -84,7 +84,7 @@ function LineaGroup({
         onClick={() => setOpen((o) => !o)}
         className={
           isPremium
-            ? "w-full flex items-center gap-[8px] bg-card/40 dark:bg-slate-900/40 border border-border dark:border-emerald-500/10 border-l-[4px] border-l-primary dark:border-l-emerald-400 rounded-[4px] p-[10px_14px] text-left hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-all outline-none"
+            ? "w-full flex items-center gap-[8px] bg-card/30 dark:bg-slate-900/30 border border-border dark:border-primary/5 border-l-[4px] border-l-primary dark:border-l-emerald-400 rounded-[2px] p-[10px_14px] text-left hover:bg-muted/40 dark:hover:bg-primary/5 transition-all outline-none"
             : "w-full flex items-center gap-[8px] bg-[#F9FAF8] dark:bg-slate-900/80 border-l-[3px] border-l-[#1C4A2E] dark:border-l-emerald-500 rounded-[10px] p-[10px_14px] text-left hover:brightness-95 transition-all outline-none"
         }
       >
@@ -93,7 +93,7 @@ function LineaGroup({
         </span>
         <span className={
           isPremium
-            ? "font-mono text-[9px] font-bold bg-slate-500/5 dark:bg-emerald-500/10 text-primary dark:text-emerald-400 border border-border dark:border-emerald-500/10 px-2 py-0.5 rounded-[3px] leading-none"
+            ? "font-mono text-[9px] font-bold bg-muted/40 dark:bg-primary/5 text-primary dark:text-emerald-400 border border-border dark:border-primary/5 px-2 py-0.5 rounded-[2px] leading-none"
             : "font-sans text-[11px] font-medium bg-[#EAF3DE] dark:bg-emerald-900/40 text-[#3B6D11] dark:text-emerald-400 px-[8px] py-[2px] rounded-full leading-none"
         }>
           {items.length}
@@ -106,7 +106,7 @@ function LineaGroup({
         className={`grid transition-all duration-300 ease-in-out ${open ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"}`}
       >
         <div className="overflow-hidden">
-          <div className={`space-y-2 ml-3 pl-3 border-l ${isPremium ? "border-border dark:border-emerald-500/10" : "border-slate-100 dark:border-slate-800"} py-1`}>
+          <div className={`space-y-2 ml-3 pl-3 border-l ${isPremium ? "border-border dark:border-primary/5" : "border-slate-100 dark:border-slate-800"} py-1`}>
             {items.map((p) => (
               <ProductRow key={p.id} product={p} />
             ))}

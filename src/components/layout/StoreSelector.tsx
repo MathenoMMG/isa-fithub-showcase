@@ -15,7 +15,7 @@ export function StoreSelector() {
       <SelectTrigger 
         className={
           isPremium 
-            ? "h-10 w-[160px] px-2.5 rounded-[4px] border border-border bg-card/40 text-xs font-mono dark:bg-slate-900/40 dark:border-emerald-500/10 dark:text-slate-200 transition-all uppercase tracking-wider"
+            ? "h-10 w-[160px] px-2.5 rounded-[3px] border border-border bg-card/30 text-xs font-mono dark:bg-slate-900/30 dark:border-primary/5 dark:text-slate-200 transition-all uppercase tracking-wider"
             : "h-12 w-[170px] px-2 rounded-xl border-slate-300 bg-white text-base font-medium dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 transition-colors"
         }
       >

@@ -65,7 +65,7 @@ export function KpiCards({
 
   if (isPremium) {
     return (
-      <div className="grid grid-cols-3 border border-border dark:border-emerald-500/10 divide-x divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+      <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden">
         {cards.map((c, idx) => {
           const Icon = c.icon;
           const isActive = activeFilters.includes(c.id);
@@ -73,12 +73,12 @@ export function KpiCards({
           return (
             <div 
               key={c.id} 
-              className={`p-[16px_14px] flex flex-col justify-between gap-3 cursor-pointer transition-colors duration-150 hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 ${isActive ? "bg-slate-500/10 dark:bg-emerald-500/10 font-bold" : ""}`}
+              className={`p-[16px_14px] flex flex-col justify-between gap-3 cursor-pointer transition-colors duration-150 hover:bg-muted/40 dark:hover:bg-primary/5 ${isActive ? "bg-muted/60 dark:bg-primary/5 font-bold" : ""}`}
               onClick={c.onClick}
             >
               <div className="flex justify-between items-start w-full">
                 <span className="font-mono text-[9px] text-muted-foreground tracking-wider uppercase">{indexStr} // {c.label}</span>
-                <div className={`w-[24px] h-[24px] rounded-[4px] border border-border dark:border-emerald-500/10 flex items-center justify-center bg-slate-500/5`}>
+                <div className={`w-[24px] h-[24px] rounded-[2px] border border-border dark:border-primary/5 flex items-center justify-center bg-muted/40`}>
                   <Icon size={12} className={c.iconColor} />
                 </div>
               </div>

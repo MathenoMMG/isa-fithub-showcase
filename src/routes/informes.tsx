@@ -46,6 +46,7 @@ function Informes() {
   const [loadingSales, setLoadingSales] = useState(true);
   const [isCriticalExpanded, setIsCriticalExpanded] = useState(false);
   const [isSalesExpanded, setIsSalesExpanded] = useState(false);
+  const [isTopProductsExpanded, setIsTopProductsExpanded] = useState(false);
 
   const filteredSalesTable = useMemo(() => {
     if (!salesDateFilter) return salesData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -259,15 +260,15 @@ function Informes() {
 
       {/* KPI Cards */}
       {profile.stylePreset === "obsidian" ? (
-        <div className="grid grid-cols-3 border border-border dark:border-emerald-500/10 divide-x divide-border dark:divide-emerald-500/10 bg-card/40 dark:bg-slate-900/40 rounded-[6px] overflow-hidden">
+        <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden">
           {/* Total vendidos */}
           <div 
             onClick={() => document.getElementById('registro-ventas')?.scrollIntoView({ behavior: 'smooth' })}
-            className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px] cursor-pointer text-left"
+            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px] cursor-pointer text-left"
           >
             <div className="flex flex-col h-full justify-between gap-2 text-left">
               <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                <span className="w-1 h-1 rounded-none bg-primary dark:bg-primary inline-block animate-pulse" />
                 [01 // TOTAL VENDIDOS]
               </div>
               <div>
@@ -284,11 +285,11 @@ function Informes() {
           {/* Categoría Estrella */}
           <div 
             onClick={() => topCategory !== "N/A" ? navigate({ to: '/inventario', search: { category: topCategory } }) : navigate({ to: '/inventario' })}
-            className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px] cursor-pointer text-left"
+            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px] cursor-pointer text-left"
           >
             <div className="flex flex-col h-full justify-between gap-2 text-left">
               <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                <span className="w-1 h-1 rounded-none bg-primary inline-block" />
                 [02 // CATEGORÍA ESTRELLA]
               </div>
               <div>
@@ -305,11 +306,11 @@ function Informes() {
           {/* Lotes Críticos */}
           <div 
             onClick={() => navigate({ to: '/inventario', search: { status: 'vencido' } })}
-            className="block outline-none hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors p-[16px_14px] cursor-pointer text-left"
+            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px] cursor-pointer text-left"
           >
             <div className="flex flex-col h-full justify-between gap-2 text-left">
               <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full inline-block ${criticos.length > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
+                <span className={`w-1 h-1 rounded-none inline-block ${criticos.length > 0 ? "bg-red-500 animate-ping" : "bg-primary"}`} />
                 [03 // LOTES CRÍTICOS]
               </div>
               <div>
@@ -497,7 +498,7 @@ function Informes() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto overflow-y-auto transition-all duration-300 ${isTopProductsExpanded ? "max-h-none" : "max-h-[300px] scrollbar-thin"}`}>
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-950/50 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
               <tr>
@@ -559,6 +560,19 @@ function Informes() {
             </tbody>
           </table>
         </div>
+        {topProducts.length > 5 && (
+          <div className="p-3 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/60 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all select-none flex items-center gap-1.5 active:scale-95 duration-200"
+              onClick={() => setIsTopProductsExpanded(!isTopProductsExpanded)}
+            >
+              <span>{isTopProductsExpanded ? "Contraer Tabla" : "Ampliar Tabla"}</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isTopProductsExpanded ? "rotate-180" : ""}`} />
+            </Button>
+          </div>
+        )}
       </Card>
 
       {/* Otras Tarjetas Analíticas */}

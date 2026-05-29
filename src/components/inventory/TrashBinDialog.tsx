@@ -39,7 +39,7 @@ export function TrashBinDialog() {
           variant="outline"
           className={`relative h-12 w-full sm:w-auto gap-2 border bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 transition-all ${
             isObsidian 
-              ? "rounded-md border-slate-300 dark:border-slate-800 font-mono text-sm tracking-tight hover:bg-slate-100/50 dark:hover:bg-slate-800/40" 
+              ? "rounded-[3px] border-slate-300 dark:border-slate-800 font-mono text-sm tracking-tight hover:bg-slate-100/50 dark:hover:bg-slate-800/40" 
               : "rounded-xl border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
           }`}
         >
@@ -57,7 +57,7 @@ export function TrashBinDialog() {
       
       <DialogContent className={`max-w-2xl bg-white dark:bg-slate-950 border transition-all ${
         isObsidian 
-          ? "rounded-md border-slate-300 dark:border-slate-800" 
+          ? "rounded-[3px] border-slate-300 dark:border-slate-800" 
           : "rounded-2xl border-slate-200 dark:border-slate-800"
       }`}>
         <DialogHeader>
@@ -96,7 +96,7 @@ export function TrashBinDialog() {
                   key={product.id}
                   className={`p-4 border bg-slate-50/50 dark:bg-slate-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:bg-slate-50 dark:hover:bg-slate-900/60 ${
                     isObsidian 
-                      ? "rounded-md border-slate-300 dark:border-slate-800 font-mono text-xs" 
+                      ? "rounded-[3px] border-slate-300 dark:border-slate-800 font-mono text-xs" 
                       : "rounded-xl border-slate-200 dark:border-slate-800"
                   }`}
                 >
@@ -141,7 +141,7 @@ export function TrashBinDialog() {
                     onClick={() => handleRestore(product.id)}
                     disabled={isRestoringId !== null}
                     className={`h-9 shrink-0 gap-1.5 border border-emerald-200 dark:border-emerald-900/30 hover:border-emerald-300 bg-white hover:bg-emerald-50 dark:bg-slate-900 dark:hover:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 ${
-                      isObsidian ? "rounded-md font-mono" : "rounded-lg"
+                      isObsidian ? "rounded-[3px] font-mono" : "rounded-lg"
                     }`}
                   >
                     {isRestoringId === product.id ? (
@@ -163,7 +163,7 @@ export function TrashBinDialog() {
               variant="ghost"
               onClick={handleClearAll}
               className={`text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 mr-auto ${
-                isObsidian ? "rounded-md font-mono text-xs uppercase" : "rounded-xl"
+                isObsidian ? "rounded-[3px] font-mono text-xs uppercase" : "rounded-xl"
               }`}
             >
               <Trash2 className="h-4 w-4 mr-2" />
@@ -173,7 +173,7 @@ export function TrashBinDialog() {
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
-            className={`${isObsidian ? "rounded-md font-mono text-xs uppercase" : "rounded-xl"}`}
+            className={`${isObsidian ? "rounded-[3px] font-mono text-xs uppercase" : "rounded-xl"}`}
           >
             Cerrar
           </Button>

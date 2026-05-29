@@ -58,17 +58,17 @@ export function DashboardAlerts() {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-[16px]">
         {/* Panel "Atención inmediata" Premium */}
-        <div className="border border-border dark:border-emerald-500/10 rounded-[6px] bg-card/40 dark:bg-slate-900/40 flex flex-col justify-between overflow-hidden">
-          <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-emerald-500/10 bg-slate-50/50 dark:bg-slate-950/20">
+        <div className="border border-border dark:border-primary/6 rounded-[3px] bg-card/30 dark:bg-slate-900/30 flex flex-col justify-between overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%] dark:shadow-[inset_0_0.5px_0_oklch(0.82_0.16_160/4%)]">
+          <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-primary/6 bg-slate-50/50 dark:bg-slate-950/20">
             <h3 className="font-mono text-[10px] font-bold text-slate-800 dark:text-slate-200 tracking-wider">
-              [ TELEMETRY // ATENCIÓN INMEDIATA ]
+              ATENCIÓN INMEDIATA
             </h3>
-            <Link to="/inventario" className="font-mono text-[10px] text-primary dark:text-emerald-400 cursor-pointer hover:underline">
-              VER TODO :: READ_ALL
+            <Link to="/inventario" className="font-mono text-[10px] text-primary dark:text-emerald-400 cursor-pointer hover:underline transition-all duration-300">
+              VER TODO
             </Link>
           </div>
           
-          <div className="flex-1 flex flex-col divide-y divide-border/60 dark:divide-emerald-500/5">
+          <div className="flex-1 flex flex-col divide-y divide-dashed divide-border/60 dark:divide-primary/5">
             {urgentLotes.length > 0 ? (
               urgentLotes.map((lote) => {
                 const status = getStatus(lote.fecha_caducidad);
@@ -77,10 +77,10 @@ export function DashboardAlerts() {
                   <div 
                     key={lote.id} 
                     onClick={() => navigate({ to: "/inventario", search: { q: lote.producto.nombre } })}
-                    className="flex items-center gap-3 p-[10px_14px] hover:bg-slate-500/5 dark:hover:bg-emerald-500/5 transition-colors cursor-pointer"
+                    className="flex items-center gap-3 p-[10px_14px] hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-center justify-center shrink-0 w-4">
-                      <span className={`w-1.5 h-1.5 rounded-full ${status === "vencido" ? "bg-red-500 animate-pulse" : "bg-amber-500"}`} />
+                      <span className={`w-1 h-1 rounded-none ${status === "vencido" ? "bg-red-500 animate-pulse" : "bg-amber-500"}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-mono text-[11px] font-medium text-slate-950 dark:text-slate-200 truncate">
@@ -104,20 +104,20 @@ export function DashboardAlerts() {
             ) : (
               <div className="p-[24px] text-center flex flex-col items-center justify-center flex-1">
                 <Package size={24} className="mb-2 text-muted-foreground/40" />
-                <div className="font-mono text-[11px] text-muted-foreground uppercase">[ REGISTRO VACÍO ]</div>
+                <div className="font-mono text-[11px] text-muted-foreground uppercase">REGISTRO VACÍO</div>
               </div>
             )}
           </div>
         </div>
 
         {/* Panel "Tendencia semanal" Premium */}
-        <div className="border border-border dark:border-emerald-500/10 rounded-[6px] bg-card/40 dark:bg-slate-900/40 flex flex-col justify-between overflow-hidden">
-          <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-emerald-500/10 bg-slate-50/50 dark:bg-slate-950/20">
+        <div className="border border-border dark:border-primary/6 rounded-[3px] bg-card/30 dark:bg-slate-900/30 flex flex-col justify-between overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%] dark:shadow-[inset_0_0.5px_0_oklch(0.82_0.16_160/4%)]">
+          <div className="flex justify-between items-center p-[12px_14px] border-b border-border dark:border-primary/6 bg-slate-50/50 dark:bg-slate-950/20">
             <h3 className="font-mono text-[10px] font-bold text-slate-800 dark:text-slate-200 tracking-wider">
-              [ METRICS // TENDENCIA SEMANAL ]
+              TENDENCIA SEMANAL
             </h3>
             <span className="font-mono text-[9px] text-muted-foreground uppercase">
-              VENCIMIENTOS_HISTORIC
+              VENCIMIENTOS
             </span>
           </div>
 
@@ -130,20 +130,20 @@ export function DashboardAlerts() {
             </ResponsiveContainer>
           </div>
 
-          <div className="border-t border-border dark:border-emerald-500/10 p-[12px_14px] flex divide-x divide-border dark:divide-emerald-500/10 bg-slate-50/20 dark:bg-slate-950/10">
+          <div className="border-t border-border dark:border-primary/6 p-[12px_14px] flex divide-x divide-border dark:divide-primary/6 bg-slate-50/20 dark:bg-slate-950/10">
             <div className="flex-1 text-center pr-2">
               <p className="font-mono text-[18px] font-semibold text-emerald-700 dark:text-emerald-400 m-0">0</p>
               <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">ESTA SEMANA</p>
             </div>
             <div className="flex-1 text-center px-2">
               <p className="font-mono text-[18px] font-semibold text-amber-700 dark:text-amber-400 m-0">0</p>
-              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">RETIROS_REG</p>
+              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">RETIROS</p>
             </div>
             <div className="flex-1 text-center pl-2">
               <p className="font-mono text-[18px] font-semibold text-slate-800 dark:text-slate-200 m-0">
                 {new Set(filteredItems.map(i => i.categoria)).size}
               </p>
-              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">LÍNEAS ACT</p>
+              <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">LÍNEAS</p>
             </div>
           </div>
         </div>
