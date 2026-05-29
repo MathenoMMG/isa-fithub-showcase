@@ -115,7 +115,7 @@ export function InventoryTable({ data, collapseCounter, expandCounter }: Props) 
                     >
                       <span className={`w-1.5 h-1.5 rounded-none shrink-0 ${statusDotColor} ${worstStatus === "vencido" ? "animate-pulse" : ""}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-mono text-[12px] font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide truncate">
+                        <p className="font-sans text-[13px] font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
                           {p.nombre}
                         </p>
                         <p className="font-mono text-[9px] text-muted-foreground/60 mt-0.5 uppercase">
@@ -244,7 +244,7 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
           <span>//</span>
           <span>{product.tienda_nombre}</span>
         </div>
-        <h2 className="font-serif-preset font-serif font-black text-3xl sm:text-4xl text-slate-900 dark:text-slate-50 uppercase tracking-wide">
+        <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-slate-50 tracking-tight">
           {product.nombre}
         </h2>
         <div className="flex items-center gap-4 text-xs font-sans font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5">
