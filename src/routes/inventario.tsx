@@ -128,10 +128,10 @@ function InventarioPage() {
           return true;
         }
 
-        // Si hay otros filtros de caducidad, verificamos si cumple alguno de los lotes con stock (o cualquier lote dependiendo de la lógica, pero preferiblemente lotes con stock)
+        // Si hay otros filtros de caducidad, verificamos si cumple alguno de los lotes con stock
         return it.lotes.some(lote => {
           const st = getExpiryStatus(lote.fecha_caducidad);
-          return statusFilters.includes(st) && (!statusFilters.includes("stock") || lote.cantidad > 0);
+          return statusFilters.includes(st) && lote.cantidad > 0;
         });
       });
     }

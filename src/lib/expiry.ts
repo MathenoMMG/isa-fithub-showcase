@@ -30,6 +30,7 @@ export function countLotesByStatus(lotes: Lote[]) {
   let proximos = 0;
   let en_regla = 0;
   for (const l of lotes) {
+    if (l.cantidad <= 0) continue; // Ignorar lotes sin stock
     const s = getExpiryStatus(l.fecha_caducidad);
     if (s === "vencido") vencidos++;
     else if (s === "proximo") proximos++;
@@ -40,16 +41,18 @@ export function countLotesByStatus(lotes: Lote[]) {
 
 /** Worst status across the product's lotes (vencido > proximo > en_regla). */
 export function getWorstStatus(lotes: Lote[]): ExpiryStatus {
-  const c = countLotesByStatus(lotes);
+  const activeLotes = lotes.filter((l) => l.cantidad > 0);
+  const c = countLotesByStatus(activeLotes);
   if (c.vencidos > 0) return "vencido";
   if (c.proximos > 0) return "proximo";
   return "en_regla";
 }
 
-/** Earliest expiry date among lotes, or null. */
+/** Earliest expiry date among active lotes, or null. */
 export function getEarliestExpiry(lotes: Lote[]): string | null {
-  if (lotes.length === 0) return null;
-  return [...lotes].sort(
+  const activeLotes = lotes.filter((l) => l.cantidad > 0);
+  if (activeLotes.length === 0) return null;
+  return [...activeLotes].sort(
     (a, b) => parseISO(a.fecha_caducidad).getTime() - parseISO(b.fecha_caducidad).getTime(),
   )[0].fecha_caducidad;
 }

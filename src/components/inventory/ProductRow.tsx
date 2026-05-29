@@ -88,22 +88,17 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           </span>
         </div>
 
-        <div className="flex items-center gap-3 md:gap-4 shrink-0 text-right">
-          <div className="shrink-0">
-            <div className={`${isPremium ? "font-mono text-[18px]" : "font-mono-data text-[16px]"} font-semibold text-[#111827] dark:text-slate-100`}>
+        <div className="text-right shrink-0">
+          <div className="flex items-baseline justify-end gap-1.5">
+            <span className={`${isPremium ? "font-mono text-[20px]" : "font-mono-data text-[18px]"} font-semibold text-[#111827] dark:text-slate-100`}>
               {total}
-            </div>
-            <div className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]"}>
-              disponibles
-            </div>
+            </span>
+            <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 font-mono-data">
+              ({product.vendidos_total || 0} vendidos)
+            </span>
           </div>
-          <div className="shrink-0 border-l border-slate-200 dark:border-slate-800 pl-3 md:pl-4">
-            <div className={`${isPremium ? "font-mono text-[18px]" : "font-mono-data text-[16px]"} font-semibold text-emerald-600 dark:text-emerald-400`}>
-              {product.vendidos_total || 0}
-            </div>
-            <div className={isPremium ? "font-mono text-[8px] text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-wider" : "font-sans text-[9px] text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.05em]"}>
-              vendidos
-            </div>
+          <div className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]"}>
+            unidades en stock
           </div>
         </div>
 
