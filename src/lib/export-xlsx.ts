@@ -39,7 +39,7 @@ export function exportInventoryToExcel(items: InventoryItem[], filename?: string
         "Lote #": idx + 1,
         "Cantidad": lote.cantidad,
         "Fecha de Caducidad": formatExpiryDate(lote.fecha_caducidad),
-        "Estado": statusLabel[getExpiryStatus(lote.fecha_caducidad)],
+        "Estado": lote.cantidad > 0 ? statusLabel[getExpiryStatus(lote.fecha_caducidad)] : "Agotado",
         "Proveedor": item.proveedor_nombre || "—",
         "Notas": lote.notas || item.notas || "—",
       });

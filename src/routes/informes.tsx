@@ -147,6 +147,7 @@ function Informes() {
     const arr = [];
     for (const p of filteredItems) {
       for (const l of p.lotes) {
+        if (l.cantidad <= 0) continue; // Ignorar lotes sin stock
         if (!l.fecha_caducidad) continue;
         const st = getExpiryStatus(l.fecha_caducidad);
         if (st === "vencido" || st === "proximo") {

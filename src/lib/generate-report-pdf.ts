@@ -174,6 +174,7 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
     if (product.lotes.length === 0) continue;
     
     for (const lote of product.lotes) {
+      if (lote.cantidad <= 0) continue; // Ignorar lotes sin stock
       if (!lote.fecha_caducidad) continue;
       const status = getExpiryStatus(lote.fecha_caducidad);
       if (status === "vencido" || status === "proximo") {
