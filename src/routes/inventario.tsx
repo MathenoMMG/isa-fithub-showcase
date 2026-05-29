@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ import { CategoryManagerDialog } from "@/components/inventory/CategoryManagerDia
 import { TrashBinDialog } from "@/components/inventory/TrashBinDialog";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
-import { getExpiryStatus } from "@/lib/expiry";
+import { getExpiryStatus, getEarliestExpiry } from "@/lib/expiry";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -57,6 +57,7 @@ function InventarioPage() {
   // State for collapse/expand all
   const [collapseCounter, setCollapseCounter] = useState(0);
   const [expandCounter, setExpandCounter] = useState(0);
+  const [sortBy, setSortBy] = useState<"nombre" | "vendidos" | "caducidad">("nombre");
 
   // Sincronizar el estado local con los parámetros de búsqueda de la ruta
   useEffect(() => {
@@ -136,8 +137,21 @@ function InventarioPage() {
       });
     }
 
+    // Aplicar ordenación
+    if (sortBy === "nombre") {
+      result = [...result].sort((a, b) => a.nombre.localeCompare(b.nombre));
+    } else if (sortBy === "vendidos") {
+      result = [...result].sort((a, b) => (b.vendidos_total || 0) - (a.vendidos_total || 0));
+    } else if (sortBy === "caducidad") {
+      result = [...result].sort((a, b) => {
+        const aExpiry = getEarliestExpiry(a.lotes) || "9999-12-31";
+        const bExpiry = getEarliestExpiry(b.lotes) || "9999-12-31";
+        return new Date(aExpiry).getTime() - new Date(bExpiry).getTime();
+      });
+    }
+
     return result;
-  }, [filteredItems, search, categoryFilters, statusFilters]);
+  }, [filteredItems, search, categoryFilters, statusFilters, sortBy]);
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -262,12 +276,46 @@ function InventarioPage() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-12 w-full sm:w-auto border-dashed bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-xl shrink-0 gap-1.5 transition-all active:scale-95 duration-200 hover:brightness-105">
+                <ArrowUpDown className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Ordenar: {sortBy === "nombre" ? "Nombre" : sortBy === "vendidos" ? "Más Vendidos" : "Caducidad"}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl shadow-lg">
+              <DropdownMenuLabel className="font-semibold text-slate-800 dark:text-slate-200">Criterio de ordenación</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+              <DropdownMenuCheckboxItem 
+                checked={sortBy === "nombre"}
+                onCheckedChange={() => setSortBy("nombre")}
+                className="dark:text-slate-300 dark:focus:bg-slate-800"
+              >
+                Por Nombre (A-Z)
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={sortBy === "vendidos"}
+                onCheckedChange={() => setSortBy("vendidos")}
+                className="dark:text-slate-300 dark:focus:bg-slate-800"
+              >
+                Por Más Vendidos
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem 
+                checked={sortBy === "caducidad"}
+                onCheckedChange={() => setSortBy("caducidad")}
+                className="dark:text-slate-300 dark:focus:bg-slate-800"
+              >
+                Por Caducidad (Próximos)
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
               
-          {(statusFilters.length > 0 || categoryFilters.length > 0 || search.trim()) && (
+          {(statusFilters.length > 0 || categoryFilters.length > 0 || search.trim() || sortBy !== "nombre") && (
             <Button 
               variant="ghost" 
               className="h-12 text-slate-500 dark:text-slate-400 shrink-0 w-full sm:w-auto"
-              onClick={() => { setStatusFilters([]); setCategoryFilters([]); setSearch(""); }}
+              onClick={() => { setStatusFilters([]); setCategoryFilters([]); setSearch(""); setSortBy("nombre"); }}
             >
               Resetear
             </Button>

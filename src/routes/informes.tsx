@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, FileBarChart, PackageOpen, TrendingUp, AlertTriangle, X } from "lucide-react";
+import { Download, FileBarChart, PackageOpen, TrendingUp, AlertTriangle, X, ChevronDown } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 import { supabase } from "@/lib/supabase";
 import { generatePdfReport } from "@/lib/generate-report-pdf";
@@ -44,6 +44,8 @@ function Informes() {
   const [salesDateFilter, setSalesDateFilter] = useState<string>("");
   const [salesData, setSalesData] = useState<any[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
+  const [isCriticalExpanded, setIsCriticalExpanded] = useState(false);
+  const [isSalesExpanded, setIsSalesExpanded] = useState(false);
 
   const filteredSalesTable = useMemo(() => {
     if (!salesDateFilter) return salesData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -141,6 +143,30 @@ function Informes() {
   }, [salesData]);
 
   const topCategory = categoryData.length > 0 ? categoryData[0].name : "N/A";
+
+  const topProducts = useMemo(() => {
+    const productMap: Record<string, { id: string; nombre: string; sku: string; categoria: string; vendidos: number; tienda_id: number }> = {};
+    
+    for (const v of salesData) {
+      if (!v.productos) continue;
+      const pId = v.producto_id;
+      if (!productMap[pId]) {
+        productMap[pId] = {
+          id: pId,
+          nombre: v.productos.nombre,
+          sku: v.productos.articulo || "N/A",
+          categoria: v.productos.categoria || "Otros",
+          vendidos: 0,
+          tienda_id: v.productos.tienda_id
+        };
+      }
+      productMap[pId].vendidos += v.cantidad;
+    }
+    
+    return Object.values(productMap)
+      .sort((a, b) => b.vendidos - a.vendidos)
+      .slice(0, 10);
+  }, [salesData]);
 
   // Critical Stock
   const criticos = useMemo(() => {
@@ -459,6 +485,82 @@ function Informes() {
         </Card>
       </div>
 
+      {/* Tabla de Productos Más Vendidos */}
+      <Card className="rounded-[12px] border-[0.5px] border-[#E5E7EB] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+          <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+            <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Top 10 Productos Más Vendidos</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Los artículos con mayor volumen de ventas registradas en el rango seleccionado</p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 dark:bg-slate-950/50 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+              <tr>
+                <th className="px-6 py-4 w-20 text-center">Puesto</th>
+                <th className="px-6 py-4">Producto</th>
+                <th className="px-6 py-4">SKU / Artículo</th>
+                <th className="px-6 py-4">Categoría</th>
+                <th className="px-6 py-4">Tienda</th>
+                <th className="px-6 py-4 text-right">Uds. Vendidas</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {topProducts.length > 0 ? (
+                topProducts.map((p, index) => {
+                  let rankBadge: React.ReactNode;
+                  
+                  if (index === 0) {
+                    rankBadge = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 font-bold text-xs">🥇</span>;
+                  } else if (index === 1) {
+                    rankBadge = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-xs">🥈</span>;
+                  } else if (index === 2) {
+                    rankBadge = <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-500 font-bold text-xs">🥉</span>;
+                  } else {
+                    rankBadge = <span className="text-slate-400 dark:text-slate-500 font-mono text-xs">#{index + 1}</span>;
+                  }
+
+                  return (
+                    <tr 
+                      key={p.id}
+                      onClick={() => navigate({ to: "/inventario", search: { q: p.nombre } })}
+                      className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
+                    >
+                      <td className="px-6 py-4 text-center font-medium">{rankBadge}</td>
+                      <td className="px-6 py-4 font-semibold text-slate-900 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        {p.nombre}
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">{p.sku}</td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50">
+                          {p.categoria}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
+                        {p.tienda_id === 1 ? "Norte" : p.tienda_id === 2 ? "Sur" : "Ambas"}
+                      </td>
+                      <td className="px-6 py-4 text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-base">
+                        {p.vendidos} <span className="text-xs font-normal text-slate-400 dark:text-slate-500">uds</span>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
+                    No se registran ventas en este periodo.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
       {/* Otras Tarjetas Analíticas */}
       {otherCards.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -477,7 +579,7 @@ function Informes() {
           <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Visor de Stock Crítico</h3>
         </div>
         
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto overflow-y-auto transition-all duration-300 ${isCriticalExpanded ? "max-h-none" : "max-h-[300px] scrollbar-thin"}`}>
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-950/50 text-slate-500 dark:text-slate-400 font-medium">
               <tr>
@@ -527,6 +629,19 @@ function Informes() {
             </tbody>
           </table>
         </div>
+        {criticos.length > 5 && (
+          <div className="p-3 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/60 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all select-none flex items-center gap-1.5 active:scale-95 duration-200"
+              onClick={() => setIsCriticalExpanded(!isCriticalExpanded)}
+            >
+              <span>{isCriticalExpanded ? "Contraer Tabla" : "Ampliar Tabla"}</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isCriticalExpanded ? "rotate-180" : ""}`} />
+            </Button>
+          </div>
+        )}
       </Card>
 
       {/* Tabla de Historial de Ventas */}
@@ -579,7 +694,7 @@ function Informes() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto overflow-y-auto transition-all duration-300 ${isSalesExpanded ? "max-h-none" : "max-h-[300px] scrollbar-thin"}`}>
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-950/50 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
               <tr>
@@ -621,6 +736,19 @@ function Informes() {
             </tbody>
           </table>
         </div>
+        {filteredSalesTable.length > 5 && (
+          <div className="p-3 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800/60 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-all select-none flex items-center gap-1.5 active:scale-95 duration-200"
+              onClick={() => setIsSalesExpanded(!isSalesExpanded)}
+            >
+              <span>{isSalesExpanded ? "Contraer Tabla" : "Ampliar Tabla"}</span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-300 ${isSalesExpanded ? "rotate-180" : ""}`} />
+            </Button>
+          </div>
+        )}
       </Card>
     </div>
   );
