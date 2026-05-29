@@ -19,7 +19,7 @@ export function Gatekeeper({ children }: { children: React.ReactNode }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "IsaMat2026") {
+    if (password === "Isapro123@") {
       localStorage.setItem("fithub_auth_granted_v2", "true");
       setGranted(true);
       setError(false);
