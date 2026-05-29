@@ -29,6 +29,7 @@ export interface Lote {
   fecha_ingreso: string;
   notas: string | null;
   created_at: string;
+  vendidos?: number;
 }
 
 export interface Venta {

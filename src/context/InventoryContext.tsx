@@ -67,28 +67,37 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 
       if (pErr) throw pErr;
 
-      // Fetch sales totals grouped by producto_id
+      // Fetch sales totals grouped by producto_id and lote_id
       const { data: ventasTotals, error: vErr } = await supabase
         .from("ventas")
-        .select("producto_id, cantidad");
+        .select("producto_id, lote_id, cantidad");
 
       if (vErr) throw vErr;
 
-      // Aggregate sales per product
+      // Aggregate sales per product and per lote
       const salesMap: Record<string, number> = {};
+      const loteSalesMap: Record<string, number> = {};
       for (const v of ventasTotals || []) {
         salesMap[v.producto_id] = (salesMap[v.producto_id] || 0) + v.cantidad;
+        if (v.lote_id) {
+          loteSalesMap[v.lote_id] = (loteSalesMap[v.lote_id] || 0) + v.cantidad;
+        }
       }
 
       const enriched: ProductoConLotes[] = (productos || []).map((p) => ({
         ...p,
         tienda_nombre: TIENDA_MAP[p.tienda_id] || "Norte",
         vendidos_total: salesMap[p.id] || 0,
-        lotes: (p.lotes || []).sort(
-          (a: Lote, b: Lote) =>
-            new Date(a.fecha_caducidad || "9999-12-31").getTime() -
-            new Date(b.fecha_caducidad || "9999-12-31").getTime(),
-        ),
+        lotes: (p.lotes || [])
+          .map((l: Lote) => ({
+            ...l,
+            vendidos: loteSalesMap[l.id] || 0,
+          }))
+          .sort(
+            (a: Lote, b: Lote) =>
+              new Date(a.fecha_caducidad || "9999-12-31").getTime() -
+              new Date(b.fecha_caducidad || "9999-12-31").getTime(),
+          ),
       }));
 
       setItems(enriched);

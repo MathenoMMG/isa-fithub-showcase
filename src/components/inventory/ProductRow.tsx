@@ -88,17 +88,23 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           </span>
         </div>
 
-        <div className="text-right shrink-0">
-          <div className="flex items-baseline justify-end gap-1.5">
-            <span className={`${isPremium ? "font-mono text-[20px]" : "font-mono-data text-[18px]"} font-semibold text-[#111827] dark:text-slate-100`}>
+        <div className="flex items-center gap-3 md:gap-4 shrink-0 text-center">
+          <div className="flex flex-col items-center min-w-[50px]">
+            <span className={`${isPremium ? "font-mono text-[20px]" : "font-mono-data text-[18px]"} font-semibold text-[#111827] dark:text-slate-100 leading-none`}>
               {total}
             </span>
-            <span className="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 font-mono-data">
-              ({product.vendidos_total || 0} vendidos)
+            <span className={`mt-1 ${isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em] font-medium"}`}>
+              en stock
             </span>
           </div>
-          <div className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider" : "font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]"}>
-            unidades en stock
+          <div className="h-6 border-l border-slate-200 dark:border-slate-800 shrink-0" />
+          <div className="flex flex-col items-center min-w-[50px]">
+            <span className={`${isPremium ? "font-mono text-[20px]" : "font-mono-data text-[18px]"} font-semibold text-emerald-600 dark:text-emerald-400 leading-none`}>
+              {product.vendidos_total || 0}
+            </span>
+            <span className={`mt-1 ${isPremium ? "font-mono text-[8px] text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-wider" : "font-sans text-[9px] text-emerald-600 dark:text-emerald-500 uppercase tracking-[0.05em] font-medium"}`}>
+              vendido
+            </span>
           </div>
         </div>
 
@@ -262,9 +268,9 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                         Venta
                       </Button>
                     </div>
-                    {product.vendidos_total > 0 && (
-                      <span className="text-[10px] text-center font-medium text-emerald-600">
-                        {product.vendidos_total} vendidos
+                    {lote.vendidos !== undefined && lote.vendidos > 0 && (
+                      <span className="text-[10px] text-center font-bold text-emerald-600 dark:text-emerald-400 w-full block mt-1">
+                        {lote.vendidos} vendidos
                       </span>
                     )}
                   </div>
@@ -352,9 +358,12 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-sm font-semibold text-slate-400 dark:text-slate-500 tabular-nums px-3">
+                        <div className="flex items-center gap-2 shrink-0 px-3">
+                          <span className="text-sm font-semibold text-slate-400 dark:text-slate-500 tabular-nums">
                             0 unidades
+                          </span>
+                          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono-data">
+                            ({lote.vendidos || 0} vendidos)
                           </span>
                         </div>
 
