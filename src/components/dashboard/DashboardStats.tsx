@@ -17,60 +17,60 @@ export function DashboardStats() {
 
   if (isPremium) {
     return (
-      <div className="grid grid-cols-3 border border-border dark:border-primary/6 divide-x divide-border dark:divide-primary/6 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%]">
+      <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%] dark:shadow-[inset_0_0.5px_0_oklch(0.82_0.16_160/4%)]">
         {/* Vigentes */}
-        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px]">
-          <div className="flex flex-col h-full justify-between gap-2 text-left">
-            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-none bg-emerald-500 inline-block animate-pulse" />
-              VIGENTES
+        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-6">
+          <div className="flex flex-col h-full justify-between gap-4 text-left">
+            <div className="font-sans text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-emerald-400 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 inline-block animate-pulse" />
+              PRODUCTOS VIGENTES
             </div>
             <div>
-              <div className="font-mono text-[32px] font-semibold text-emerald-700 dark:text-emerald-400 leading-none">
+              <div className="font-serif-preset font-serif text-5xl font-black text-emerald-700 dark:text-emerald-400 leading-none">
                 {vigentes}
               </div>
             </div>
-            <div className="font-mono text-[9px] text-muted-foreground/60 uppercase">
-              STATUS: NOMINAL
+            <div className="font-sans text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+              SISTEMA: NOMINAL
             </div>
           </div>
         </Link>
 
         {/* Próximos */}
-        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px]">
-          <div className="flex flex-col h-full justify-between gap-2 text-left">
-            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-none bg-amber-500 inline-block" />
-              PRÓXIMOS
+        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-6">
+          <div className="flex flex-col h-full justify-between gap-4 text-left">
+            <div className="font-sans text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-amber-500 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-none bg-amber-500 inline-block" />
+              PRÓXIMOS A VENCER
             </div>
             <div>
-              <div className="font-mono text-[32px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
+              <div className="font-serif-preset font-serif text-5xl font-black text-amber-700 dark:text-amber-400 leading-none">
                 {proximos}
               </div>
             </div>
-            <div className="font-mono text-[9px] text-amber-700/80 dark:text-amber-400/80 uppercase">
-              LIMIT: ≤ 30 DAYS
+            <div className="font-sans text-[11px] font-semibold text-amber-700/80 dark:text-amber-400/80 uppercase tracking-wider">
+              LIMITE: ≤ 30 DÍAS
             </div>
           </div>
         </Link>
 
         {/* Vencidos */}
-        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px]">
-          <div className="flex flex-col h-full justify-between gap-2 text-left">
-            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-              <span className={`w-1 h-1 rounded-none inline-block ${vencidos > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
-              VENCIDOS
+        <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-6">
+          <div className="flex flex-col h-full justify-between gap-4 text-left">
+            <div className="font-sans text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-red-500 flex items-center gap-2">
+              <span className={`w-1.5 h-1.5 rounded-none inline-block ${vencidos > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
+              LOTES VENCIDOS
             </div>
             <div>
-              <div className="font-mono text-[32px] font-semibold text-red-600 dark:text-red-400 leading-none">
+              <div className="font-serif-preset font-serif text-5xl font-black text-red-600 dark:text-red-400 leading-none">
                 {vencidos}
               </div>
             </div>
-            <div className="font-mono text-[9px] uppercase">
+            <div className="font-sans text-[11px] uppercase tracking-wider font-semibold">
               {vencidos > 0 ? (
-                <span className="text-red-600 dark:text-red-400">CRITICAL: DISPOSE</span>
+                <span className="text-red-600 dark:text-red-400 font-extrabold animate-pulse">ALERTA: DISPONER HOY</span>
               ) : (
-                <span className="text-muted-foreground/60">SYS: CLEAR</span>
+                <span className="text-slate-400 dark:text-slate-500">SYS: SIN ALERTAS</span>
               )}
             </div>
           </div>
