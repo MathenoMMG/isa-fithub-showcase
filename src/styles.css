@@ -770,3 +770,19 @@
   transition-duration: 0.25s !important;
 }
 
+/* ------------------------------------------------------------------
+   20. PREMIUM PRODUCT TYPOGRAPHY — Force elegant high-legibility sans-serif
+   ------------------------------------------------------------------ */
+.style-obsidian .premium-product-title {
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  text-transform: none !important;
+}
+
+.style-obsidian .premium-product-name-list {
+  font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
+  text-transform: none !important;
+}

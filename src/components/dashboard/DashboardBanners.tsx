@@ -32,13 +32,13 @@ export function DashboardBanners() {
       const masStr = vencidos > 1 ? `y ${vencidos - 1} más` : "";
       return (
         <Link to="/inventario" search={{ q: primerNombre }} className="block w-full">
-          <div className="flex flex-row items-center gap-[10px] bg-red-500/4 dark:bg-red-500/8 border border-red-500/15 border-l-[3px] border-l-red-500 py-[10px] px-[14px] min-h-[48px] cursor-pointer hover:bg-red-500/8 dark:hover:bg-red-500/12 transition-all duration-300 rounded-[3px] active:scale-[0.97]">
+          <div className="flex flex-row items-center gap-[10px] bg-red-500/4 dark:bg-red-500/8 border border-red-500/15 border-l-[3px] border-l-red-500 py-[12px] px-[16px] min-h-[52px] cursor-pointer hover:bg-red-500/8 dark:hover:bg-red-500/12 transition-all duration-300 rounded-[3px] active:scale-[0.97]">
             <AlertCircle size={14} className="text-red-600 dark:text-red-400 shrink-0" />
             <div className="flex-1 flex flex-col justify-center text-left">
-              <span className="font-mono text-[11px] font-bold text-red-700 dark:text-red-400 uppercase tracking-wide">
+              <span className="font-sans text-[12px] font-extrabold text-red-750 dark:text-red-400 uppercase tracking-wide">
                 {vencidos} VENCIDOS — RETIRAR HOY
               </span>
-              <span className="font-mono text-[9px] text-red-600/80 dark:text-red-400/80 mt-0.5 uppercase">
+              <span className="font-sans text-[11px] font-semibold text-red-600/95 dark:text-red-450 mt-0.5 uppercase tracking-wide">
                 {primerNombre} {masStr}
               </span>
             </div>
@@ -53,13 +53,13 @@ export function DashboardBanners() {
       const masStr = proximos > 1 ? `y ${proximos - 1} más` : "";
       return (
         <Link to="/inventario" search={{ q: primerNombre }} className="block w-full">
-          <div className="flex flex-row items-center gap-[10px] bg-amber-500/4 dark:bg-amber-500/8 border border-amber-500/15 border-l-[3px] border-l-amber-500 py-[10px] px-[14px] min-h-[48px] cursor-pointer hover:bg-amber-500/8 dark:hover:bg-amber-500/12 transition-all duration-300 rounded-[3px] active:scale-[0.97]">
+          <div className="flex flex-row items-center gap-[10px] bg-amber-500/4 dark:bg-amber-500/8 border border-amber-500/15 border-l-[3px] border-l-amber-500 py-[12px] px-[16px] min-h-[52px] cursor-pointer hover:bg-amber-500/8 dark:hover:bg-amber-500/12 transition-all duration-300 rounded-[3px] active:scale-[0.97]">
             <Clock size={14} className="text-amber-600 dark:text-amber-400 shrink-0" />
             <div className="flex-1 flex flex-col justify-center text-left">
-              <span className="font-mono text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+              <span className="font-sans text-[12px] font-extrabold text-amber-750 dark:text-amber-400 uppercase tracking-wide">
                 {proximos} PRÓXIMOS A VENCER (≤ 30 DÍAS)
               </span>
-              <span className="font-mono text-[9px] text-amber-600/80 dark:text-amber-400/80 mt-0.5 uppercase">
+              <span className="font-sans text-[11px] font-semibold text-amber-650/95 dark:text-amber-400 mt-0.5 uppercase tracking-wide">
                 {primerNombre} {masStr}
               </span>
             </div>

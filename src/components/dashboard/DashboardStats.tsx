@@ -21,16 +21,16 @@ export function DashboardStats() {
         {/* Vigentes */}
         <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-6">
           <div className="flex flex-col h-full justify-between gap-4 text-left">
-            <div className="font-sans text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-emerald-400 flex items-center gap-2">
+            <div className="font-sans text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-emerald-400 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 inline-block animate-pulse" />
               PRODUCTOS VIGENTES
             </div>
             <div>
-              <div className="font-serif-preset font-serif text-5xl font-black text-emerald-700 dark:text-emerald-400 leading-none">
+              <div className="font-sans text-5xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight leading-none">
                 {vigentes}
               </div>
             </div>
-            <div className="font-sans text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <div className="font-sans text-[11px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
               SISTEMA: NOMINAL
             </div>
           </div>
@@ -39,16 +39,16 @@ export function DashboardStats() {
         {/* Próximos */}
         <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-6">
           <div className="flex flex-col h-full justify-between gap-4 text-left">
-            <div className="font-sans text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-amber-500 flex items-center gap-2">
+            <div className="font-sans text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-amber-500 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-none bg-amber-500 inline-block" />
               PRÓXIMOS A VENCER
             </div>
             <div>
-              <div className="font-serif-preset font-serif text-5xl font-black text-amber-700 dark:text-amber-400 leading-none">
+              <div className="font-sans text-5xl font-black text-amber-700 dark:text-amber-400 tracking-tight leading-none">
                 {proximos}
               </div>
             </div>
-            <div className="font-sans text-[11px] font-semibold text-amber-700/80 dark:text-amber-400/80 uppercase tracking-wider">
+            <div className="font-sans text-[11px] font-bold text-amber-700/80 dark:text-amber-400/80 uppercase tracking-wider">
               LIMITE: ≤ 30 DÍAS
             </div>
           </div>
@@ -57,20 +57,20 @@ export function DashboardStats() {
         {/* Vencidos */}
         <Link to="/inventario" className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-6">
           <div className="flex flex-col h-full justify-between gap-4 text-left">
-            <div className="font-sans text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-red-500 flex items-center gap-2">
+            <div className="font-sans text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-red-500 flex items-center gap-2">
               <span className={`w-1.5 h-1.5 rounded-none inline-block ${vencidos > 0 ? "bg-red-500 animate-ping" : "bg-emerald-500"}`} />
               LOTES VENCIDOS
             </div>
             <div>
-              <div className="font-serif-preset font-serif text-5xl font-black text-red-600 dark:text-red-400 leading-none">
+              <div className="font-sans text-5xl font-black text-red-600 dark:text-red-400 tracking-tight leading-none">
                 {vencidos}
               </div>
             </div>
-            <div className="font-sans text-[11px] uppercase tracking-wider font-semibold">
+            <div className="font-sans text-[11px] uppercase tracking-wider font-bold">
               {vencidos > 0 ? (
                 <span className="text-red-600 dark:text-red-400 font-extrabold animate-pulse">ALERTA: DISPONER HOY</span>
               ) : (
-                <span className="text-slate-400 dark:text-slate-500">SYS: SIN ALERTAS</span>
+                <span className="text-slate-450 dark:text-slate-500">SYS: SIN ALERTAS</span>
               )}
             </div>
           </div>

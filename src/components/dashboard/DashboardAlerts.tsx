@@ -83,7 +83,7 @@ export function DashboardAlerts() {
                       <span className={`w-1 h-1 rounded-none ${status === "vencido" ? "bg-red-500 animate-pulse" : "bg-amber-500"}`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-sans text-[12px] font-bold text-slate-950 dark:text-slate-200 truncate">
+                      <div className="premium-product-name-list text-[12px] text-slate-950 dark:text-slate-200 truncate">
                         {lote.producto.nombre}
                       </div>
                       <div className="font-sans text-[10px] font-semibold text-muted-foreground/70 mt-0.5 uppercase tracking-wider">

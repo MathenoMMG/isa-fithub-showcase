@@ -260,23 +260,23 @@ function Informes() {
 
       {/* KPI Cards */}
       {profile.stylePreset === "obsidian" ? (
-        <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden">
+        <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%]">
           {/* Total vendidos */}
           <div 
             onClick={() => document.getElementById('registro-ventas')?.scrollIntoView({ behavior: 'smooth' })}
-            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px] cursor-pointer text-left"
+            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[20px_16px] cursor-pointer text-left"
           >
-            <div className="flex flex-col h-full justify-between gap-2 text-left">
-              <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-                <span className="w-1 h-1 rounded-none bg-primary dark:bg-primary inline-block animate-pulse" />
+            <div className="flex flex-col h-full justify-between gap-3 text-left">
+              <div className="font-sans text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-none bg-emerald-500 inline-block animate-pulse" />
                 [01 // TOTAL VENDIDOS]
               </div>
               <div>
-                <div className="font-mono text-[32px] font-semibold text-emerald-700 dark:text-emerald-400 leading-none">
-                  {loadingSales ? "-" : totalUnits} <span className="text-[12px] font-normal text-muted-foreground">uds</span>
+                <div className="font-sans text-4xl md:text-5xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight leading-none">
+                  {loadingSales ? "-" : totalUnits} <span className="text-[14px] font-bold text-slate-450 dark:text-slate-500">uds</span>
                 </div>
               </div>
-              <div className="font-mono text-[9px] text-muted-foreground/60 uppercase">
+              <div className="font-sans text-[11px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                 LOG RANGE: {range.toUpperCase()}
               </div>
             </div>
@@ -285,19 +285,19 @@ function Informes() {
           {/* Categoría Estrella */}
           <div 
             onClick={() => topCategory !== "N/A" ? navigate({ to: '/inventario', search: { category: topCategory } }) : navigate({ to: '/inventario' })}
-            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px] cursor-pointer text-left"
+            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[20px_16px] cursor-pointer text-left"
           >
-            <div className="flex flex-col h-full justify-between gap-2 text-left">
-              <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-                <span className="w-1 h-1 rounded-none bg-primary inline-block" />
+            <div className="flex flex-col h-full justify-between gap-3 text-left">
+              <div className="font-sans text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-none bg-primary inline-block" />
                 [02 // CATEGORÍA ESTRELLA]
               </div>
               <div>
-                <div className="font-mono text-[20px] font-semibold text-slate-900 dark:text-slate-100 leading-none truncate">
+                <div className="font-sans text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none truncate">
                   {loadingSales ? "-" : topCategory}
                 </div>
               </div>
-              <div className="font-mono text-[9px] text-muted-foreground/60 uppercase">
+              <div className="font-sans text-[11px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
                 TOP_PERFORMING_PATH
               </div>
             </div>
@@ -306,23 +306,23 @@ function Informes() {
           {/* Lotes Críticos */}
           <div 
             onClick={() => navigate({ to: '/inventario', search: { status: 'vencido' } })}
-            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[16px_14px] cursor-pointer text-left"
+            className="block outline-none hover:bg-muted/40 dark:hover:bg-primary/3 transition-all duration-300 p-[20px_16px] cursor-pointer text-left"
           >
-            <div className="flex flex-col h-full justify-between gap-2 text-left">
-              <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-1.5">
-                <span className={`w-1 h-1 rounded-none inline-block ${criticos.length > 0 ? "bg-red-500 animate-ping" : "bg-primary"}`} />
+            <div className="flex flex-col h-full justify-between gap-3 text-left">
+              <div className="font-sans text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-none inline-block ${criticos.length > 0 ? "bg-red-500 animate-ping" : "bg-primary"}`} />
                 [03 // LOTES CRÍTICOS]
               </div>
               <div>
-                <div className="font-mono text-[32px] font-semibold text-red-600 dark:text-red-400 leading-none">
-                  {criticos.length} <span className="text-[12px] font-normal text-muted-foreground">alertas</span>
+                <div className="font-sans text-4xl md:text-5xl font-black text-red-600 dark:text-red-400 tracking-tight leading-none">
+                  {criticos.length} <span className="text-[14px] font-bold text-slate-450 dark:text-slate-500">alertas</span>
                 </div>
               </div>
-              <div className="font-mono text-[9px] uppercase">
+              <div className="font-sans text-[11px] font-bold uppercase tracking-wider">
                 {criticos.length > 0 ? (
-                  <span className="text-red-600 dark:text-red-400 font-bold">WARNING: REVIEW</span>
+                  <span className="text-red-600 dark:text-red-400 font-extrabold animate-pulse">WARNING: REVIEW</span>
                 ) : (
-                  <span className="text-muted-foreground/60">SYS: OPERATIONAL</span>
+                  <span className="text-slate-450 dark:text-slate-500">SYS: OPERATIONAL</span>
                 )}
               </div>
             </div>

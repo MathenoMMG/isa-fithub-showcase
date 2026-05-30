@@ -42,7 +42,7 @@ export function AppSidebar() {
             <span className={isPremium ? "font-mono font-bold text-slate-900 dark:text-slate-100 text-sm tracking-widest uppercase" : "font-bold text-slate-900 dark:text-slate-100 text-base leading-tight"}>
               {isPremium ? "[FITHUB_SYS]" : "FitHub"}
             </span>
-            <span className={isPremium ? "font-mono text-[8px] text-muted-foreground uppercase tracking-wider mt-0.5" : "text-xs text-slate-500 dark:text-slate-400"}>
+            <span className={isPremium ? "font-mono text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5" : "text-xs text-slate-500 dark:text-slate-400"}>
               {isPremium ? "TELEMETRY_LOG_v2.0" : "Gestión de Inventario"}
             </span>
           </div>
@@ -51,7 +51,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className={isPremium ? "font-mono text-[8px] uppercase tracking-widest text-muted-foreground" : ""}>
+          <SidebarGroupLabel className={isPremium ? "font-mono text-[10px] uppercase tracking-widest text-muted-foreground/80" : ""}>
             {isPremium ? "[ SYS_NAV // SELECT_PATH ]" : "Navegación"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -77,7 +77,7 @@ export function AppSidebar() {
                           {isPremium ? `${item.title.toUpperCase()}` : item.title}
                         </span>
                         {isPremium && active && (
-                          <span className="ml-auto text-[8px] opacity-60">ACTIVE</span>
+                          <span className="ml-auto font-sans text-[9px] font-bold opacity-60">ACTIVE</span>
                         )}
                       </Link>
                     </SidebarMenuButton>
@@ -90,7 +90,7 @@ export function AppSidebar() {
 
         {isPremium && (
           <div className="mt-auto p-4 group-data-[collapsible=icon]:hidden">
-            <div className="border border-border dark:border-primary/5 bg-muted/40 rounded-[3px] p-2.5 font-mono text-[8px] text-muted-foreground uppercase space-y-1">
+            <div className="border border-border dark:border-primary/5 bg-muted/40 rounded-[3px] p-3 font-mono text-[10px] text-muted-foreground uppercase space-y-1.5">
               <div className="flex justify-between">
                 <span>SYSTEM_STATUS:</span>
                 <span className="text-emerald-500 font-bold">ONLINE</span>

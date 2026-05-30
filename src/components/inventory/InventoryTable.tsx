@@ -115,18 +115,18 @@ export function InventoryTable({ data, collapseCounter, expandCounter }: Props) 
                     >
                       <span className={`w-1.5 h-1.5 rounded-none shrink-0 ${statusDotColor} ${worstStatus === "vencido" ? "animate-pulse" : ""}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-sans text-[13px] font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+                        <p className="premium-product-name-list text-[13px] text-slate-900 dark:text-slate-100 truncate">
                           {p.nombre}
                         </p>
-                        <p className="font-mono text-[9px] text-muted-foreground/60 mt-0.5 uppercase">
+                        <p className="font-sans text-[10px] font-bold text-muted-foreground/60 mt-0.5 uppercase tracking-wide">
                           SKU: {p.articulo}
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-mono text-[13px] font-bold text-slate-900 dark:text-slate-100 leading-none">
+                        <p className="font-sans text-[14px] font-black text-slate-900 dark:text-slate-100 leading-none">
                           {totalStock}
                         </p>
-                        <p className="font-mono text-[8px] text-muted-foreground/50 uppercase tracking-widest mt-1">
+                        <p className="font-sans text-[10px] font-bold text-slate-500 dark:text-muted-foreground/60 uppercase tracking-wider mt-1">
                           STOCK
                         </p>
                       </div>
@@ -244,9 +244,9 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
           <span>//</span>
           <span>{product.tienda_nombre}</span>
         </div>
-        <h2 className="font-sans font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-slate-50 tracking-tight">
+        <div className="premium-product-title text-2xl sm:text-3xl text-slate-900 dark:text-slate-50 tracking-tight leading-tight">
           {product.nombre}
-        </h2>
+        </div>
         <div className="flex items-center gap-4 text-xs font-sans font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5">
           <span>SKU: {product.articulo}</span>
           <span>•</span>
@@ -257,18 +257,18 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
       {/* MASSIVE METRICS GRID - HIGH READABILITY (Resolves user's sizing critique!) */}
       <div className="grid grid-cols-2 gap-4 border border-border dark:border-primary/5 rounded-[3px] bg-slate-50/40 dark:bg-slate-900/10 p-6 text-center">
         <div className="flex flex-col items-center justify-center p-3 border-r border-border dark:border-primary/5">
-          <span className="font-serif-preset font-serif text-5xl md:text-6xl font-black text-slate-900 dark:text-emerald-400 tracking-tight leading-none">
+          <span className="font-sans text-5xl md:text-6xl font-black text-slate-900 dark:text-emerald-400 tracking-tight leading-none">
             {totalQty}
           </span>
-          <span className="font-sans text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mt-3">
+          <span className="font-sans text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-3">
             UNIDADES EN STOCK
           </span>
         </div>
         <div className="flex flex-col items-center justify-center p-3">
-          <span className="font-serif-preset font-serif text-5xl md:text-6xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight leading-none">
+          <span className="font-sans text-5xl md:text-6xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight leading-none">
             {product.vendidos_total || 0}
           </span>
-          <span className="font-sans text-[11px] font-extrabold text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-wider mt-3">
+          <span className="font-sans text-[11px] font-bold text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-wider mt-3">
             UNIDADES VENDIDAS
           </span>
         </div>

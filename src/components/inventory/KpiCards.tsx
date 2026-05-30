@@ -65,7 +65,7 @@ export function KpiCards({
 
   if (isPremium) {
     return (
-      <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden">
+      <div className="grid grid-cols-3 border border-border dark:border-primary/5 divide-x divide-border dark:divide-primary/5 bg-card/30 dark:bg-slate-900/30 rounded-[3px] overflow-hidden dark:backdrop-blur-[12px] dark:backdrop-saturate-[140%]">
         {cards.map((c, idx) => {
           const Icon = c.icon;
           const isActive = activeFilters.includes(c.id);
@@ -73,20 +73,20 @@ export function KpiCards({
           return (
             <div 
               key={c.id} 
-              className={`p-[16px_14px] flex flex-col justify-between gap-3 cursor-pointer transition-colors duration-150 hover:bg-muted/40 dark:hover:bg-primary/5 ${isActive ? "bg-muted/60 dark:bg-primary/5 font-bold" : ""}`}
+              className={`p-[20px_16px] flex flex-col justify-between gap-4 cursor-pointer transition-colors duration-200 hover:bg-muted/40 dark:hover:bg-primary/5 ${isActive ? "bg-muted/60 dark:bg-primary/5" : ""}`}
               onClick={c.onClick}
             >
-              <div className="flex justify-between items-start w-full">
-                <span className="font-mono text-[9px] text-muted-foreground tracking-wider uppercase">{indexStr} // {c.label}</span>
-                <div className={`w-[24px] h-[24px] rounded-[2px] border border-border dark:border-primary/5 flex items-center justify-center bg-muted/40`}>
+              <div className="flex justify-between items-start w-full gap-2">
+                <span className="font-sans text-[10px] md:text-[11px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase">{indexStr} // {c.label}</span>
+                <div className={`w-[24px] h-[24px] rounded-[2px] border border-border dark:border-primary/5 flex items-center justify-center shrink-0 bg-muted/40`}>
                   <Icon size={12} className={c.iconColor} />
                 </div>
               </div>
               <div>
-                <div className="font-mono text-[32px] font-semibold leading-none text-slate-900 dark:text-slate-100 mt-2">
+                <div className="font-sans text-4xl md:text-5xl font-black leading-none text-slate-900 dark:text-slate-100 mt-1 tracking-tight">
                   {c.value}
                 </div>
-                <div className="font-mono text-[9px] text-muted-foreground/70 uppercase mt-1">
+                <div className="font-sans text-[11px] font-bold text-slate-450 dark:text-slate-500 uppercase mt-2 tracking-wider">
                   {c.hint}
                 </div>
               </div>
