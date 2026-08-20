@@ -1,8 +1,9 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { DashboardStoreCard } from "@/components/dashboard/DashboardStoreCard";
 import { DashboardBanners } from "@/components/dashboard/DashboardBanners";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { DashboardAlerts } from "@/components/dashboard/DashboardAlerts";
@@ -34,6 +35,12 @@ function Dashboard() {
   return (
     <div className="max-w-[1600px] mx-auto space-y-[24px] animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
       
+      {loading ? (
+        <Skeleton className="w-full h-44 sm:h-52 rounded-2xl" />
+      ) : (
+        <DashboardStoreCard />
+      )}
+
       {loading ? (
         <Skeleton className="w-full h-[52px] rounded-lg" />
       ) : (

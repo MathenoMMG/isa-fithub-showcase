@@ -99,7 +99,7 @@ export function ClockInOutCard() {
                     <LogOut className="h-4 w-4 text-slate-700 dark:text-slate-400" />
                   )}
                   <span className="font-medium capitalize dark:text-slate-200">{l.tipo}</span>
-                  <span className="text-slate-500">· {l.tienda_id === 2 ? "Sur" : "Norte"}</span>
+                  <span className="text-slate-500">· {l.tienda_id === 1 ? "Norte" : l.tienda_id === 2 ? "Sur" : l.tienda_id === 3 ? "Centro" : "General"}</span>
                 </span>
                 <span className="tabular-nums text-slate-700 dark:text-slate-300 font-medium">{formatInBogota(l.created_at, "HH:mm:ss")}</span>
               </li>

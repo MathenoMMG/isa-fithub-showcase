@@ -90,7 +90,7 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
     totalVendidos += v.cantidad;
     
     // key depends on product and store to keep them separate if analyzing both stores
-    const tiendaStr = v.productos.tienda_id === 2 ? "Sur" : "Norte";
+    const tiendaStr = v.productos.tienda_id === 1 ? "Norte" : v.productos.tienda_id === 2 ? "Sur" : v.productos.tienda_id === 3 ? "Centro" : "N/A";
     const key = `${v.producto_id}-${tiendaStr}`;
     
     if (!salesMap[key]) {
@@ -148,7 +148,7 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
       const dateFormatted = formatInBogota(v.created_at, "dd/MM/yyyy HH:mm");
       const cat = v.productos?.categoria || "Otros";
       const prodName = v.productos?.nombre || "Producto desconocido";
-      const tiendaStr = v.productos?.tienda_id === 1 ? "Norte" : v.productos?.tienda_id === 2 ? "Sur" : "N/A";
+      const tiendaStr = v.productos?.tienda_id === 1 ? "Norte" : v.productos?.tienda_id === 2 ? "Sur" : v.productos?.tienda_id === 3 ? "Centro" : "N/A";
       return [dateFormatted, cat, prodName, tiendaStr, `+${v.cantidad}`];
     }),
     headStyles: { fillColor: [5, 150, 105] },

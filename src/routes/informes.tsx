@@ -32,13 +32,25 @@ export const Route = createFileRoute("/informes")({
   component: Informes,
 });
 
+import type { StoreId } from "@/types/inventory";
+
 const PIE_COLORS = ['#059669', '#0284c7', '#d97706', '#9333ea', '#db2777', '#0d9488', '#2563eb', '#65a30d'];
+
+const ALL_STORES: StoreId[] = ["Norte", "Sur", "Centro"];
+const STORE_ID_MAP: Record<StoreId, number> = { Norte: 1, Sur: 2, Centro: 3 };
 
 function Informes() {
   const navigate = useNavigate();
   const { items } = useInventory();
   const { store } = useStore();
   const { theme, profile } = useProfile();
+  
+  // Multi-store selection state for analytics & reports
+  const [selectedStores, setSelectedStores] = useState<StoreId[]>(() => {
+    if (store === "Ambas" || store === "Todas") return ["Norte", "Sur", "Centro"];
+    return [store as StoreId];
+  });
+
   const [range, setRange] = useState("semana");
   const [isGenerating, setIsGenerating] = useState(false);
   const [salesDateFilter, setSalesDateFilter] = useState<string>("");
@@ -47,6 +59,20 @@ function Informes() {
   const [isCriticalExpanded, setIsCriticalExpanded] = useState(false);
   const [isSalesExpanded, setIsSalesExpanded] = useState(false);
   const [isTopProductsExpanded, setIsTopProductsExpanded] = useState(false);
+
+  const toggleStoreSelection = (s: StoreId) => {
+    setSelectedStores(prev => {
+      if (prev.includes(s)) {
+        if (prev.length === 1) return prev; // Mantener al menos 1 seleccionada
+        return prev.filter(x => x !== s);
+      }
+      return [...prev, s];
+    });
+  };
+
+  const selectAllStores = () => {
+    setSelectedStores(["Norte", "Sur", "Centro"]);
+  };
 
   const filteredSalesTable = useMemo(() => {
     if (!salesDateFilter) return salesData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -60,13 +86,13 @@ function Informes() {
 
   const { favorites, toggleFavorite } = useFavorites("fithub_analytics_favs", 2);
 
-  // We only show items from the selected store (or both)
+  // Filter items matching ANY of the selected stores
   const filteredItems = useMemo(
-    () => (store === "Ambas" ? items : items.filter((it) => it.tienda_nombre === store)),
-    [items, store],
+    () => items.filter((it) => selectedStores.includes(it.tienda_nombre)),
+    [items, selectedStores],
   );
 
-  // Fetch sales to have real category breakdown based on time
+  // Fetch sales matching the selected stores
   useEffect(() => {
     let isMounted = true;
     async function fetchSales() {
@@ -87,10 +113,10 @@ function Informes() {
           
         if (error) throw error;
 
-        const storeId = store === "Sur" ? 2 : store === "Norte" ? 1 : null;
-        const filteredVentas = storeId 
-          ? ventas?.filter(v => v.productos?.tienda_id === storeId)
-          : ventas;
+        const selectedStoreIds = selectedStores.map(st => STORE_ID_MAP[st]);
+        const filteredVentas = ventas?.filter(v => 
+          v.productos && selectedStoreIds.includes(v.productos.tienda_id)
+        );
 
         if (isMounted) setSalesData(filteredVentas || []);
       } catch (err) {
@@ -101,7 +127,7 @@ function Informes() {
     }
     fetchSales();
     return () => { isMounted = false };
-  }, [range, store]);
+  }, [range, selectedStores]);
 
   // Derive metrics
   const { topSold, categoryData, totalUnits } = useMemo(() => {
@@ -199,8 +225,9 @@ function Informes() {
   const handleGeneratePDF = async () => {
     setIsGenerating(true);
     try {
+      const storeLabel = selectedStores.length === 3 ? "Todas las sedes (Norte, Sur, Centro)" : selectedStores.join(", ");
       await generatePdfReport({
-        store,
+        store: storeLabel,
         range,
         ventas: salesData as any,
         inventory: filteredItems,
@@ -225,14 +252,43 @@ function Informes() {
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-[24px] animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-[16px]">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-[16px]">
         <div>
           <h1 className="font-sans text-[22px] font-bold text-[#111827] dark:text-slate-50 transition-colors">
-            Panel de Analítica
+            Panel de Analítica y Reportes
           </h1>
           <p className="font-sans text-[13px] text-[#6B7280] dark:text-slate-400 mt-1 transition-colors max-w-xl">
-            Monitorea el rendimiento de {store}, analiza ventas por categoría y controla productos en riesgo.
+            Monitorea el rendimiento, analiza ventas por categoría y genera reportes combinados para 1, 2 o las 3 tiendas.
           </p>
+
+          {/* Selector interactivo multi-tienda */}
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1">Tiendas incluidas:</span>
+            {ALL_STORES.map((st) => {
+              const isSelected = selectedStores.includes(st);
+              return (
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => toggleStoreSelection(st)}
+                  className={`px-3 py-1 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                    isSelected
+                      ? "border-emerald-500 bg-emerald-500 text-white shadow-xs"
+                      : "border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:border-slate-400"
+                  }`}
+                >
+                  {isSelected ? `✓ ${st}` : `+ ${st}`}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={selectAllStores}
+              className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold ml-1 cursor-pointer"
+            >
+              Seleccionar las 3
+            </button>
+          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-[10px]">
@@ -253,7 +309,7 @@ function Informes() {
             className="w-full sm:w-auto h-[44px] bg-[#1C4A2E] hover:bg-[#1C4A2E]/90 text-white gap-[8px] font-sans font-medium px-[20px] rounded-[8px] transition-colors cursor-pointer"
           >
             <Download size={16} />
-            {isGenerating ? "Creando PDF..." : "Generar Reporte PDF"}
+            {isGenerating ? "Creando PDF..." : `Generar PDF (${selectedStores.length} ${selectedStores.length === 1 ? "tienda" : "tiendas"})`}
           </Button>
         </div>
       </div>
@@ -542,7 +598,7 @@ function Informes() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
-                        {p.tienda_id === 1 ? "Norte" : p.tienda_id === 2 ? "Sur" : "Ambas"}
+                        {p.tienda_id === 1 ? "Norte" : p.tienda_id === 2 ? "Sur" : p.tienda_id === 3 ? "Centro" : "General"}
                       </td>
                       <td className="px-6 py-4 text-right font-extrabold text-emerald-600 dark:text-emerald-400 text-base">
                         {p.vendidos} <span className="text-xs font-normal text-slate-400 dark:text-slate-500">uds</span>
@@ -733,7 +789,7 @@ function Informes() {
                       {v.productos?.nombre || "Producto desconocido"}
                     </td>
                     <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
-                      {v.productos?.tienda_id === 1 ? "Norte" : v.productos?.tienda_id === 2 ? "Sur" : "N/A"}
+                      {v.productos?.tienda_id === 1 ? "Norte" : v.productos?.tienda_id === 2 ? "Sur" : v.productos?.tienda_id === 3 ? "Centro" : "N/A"}
                     </td>
                     <td className="px-6 py-4 text-right font-bold text-emerald-600 dark:text-emerald-400">
                       +{v.cantidad}

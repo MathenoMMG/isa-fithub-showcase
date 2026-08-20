@@ -305,7 +305,7 @@ export function DashboardJornada() {
                 </button>
               </Link>
               <span className="font-sans text-[10px] text-[#9CA3AF]">
-                {store === "Ambas" ? "Norte/Sur" : store}
+                {store === "Ambas" || store === "Todas" ? "Todas las sedes" : store}
               </span>
             </div>
           )}

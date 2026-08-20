@@ -32,7 +32,7 @@ interface InventoryContextValue {
 
 const InventoryContext = createContext<InventoryContextValue | null>(null);
 
-const TIENDA_MAP: Record<number, "Sur" | "Norte"> = { 1: "Norte", 2: "Sur" };
+const TIENDA_MAP: Record<number, StoreId> = { 1: "Norte", 2: "Sur", 3: "Centro" };
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ProductoConLotes[]>([]);
@@ -410,7 +410,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 
   const filteredItems = useMemo(
     () =>
-      store === "Ambas"
+      store === "Ambas" || store === "Todas"
         ? items
         : items.filter((it) => it.tienda_nombre === store),
     [items, store],

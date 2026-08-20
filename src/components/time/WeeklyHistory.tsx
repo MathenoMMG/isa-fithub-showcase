@@ -79,8 +79,14 @@ export function WeeklyHistory() {
                 ? (differenceInMinutes(parseISO(salida.created_at), parseISO(entrada.created_at)) / 60).toFixed(2)
                 : "—";
 
-            const storeName = entrada ? (entrada.tienda_id === 2 ? "Sur" : "Norte") 
-                            : salida ? (salida.tienda_id === 2 ? "Sur" : "Norte") 
+            const getStoreLabel = (id: number | null | undefined) => {
+              if (id === 1) return "Norte";
+              if (id === 2) return "Sur";
+              if (id === 3) return "Centro";
+              return "—";
+            };
+            const storeName = entrada ? getStoreLabel(entrada.tienda_id) 
+                            : salida ? getStoreLabel(salida.tienda_id) 
                             : "—";
 
             return (

@@ -7,12 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useStore } from "@/context/StoreContext";
 import { useInventory } from "@/context/InventoryContext";
 import { useTimeLog } from "@/context/TimeLogContext";
-import { useVisitas } from "@/context/VisitContext";
-import { useProfile } from "@/context/ProfileContext";
+import { useProfile, DEFAULT_STORE_PHOTOS } from "@/context/ProfileContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import type { StoreFilter } from "@/types/inventory";
-import { RotateCcw, Monitor, Moon, Sun, Camera, RefreshCcw, Bell, BellOff, Database, AlertTriangle, Download, Sparkles } from "lucide-react";
+import type { StoreFilter, StoreId } from "@/types/inventory";
+import { RotateCcw, Monitor, Moon, Sun, Camera, RefreshCcw, Bell, BellOff, Database, AlertTriangle, Download, Sparkles, Store, Image as ImageIcon, Upload, Check } from "lucide-react";
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { Switch } from "@/components/ui/switch";
@@ -35,6 +34,8 @@ function AjustesPage() {
   const { theme, setTheme, profile, updateProfile } = useProfile();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const storePhotoInputRef = useRef<HTMLInputElement>(null);
+  const [selectedStoreToEdit, setSelectedStoreToEdit] = useState<StoreId>("Norte");
   
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -143,11 +144,51 @@ function AjustesPage() {
     reader.readAsDataURL(file);
   };
 
+  const handleStorePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error("La imagen es muy grande (máximo 3MB)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      const currentPhotos = profile.storePhotos || DEFAULT_STORE_PHOTOS;
+      updateProfile({
+        storePhotos: {
+          ...currentPhotos,
+          [selectedStoreToEdit]: base64,
+        },
+      });
+      toast.success(`Foto de ${selectedStoreToEdit} actualizada`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleResetStorePhoto = (storeName: StoreId) => {
+    const currentPhotos = profile.storePhotos || DEFAULT_STORE_PHOTOS;
+    updateProfile({
+      storePhotos: {
+        ...currentPhotos,
+        [storeName]: DEFAULT_STORE_PHOTOS[storeName],
+      },
+    });
+    toast.success(`Foto de ${storeName} restablecida a la predeterminada`);
+  };
+
+  const activeStorePhotos = {
+    ...DEFAULT_STORE_PHOTOS,
+    ...(profile.storePhotos || {}),
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 transition-colors">Ajustes</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors">Personaliza tu experiencia, perfil y aspecto visual.</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors">Personaliza tu experiencia, perfil, sedes y aspecto visual.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,6 +252,85 @@ function AjustesPage() {
                 />
               </div>
             </div>
+          </div>
+        </Card>
+
+        {/* Fotos de Tiendas */}
+        <Card className="p-6 md:p-8 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <Store className="h-5 w-5 text-emerald-500" />
+                Fotos de las Tiendas
+              </h3>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                3 Sedes
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              Personaliza la foto de portada para cada tienda. Se mostrará en el Card Showcase del Dashboard.
+            </p>
+
+            {/* Pestañas de selección de tienda a editar */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {(["Norte", "Sur", "Centro"] as StoreId[]).map((st) => (
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => setSelectedStoreToEdit(st)}
+                  className={`py-2 px-1 text-xs font-semibold rounded-xl border transition-all ${
+                    selectedStoreToEdit === st
+                      ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                      : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-400"
+                  }`}
+                >
+                  {st}
+                </button>
+              ))}
+            </div>
+
+            {/* Preview de la foto de la tienda activa */}
+            <div className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 h-36 bg-slate-100 dark:bg-slate-950 group">
+              <img
+                src={activeStorePhotos[selectedStoreToEdit]}
+                alt={selectedStoreToEdit}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-3">
+                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  Sede {selectedStoreToEdit}
+                </span>
+              </div>
+            </div>
+
+            <input
+              type="file"
+              ref={storePhotoInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleStorePhotoChange}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 mt-4 pt-2">
+            <Button
+              type="button"
+              onClick={() => storePhotoInputRef.current?.click()}
+              className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs gap-1.5 font-medium shadow-sm transition-colors"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Subir Foto {selectedStoreToEdit}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleResetStorePhoto(selectedStoreToEdit)}
+              className="h-10 text-xs text-slate-500 rounded-xl px-3 border-slate-200 dark:border-slate-800"
+              title="Restablecer a imagen por defecto"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </Card>
 
@@ -314,9 +434,10 @@ function AjustesPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Ambas" className="text-base py-3">Ambas tiendas</SelectItem>
-                <SelectItem value="Sur" className="text-base py-3">Sur</SelectItem>
+                <SelectItem value="Ambas" className="text-base py-3">Todas las tiendas</SelectItem>
                 <SelectItem value="Norte" className="text-base py-3">Norte</SelectItem>
+                <SelectItem value="Sur" className="text-base py-3">Sur</SelectItem>
+                <SelectItem value="Centro" className="text-base py-3">Centro</SelectItem>
               </SelectContent>
             </Select>
           </Card>

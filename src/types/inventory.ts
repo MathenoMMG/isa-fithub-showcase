@@ -1,5 +1,5 @@
-export type StoreId = "Sur" | "Norte";
-export type StoreFilter = StoreId | "Ambas";
+export type StoreId = "Sur" | "Norte" | "Centro";
+export type StoreFilter = StoreId | "Ambas" | "Todas";
 
 // Database types
 export interface Tienda {

@@ -1,8 +1,14 @@
-﻿import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/lib/supabase";
 
 type ThemeMode = "light" | "dark" | "system";
+
+export const DEFAULT_STORE_PHOTOS: Record<string, string> = {
+  Norte: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=1000&auto=format&fit=crop",
+  Sur: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1000&auto=format&fit=crop",
+  Centro: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1000&auto=format&fit=crop",
+};
 
 interface Profile {
   name: string;
@@ -12,6 +18,7 @@ interface Profile {
   glowEnabled: boolean;
   stylePreset?: "classic" | "obsidian";
   fontPreset?: "jakarta" | "sans" | "serif";
+  storePhotos?: Record<string, string>;
 }
 
 interface ProfileContextValue {
@@ -30,6 +37,7 @@ const defaultProfile: Profile = {
   glowEnabled: true,
   stylePreset: "classic",
   fontPreset: "jakarta",
+  storePhotos: DEFAULT_STORE_PHOTOS,
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -74,6 +82,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         glowEnabled: user.user_metadata.glowEnabled ?? true,
         stylePreset: user.user_metadata.stylePreset || "classic",
         fontPreset: user.user_metadata.fontPreset || "jakarta",
+        storePhotos: {
+          ...DEFAULT_STORE_PHOTOS,
+          ...(user.user_metadata.storePhotos || {}),
+        },
       };
       setProfile(cloudProfile);
       localStorage.setItem(profileStorageKey, JSON.stringify(cloudProfile));
@@ -82,7 +94,15 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       try {
         const saved = localStorage.getItem(profileStorageKey);
         if (saved) {
-          setProfile(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          setProfile({
+            ...defaultProfile,
+            ...parsed,
+            storePhotos: {
+              ...DEFAULT_STORE_PHOTOS,
+              ...(parsed.storePhotos || {}),
+            },
+          });
         }
       } catch (e) {}
     }

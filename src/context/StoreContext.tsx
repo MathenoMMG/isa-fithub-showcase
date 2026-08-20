@@ -31,7 +31,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [store, setStoreState] = useState<StoreFilter>(() => {
     if (typeof window === "undefined") return getRotativeStore();
     const saved = localStorage.getItem(STORAGE_KEY) as StoreFilter;
-    return saved && (saved === "Sur" || saved === "Norte" || saved === "Ambas") ? saved : getRotativeStore();
+    return saved && (saved === "Sur" || saved === "Norte" || saved === "Centro" || saved === "Ambas" || saved === "Todas") ? saved : getRotativeStore();
   });
 
   useEffect(() => {

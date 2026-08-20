@@ -24,13 +24,16 @@ export function StoreSelector() {
       </SelectTrigger>
       <SelectContent className={isPremium ? "font-mono text-xs uppercase" : ""}>
         <SelectItem value="Ambas" className={isPremium ? "text-xs py-2 uppercase" : "text-base py-3"}>
-          {isPremium ? "SYS_ALL" : "Ambas tiendas"}
+          {isPremium ? "SYS_ALL" : "Todas las tiendas"}
+        </SelectItem>
+        <SelectItem value="Norte" className={isPremium ? "text-xs py-2 uppercase" : "text-base py-3"}>
+          Norte
         </SelectItem>
         <SelectItem value="Sur" className={isPremium ? "text-xs py-2 uppercase" : "text-base py-3"}>
           Sur
         </SelectItem>
-        <SelectItem value="Norte" className={isPremium ? "text-xs py-2 uppercase" : "text-base py-3"}>
-          Norte
+        <SelectItem value="Centro" className={isPremium ? "text-xs py-2 uppercase" : "text-base py-3"}>
+          Centro
         </SelectItem>
       </SelectContent>
     </Select>

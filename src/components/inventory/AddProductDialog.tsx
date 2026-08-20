@@ -11,14 +11,14 @@ import { useStore } from "@/context/StoreContext";
 import type { StoreId } from "@/types/inventory";
 
 const DEFAULT_CATEGORIAS = ["Arepas", "Lácteos", "Snacks", "Bebidas", "Suplementos", "Despensa", "Panadería", "Cereales", "Confitería", "Quesos", "Frutos y Nueces", "Accesorios", "Otros"];
-const STORE_MAP: Record<StoreId, number> = { Norte: 1, Sur: 2 };
+const STORE_MAP: Record<StoreId, number> = { Norte: 1, Sur: 2, Centro: 3 };
 
 export function AddProductDialog({ customTrigger }: { customTrigger?: React.ReactNode }) {
   const { addProduct, filteredItems } = useInventory();
   const { store } = useStore();
   const [open, setOpen] = useState(false);
 
-  const defaultStore: StoreId = store === "Ambas" ? "Norte" : store;
+  const defaultStore: StoreId = store === "Ambas" || store === "Todas" ? "Norte" : store;
 
   const allCategorias = useMemo(() => {
     const existing = filteredItems.map(i => i.categoria).filter(Boolean);
@@ -142,8 +142,9 @@ export function AddProductDialog({ customTrigger }: { customTrigger?: React.Reac
             <Select value={String(form.tienda_id)} onValueChange={(v) => setForm({ ...form, tienda_id: Number(v) })}>
               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="2">Sur</SelectItem>
                 <SelectItem value="1">Norte</SelectItem>
+                <SelectItem value="2">Sur</SelectItem>
+                <SelectItem value="3">Centro</SelectItem>
               </SelectContent>
             </Select>
           </div>
