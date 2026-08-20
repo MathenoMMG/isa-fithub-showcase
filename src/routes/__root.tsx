@@ -45,22 +45,42 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error }: { error: Error }) {
-  console.error(error);
+  console.error("FitHub Runtime Error:", error);
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Algo salió mal</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Intenta recargar la página.</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+      <div className="max-w-lg text-center p-6 bg-card border rounded-2xl shadow-xl">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">Algo no cargó correctamente</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {error?.message || "Error al renderizar los datos locales o remotos."}
+        </p>
+        
+        {error?.stack && (
+          <div className="mt-4 p-3 bg-muted/60 rounded-lg text-left overflow-auto max-h-40 font-mono text-[11px] text-muted-foreground border">
+            {error.stack}
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+            className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 cursor-pointer shadow-sm"
           >
-            Intentar de nuevo
+            Recargar página
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("fithub-profile");
+              localStorage.removeItem("fithub-theme");
+              localStorage.removeItem("fithub_pending_ops");
+              window.location.href = "/dashboard";
+            }}
+            className="inline-flex items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-2.5 text-sm font-semibold hover:bg-amber-500/20 cursor-pointer"
+          >
+            Restablecer caché local
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium"
+            className="inline-flex items-center justify-center rounded-xl border border-input bg-background px-4 py-2.5 text-sm font-medium hover:bg-muted cursor-pointer"
           >
             Ir al inicio
           </a>

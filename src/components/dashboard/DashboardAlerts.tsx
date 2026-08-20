@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
 import { Package } from "lucide-react";
-import { BarChart, Bar, ResponsiveContainer, XAxis } from "recharts";
 import { useProfile } from "@/context/ProfileContext";
 import { getExpiryStatus, getDaysUntilExpiry } from "@/lib/expiry";
 
@@ -123,13 +122,16 @@ export function DashboardAlerts() {
             </span>
           </div>
 
-          <div className="p-[14px_14px_10px_14px] h-[72px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trendData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                <XAxis dataKey="name" fontSize={8} fill="currentColor" className="text-muted-foreground/60 font-mono" tickLine={false} axisLine={false} />
-                <Bar dataKey="vencidos" fill="#10b981" opacity={0.35} radius={[1, 1, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="p-[14px_14px_10px_14px] h-[72px] flex items-end justify-between gap-2">
+            {trendData.map((d, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                <div 
+                  className="w-full bg-emerald-500/30 dark:bg-emerald-400/30 rounded-[1px] transition-all"
+                  style={{ height: d.vencidos > 0 ? `${Math.min(100, d.vencidos * 20)}%` : '4px' }}
+                />
+                <span className="font-mono text-[9px] text-muted-foreground/70 leading-none">{d.name}</span>
+              </div>
+            ))}
           </div>
 
           <div className="border-t border-border dark:border-primary/6 p-[12px_14px] flex divide-x divide-border dark:divide-primary/6 bg-slate-50/20 dark:bg-slate-950/10">
@@ -219,13 +221,16 @@ export function DashboardAlerts() {
           </span>
         </div>
 
-        <div className="p-[0_14px_12px_14px] h-[72px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={trendData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-              <XAxis dataKey="name" fontSize={8} fill="#9CA3AF" tickLine={false} axisLine={false} />
-              <Bar dataKey="vencidos" fill="#F3F4F6" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="p-[0_14px_12px_14px] h-[72px] flex items-end justify-between gap-2">
+          {trendData.map((d, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+              <div 
+                className="w-full bg-slate-200 dark:bg-slate-800 rounded-t-[3px] transition-all"
+                style={{ height: d.vencidos > 0 ? `${Math.min(100, d.vencidos * 20)}%` : '4px' }}
+              />
+              <span className="font-sans text-[8px] text-[#9CA3AF] leading-none">{d.name}</span>
+            </div>
+          ))}
         </div>
 
         <div className="border-t-[0.5px] border-[#F3F4F6] dark:border-slate-800 p-[10px_14px] flex">
