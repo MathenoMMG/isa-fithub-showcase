@@ -87,11 +87,13 @@ function AjustesPage() {
       const invData = filteredItems.map(p => ({
         ID: p.id,
         SKU: p.articulo,
+        Sicol: p.sicol,
         Nombre: p.nombre,
-        Línea: p.linea,
-        Categoría: p.categoria,
-        Stock: p.stockTotal,
-        Lotes: p.lotes?.length || 0
+        Categoría: p.categoria || "Otros",
+        Proveedor: p.proveedor_nombre,
+        Stock_Total: p.lotes?.reduce((acc, l) => acc + (l.cantidad || 0), 0) || 0,
+        Lotes_Activos: p.lotes?.filter(l => l.cantidad > 0).length || 0,
+        Tienda: p.tienda_nombre,
       }));
       const wsInv = XLSX.utils.json_to_sheet(invData);
       XLSX.utils.book_append_sheet(wb, wsInv, "Inventario");
@@ -99,11 +101,9 @@ function AjustesPage() {
       // Hoja 2: Horarios (Logs)
       const logsData = logs.map(l => ({
         ID: l.id,
-        Usuario_ID: l.user_id,
         Tienda_ID: l.tienda_id,
-        Fecha: l.fecha,
-        Tipo: l.tipo === 'in' ? 'Entrada' : 'Salida',
-        Hora: l.hora
+        Tipo: l.tipo === 'entrada' ? 'Entrada' : 'Salida',
+        Fecha_Hora: l.created_at,
       }));
       const wsLogs = XLSX.utils.json_to_sheet(logsData);
       XLSX.utils.book_append_sheet(wb, wsLogs, "Horarios");
@@ -112,10 +112,25 @@ function AjustesPage() {
       const visitasData = visitas.map(v => ({
         ID: v.id,
         Tienda_ID: v.tienda_id,
-        Fecha: v.fecha
+        Fecha: v.fecha,
+        Notas: v.notas || "—",
       }));
       const wsVisitas = XLSX.utils.json_to_sheet(visitasData);
       XLSX.utils.book_append_sheet(wb, wsVisitas, "Visitas");
+
+      // Hoja 4: Mermas
+      const mermasData = (mermas || []).map(m => ({
+        ID: m.id,
+        Producto_ID: m.producto_id,
+        Tienda_ID: m.tienda_id,
+        Cantidad: m.cantidad,
+        Motivo: m.motivo,
+        Notas: m.notas || "—",
+        Usuario: m.usuario || "—",
+        Fecha: m.created_at,
+      }));
+      const wsMermas = XLSX.utils.json_to_sheet(mermasData);
+      XLSX.utils.book_append_sheet(wb, wsMermas, "Mermas");
 
       // Guardar
       const today = new Date().toISOString().slice(0,10);

@@ -9,10 +9,10 @@ export function DashboardAlerts() {
   const { profile } = useProfile();
   const navigate = useNavigate();
 
-  // "Atención inmediata" top 6 urgent items (based on lotes expiration)
+  // "Atención inmediata" top 6 urgent items (based on lotes expiration with active stock)
   const urgentLotes = filteredItems
     .flatMap((p) => p.lotes.map((l) => ({ ...l, producto: p })))
-    .filter((l) => l.fecha_caducidad != null)
+    .filter((l) => l.fecha_caducidad != null && l.cantidad > 0)
     .sort((a, b) => new Date(a.fecha_caducidad!).getTime() - new Date(b.fecha_caducidad!).getTime())
     .slice(0, 6);
 

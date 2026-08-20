@@ -267,6 +267,10 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
   }
 
   // Descargar
-  const safeStore = store === "Ambas" ? "Ambas_Tiendas" : store;
+  const safeStore = store
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .replace(/_+/g, "_");
   doc.save(`Fithub_Reporte_${safeStore}_${dateStr.replace(/ /g, "_")}.pdf`);
 }

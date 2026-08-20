@@ -416,46 +416,76 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     motivo: MotivoMerma,
     notas?: string
   ) => {
+    const product = items.find((p) => p.id === productId);
+    if (!product) throw new Error("Producto no encontrado");
+
+    const newMerma: Merma = {
+      id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
+      producto_id: productId,
+      lote_id: loteId,
+      tienda_id: product.tienda_id,
+      cantidad,
+      motivo,
+      notas: notas || null,
+      created_at: new Date().toISOString(),
+      usuario: user?.user_metadata?.name || user?.email || "Usuario",
+    };
+
+    // Determinar lote objetivo (si loteId es null, tomar el lote con fecha más próxima con stock)
+    let targetLoteId = loteId;
+    if (!targetLoteId) {
+      const activeLotes = [...product.lotes]
+        .filter(l => l.cantidad > 0)
+        .sort((a, b) => new Date(a.fecha_caducidad || '9999').getTime() - new Date(b.fecha_caducidad || '9999').getTime());
+      if (activeLotes.length > 0) {
+        targetLoteId = activeLotes[0].id;
+        newMerma.lote_id = targetLoteId;
+      }
+    }
+
+    // Actualización optimista inmediata
+    const updatedMermas = [newMerma, ...mermas];
+    setMermas(updatedMermas);
+
+    if (targetLoteId) {
+      setItems(prev => prev.map(p => {
+        if (p.id !== productId) return p;
+        return {
+          ...p,
+          lotes: p.lotes.map(l => {
+            if (l.id !== targetLoteId) return l;
+            return { ...l, cantidad: Math.max(0, l.cantidad - cantidad) };
+          })
+        };
+      }));
+    }
+
     try {
-      const product = items.find((p) => p.id === productId);
-      if (!product) throw new Error("Producto no encontrado");
+      if (!window.navigator.onLine) {
+        throw new Error("offline");
+      }
 
-      const newMerma: Merma = {
-        id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
-        producto_id: productId,
-        lote_id: loteId,
-        tienda_id: product.tienda_id,
-        cantidad,
-        motivo,
-        notas: notas || null,
-        created_at: new Date().toISOString(),
-        usuario: user?.user_metadata?.name || user?.email || "Usuario",
-      };
-
-      // 1. Descontar del lote si aplica
-      if (loteId) {
-        const lote = product.lotes.find((l) => l.id === loteId);
+      // 1. Descontar del lote en Supabase
+      if (targetLoteId) {
+        const lote = product.lotes.find((l) => l.id === targetLoteId);
         if (lote) {
           const newQty = Math.max(0, lote.cantidad - cantidad);
-          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", loteId);
+          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", targetLoteId);
         }
       }
 
       // 2. Guardar en registro global de Supabase
-      const updatedMermas = [newMerma, ...mermas];
-      setMermas(updatedMermas);
-
       await supabase
         .from("visitas")
         .update({ notas: JSON.stringify(updatedMermas) })
         .eq("id", MERMAS_RECORD_ID);
 
       await fetchData();
-      toast.success(`Merma registrada: -${cantidad} uds por ${motivo.replace('_', ' ')}`);
+      toast.success(`Merma registrada: -${cantidad} uds (${motivo.replace('_', ' ')})`);
     } catch (err) {
-      console.error("Error registering merma:", err);
-      toast.error("Error al registrar la merma");
-      throw err;
+      console.warn("Sin conexión o error al registrar merma, encolando offline:", err);
+      addPendingOp('merma', { merma: newMerma, lote_id: loteId, cantidad });
+      toast.warning("Sin conexión: Merma registrada en cola local.");
     }
   };
 

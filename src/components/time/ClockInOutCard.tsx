@@ -28,8 +28,8 @@ export function ClockInOutCard() {
   const canEntrar = !last || last.tipo === "salida";
   const canSalir = last?.tipo === "entrada";
 
-  const tiendaName = store === "Ambas" ? getRotativeStore(now) : store;
-  const tiendaId = tiendaName === "Sur" ? 2 : 1;
+  const tiendaName = store === "Ambas" || store === "Todas" ? getRotativeStore(now) : store;
+  const tiendaId = tiendaName === "Sur" ? 2 : tiendaName === "Centro" ? 3 : 1;
 
   const handle = (tipo: "entrada" | "salida") => {
     addLog(tipo, tiendaId);

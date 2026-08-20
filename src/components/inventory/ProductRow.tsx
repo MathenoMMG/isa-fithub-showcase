@@ -46,7 +46,11 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
   const worst = getWorstStatus(product.lotes);
   const earliest = getEarliestExpiry(product.lotes);
   const sortedLotes = [...product.lotes].sort(
-    (a, b) => new Date(a.fecha_caducidad).getTime() - new Date(b.fecha_caducidad).getTime(),
+    (a, b) => {
+      const timeA = a.fecha_caducidad ? new Date(a.fecha_caducidad).getTime() : Infinity;
+      const timeB = b.fecha_caducidad ? new Date(b.fecha_caducidad).getTime() : Infinity;
+      return timeA - timeB;
+    },
   );
 
   const activeLotes = sortedLotes.filter((l) => l.cantidad > 0);
@@ -130,7 +134,7 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                 <span className={isPremium ? "text-[9px] font-bold text-muted-foreground uppercase tracking-wider" : "text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"}>Notas del Producto</span>
                 {!isEditingNotes ? (
                   <button 
-                    onClick={() => { setNotesTemp(product.notes || ""); setIsEditingNotes(true); }}
+                    onClick={() => { setNotesTemp(product.notas || ""); setIsEditingNotes(true); }}
                     className={`${isPremium ? "text-[9px] uppercase tracking-wider font-bold" : "text-[10px] font-medium"} text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 p-1 flex items-center gap-1`}
                   >
                     <Edit2 size={10} /> <span>{isPremium ? "EDITAR" : "Editar"}</span>

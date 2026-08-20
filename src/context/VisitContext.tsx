@@ -8,7 +8,8 @@ import { toast } from "sonner";
 interface VisitContextValue {
   visitas: Visita[];
   loading: boolean;
-  addVisita: (tienda_id: number, comentario: string) => Promise<void>;
+  registrarVisita: (tienda_id: number, fecha: string, notas?: string) => Promise<void>;
+  addVisita?: (tienda_id: number, comentario: string) => Promise<void>;
   refreshVisitas: () => Promise<void>;
 }
 
@@ -25,7 +26,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from("visitas")
         .select("*")
-        .neq("id", "00000000-0000-0000-0000-000000000001")
+        .not("id", "like", "00000000-0000-0000-0000-%")
         .order("fecha", { ascending: false });
 
       if (error) throw error;

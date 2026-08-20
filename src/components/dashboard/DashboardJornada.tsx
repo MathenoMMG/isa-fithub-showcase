@@ -21,11 +21,11 @@ export function DashboardJornada() {
   
   // Encontrar logs de hoy
   const todayStr = now.toISOString().slice(0, 10);
-  const storeId = store === "Sur" ? 2 : 1;
+  const storeId = store === "Sur" ? 2 : store === "Centro" ? 3 : 1;
   
   const todayLogs = logs.filter(l => {
     const isToday = l.created_at.startsWith(todayStr);
-    const isStore = store === "Ambas" ? true : l.tienda_id === storeId;
+    const isStore = (store === "Ambas" || store === "Todas") ? true : l.tienda_id === storeId;
     return isToday && isStore;
   });
 

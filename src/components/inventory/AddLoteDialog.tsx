@@ -25,7 +25,7 @@ export function AddLoteDialog({ productId, productName }: Props) {
     }
     addLote(productId, {
       cantidad: Number(cantidad),
-      fecha_caducidad: new Date(fecha).toISOString(),
+      fecha_caducidad: fecha ? `${fecha}T12:00:00.000Z` : null,
     });
     toast.success(`Nuevo lote añadido a ${productName}`);
     setOpen(false);

@@ -11,12 +11,12 @@ export function DashboardShortcuts() {
   const { store } = useStore();
   const { profile } = useProfile();
 
-  const storeId = store === "Sur" ? 2 : 1;
+  const storeId = store === "Sur" ? 2 : store === "Centro" ? 3 : 1;
   const todayStr = new Date().toISOString().slice(0, 10);
   const hasEntrada = logs.some(l => l.created_at.startsWith(todayStr) && l.tienda_id === storeId && l.tipo === "entrada");
 
   const handleCheckInOut = async () => {
-    if (store === "Ambas") {
+    if (store === "Ambas" || store === "Todas") {
       toast.error("Selecciona una tienda específica primero");
       return;
     }

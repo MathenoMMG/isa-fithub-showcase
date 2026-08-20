@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 
 export interface PendingOp {
   id: string;
-  type: 'sell' | 'adjust' | 'add_product' | 'add_lote' | 'add_log' | 'visit';
+  type: 'sell' | 'adjust' | 'add_product' | 'add_lote' | 'add_log' | 'visit' | 'merma';
   data: any;
   timestamp: number;
 }
@@ -233,6 +233,47 @@ export async function processPendingOp(op: PendingOp) {
         notas: notas || null,
       });
       if (error && error.code !== "23505") throw error; // Ignorar duplicados
+      break;
+    }
+
+    case 'merma': {
+      const { merma, lote_id, cantidad } = op.data;
+      const CONFIG_MERMAS_ID = "00000000-0000-0000-0000-000000000002";
+
+      // 1. Descontar lote en DB si existe
+      if (lote_id) {
+        const { data: lote } = await supabase
+          .from("lotes")
+          .select("cantidad")
+          .eq("id", lote_id)
+          .maybeSingle();
+
+        if (lote) {
+          const newQty = Math.max(0, lote.cantidad - cantidad);
+          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", lote_id);
+        }
+      }
+
+      // 2. Apendizar a lista global de mermas
+      const { data: existingData } = await supabase
+        .from("visitas")
+        .select("notas")
+        .eq("id", CONFIG_MERMAS_ID)
+        .maybeSingle();
+
+      let currentList: any[] = [];
+      try {
+        if (existingData?.notas) currentList = JSON.parse(existingData.notas);
+      } catch (e) {}
+
+      // Evitar duplicados por ID
+      if (!currentList.some((m: any) => m.id === merma.id)) {
+        currentList.unshift(merma);
+        await supabase
+          .from("visitas")
+          .update({ notas: JSON.stringify(currentList) })
+          .eq("id", CONFIG_MERMAS_ID);
+      }
       break;
     }
   }

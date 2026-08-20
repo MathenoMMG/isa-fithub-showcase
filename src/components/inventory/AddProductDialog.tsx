@@ -73,7 +73,7 @@ export function AddProductDialog({ customTrigger }: { customTrigger?: React.Reac
       ...form,
       categoria: finalCategory,
       cantidad: Number(form.cantidad) || 0,
-      fecha_caducidad: new Date(form.fecha_caducidad).toISOString(),
+      fecha_caducidad: form.fecha_caducidad ? `${form.fecha_caducidad}T12:00:00.000Z` : null,
     });
     toast.success(`Producto "${form.nombre}" añadido`);
     reset();
