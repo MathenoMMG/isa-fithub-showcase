@@ -11,17 +11,15 @@ export function DashboardBanners() {
   const allLotes = filteredItems.flatMap((i) => i.lotes);
   const { proximos, vencidos } = countLotesByStatus(allLotes);
 
-  // We need to find the name of the first expired or near-expiry product
+  // We need to find the name of the first expired or near-expiry product (with active stock)
   const vencidosItems = filteredItems.filter(p => p.lotes.some(l => {
-    if (!l.fecha_caducidad) return false;
-    const days = (new Date(l.fecha_caducidad).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
-    return days < 0;
+    if (!l.fecha_caducidad || l.cantidad <= 0) return false;
+    return getExpiryStatus(l.fecha_caducidad) === "vencido";
   }));
 
   const proximosItems = filteredItems.filter(p => p.lotes.some(l => {
-    if (!l.fecha_caducidad) return false;
-    const days = (new Date(l.fecha_caducidad).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
-    return days >= 0 && days <= 30;
+    if (!l.fecha_caducidad || l.cantidad <= 0) return false;
+    return getExpiryStatus(l.fecha_caducidad) === "proximo";
   }));
 
   const isPremium = profile.stylePreset === "obsidian";

@@ -169,7 +169,7 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
   doc.setFont("helvetica", "bold");
   doc.text("Stock Crítico (Vencidos / Próximos)", 14, currentY);
 
-  const criticos: { tienda: string; articulo: string; nombre: string; caducidad: string; estado: string; loteQty: number }[] = [];
+  const criticos: { tienda: string; articulo: string; nombre: string; caducidad: string; estado: string; loteQty: number; notas: string }[] = [];
   
   for (const product of inventory) {
     if (product.lotes.length === 0) continue;
@@ -185,7 +185,8 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
           nombre: product.nombre,
           caducidad: lote.fecha_caducidad,
           estado: status === "vencido" ? "VENCIDO" : "Próximo a vencer",
-          loteQty: lote.cantidad
+          loteQty: lote.cantidad,
+          notas: lote.notas || product.notas || "—"
         });
       }
     }
@@ -204,20 +205,15 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
     autoTable(doc, {
       startY: currentY + 5,
       head: [["Estado", "Fecha Cad.", "Tienda", "Articulo", "Producto", "Uds", "Notas"]],
-      body: criticos.map(c => {
-        const prod = inventory.find(p => p.articulo === c.articulo && (p.tienda_nombre || "Norte") === c.tienda);
-        const loteProd = prod?.lotes?.find(l => l.fecha_caducidad === c.caducidad);
-        const notasTexto = loteProd?.notas || prod?.notas || "—";
-        return [
-          c.estado,
-          formatInBogota(c.caducidad, "dd/MM/yyyy"),
-          c.tienda,
-          c.articulo,
-          c.nombre,
-          c.loteQty.toString(),
-          notasTexto
-        ];
-      }),
+      body: criticos.map(c => [
+        c.estado,
+        formatInBogota(c.caducidad, "dd/MM/yyyy"),
+        c.tienda,
+        c.articulo,
+        c.nombre,
+        c.loteQty.toString(),
+        c.notas
+      ]),
       headStyles: { fillColor: [220, 38, 38] }, // Red header for critical
       theme: "striped",
       styles: { fontSize: 8 },

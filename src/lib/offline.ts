@@ -220,6 +220,7 @@ export async function processPendingOp(op: PendingOp) {
       const { error } = await supabase.from("registros_horario").insert({
         tipo,
         tienda_id,
+        created_at: op.timestamp ? new Date(op.timestamp).toISOString() : new Date().toISOString(),
       });
       if (error) throw error;
       break;
@@ -231,6 +232,7 @@ export async function processPendingOp(op: PendingOp) {
         tienda_id,
         fecha,
         notas: notas || null,
+        created_at: op.timestamp ? new Date(op.timestamp).toISOString() : new Date().toISOString(),
       });
       if (error && error.code !== "23505") throw error; // Ignorar duplicados
       break;

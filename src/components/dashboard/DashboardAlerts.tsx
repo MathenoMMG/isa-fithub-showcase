@@ -3,6 +3,7 @@ import { useInventory } from "@/context/InventoryContext";
 import { Package } from "lucide-react";
 import { BarChart, Bar, ResponsiveContainer, XAxis } from "recharts";
 import { useProfile } from "@/context/ProfileContext";
+import { getExpiryStatus, getDaysUntilExpiry } from "@/lib/expiry";
 
 export function DashboardAlerts() {
   const { filteredItems } = useInventory();
@@ -18,14 +19,11 @@ export function DashboardAlerts() {
 
   const getStatus = (fecha: string | null) => {
     if (!fecha) return "ok";
-    const days = (new Date(fecha).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
-    if (days < 0) return "vencido";
-    if (days <= 30) return "proximo";
-    return "ok";
+    return getExpiryStatus(fecha);
   };
 
   const getDaysLabel = (fecha: string) => {
-    const days = Math.ceil((new Date(fecha).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+    const days = getDaysUntilExpiry(fecha);
     if (days < 0) return `Vencido hace ${Math.abs(days)}d`;
     if (days === 0) return "Vence hoy";
     return `Vence en ${days}d`;

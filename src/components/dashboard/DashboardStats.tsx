@@ -8,10 +8,7 @@ export function DashboardStats() {
   const { profile } = useProfile();
   
   const allLotes = filteredItems.flatMap((i) => i.lotes);
-  const { proximos, vencidos } = countLotesByStatus(allLotes);
-
-  // Vigentes: total lotes - proximos - vencidos
-  const vigentes = allLotes.length - proximos - vencidos;
+  const { proximos, vencidos, en_regla: vigentes } = countLotesByStatus(allLotes);
   
   const isPremium = profile.stylePreset === "obsidian";
 

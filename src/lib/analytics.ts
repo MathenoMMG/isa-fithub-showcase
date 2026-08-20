@@ -1,5 +1,6 @@
 import { differenceInDays, parseISO, getDay, getHours } from "date-fns";
 import type { Venta, ProductoConLotes } from "@/types/inventory";
+import { getBogotaDate } from "./date-utils";
 
 // Definir el rango en días para el cálculo base (ej. últimos 7 o 30 días)
 export const calculateRunRate = (ventas: Venta[], windowDays: number): number => {
@@ -95,11 +96,12 @@ export const getRestockSuggestions = (
   return suggestions.sort((a, b) => b.sugerido - a.sugerido);
 };
 
-// Mapa de calor por día de la semana (0 = Domingo, 1 = Lunes...)
+// Mapa de calor por día de la semana (0 = Domingo, 1 = Lunes...) en Colombia
 export const getSalesByDayOfWeek = (ventas: Venta[]) => {
   const days = [0, 0, 0, 0, 0, 0, 0];
   for (const v of ventas) {
-    const day = getDay(parseISO(v.created_at));
+    const bogotaDate = getBogotaDate(v.created_at);
+    const day = bogotaDate.getDay();
     days[day] += v.cantidad;
   }
   return [
@@ -113,14 +115,15 @@ export const getSalesByDayOfWeek = (ventas: Venta[]) => {
   ];
 };
 
-// Franja horaria: Mañana (06:00 - 11:59), Tarde (12:00 - 17:59), Noche (18:00 - 23:59)
+// Franja horaria: Mañana (06:00 - 11:59), Tarde (12:00 - 17:59), Noche (18:00 - 23:59) en Colombia
 export const getSalesByTimeOfDay = (ventas: Venta[]) => {
   let manana = 0;
   let tarde = 0;
   let noche = 0;
 
   for (const v of ventas) {
-    const h = getHours(parseISO(v.created_at));
+    const bogotaDate = getBogotaDate(v.created_at);
+    const h = bogotaDate.getHours();
     if (h >= 6 && h < 12) manana += v.cantidad;
     else if (h >= 12 && h < 18) tarde += v.cantidad;
     else noche += v.cantidad;

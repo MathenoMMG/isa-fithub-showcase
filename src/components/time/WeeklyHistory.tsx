@@ -34,17 +34,24 @@ export function WeeklyHistory() {
 
   const handleEditOpen = (log: RegistroHorario) => {
     setEditLog(log);
-    setEditTime(format(parseISO(log.created_at), "HH:mm"));
+    setEditTime(formatInBogota(log.created_at, "HH:mm"));
   };
 
   const handleEditSave = async () => {
     if (!editLog) return;
     try {
-      const date = parseISO(editLog.created_at);
+      const bogotaDate = getBogotaDate(editLog.created_at);
       const [hours, mins] = editTime.split(":");
-      date.setHours(Number(hours), Number(mins));
+      const y = bogotaDate.getFullYear();
+      const m = String(bogotaDate.getMonth() + 1).padStart(2, "0");
+      const d = String(bogotaDate.getDate()).padStart(2, "0");
+      const hh = String(Number(hours)).padStart(2, "0");
+      const mm = String(Number(mins)).padStart(2, "0");
       
-      await updateLog(editLog.id, date.toISOString());
+      // Construir ISO explícito en zona horaria de Colombia (-05:00)
+      const isoColombia = `${y}-${m}-${d}T${hh}:${mm}:00.000-05:00`;
+      
+      await updateLog(editLog.id, new Date(isoColombia).toISOString());
       toast.success("Hora actualizada correctamente");
       setEditLog(null);
     } catch (e) {
