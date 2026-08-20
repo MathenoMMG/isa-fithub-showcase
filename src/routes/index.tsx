@@ -1,8 +1,9 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingHero } from "@/components/landing/LandingHero";
-import { LandingFeatures } from "@/components/landing/LandingFeatures";
 import { LandingInteractivePreview } from "@/components/landing/LandingInteractivePreview";
+import { LandingKpis } from "@/components/landing/LandingKpis";
+import { LandingFeatures } from "@/components/landing/LandingFeatures";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
 export const Route = createFileRoute("/")({
@@ -22,6 +23,7 @@ function LandingPage() {
       <main className="flex-1">
         <LandingHero />
         <LandingInteractivePreview />
+        <LandingKpis />
         <LandingFeatures />
       </main>
       <LandingFooter />
