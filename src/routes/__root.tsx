@@ -1,4 +1,4 @@
-﻿import { Outlet, createRootRoute, useRouterState } from "@tanstack/react-router";
+import { Outlet, createRootRoute, useRouterState } from "@tanstack/react-router";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ProfileProvider, useProfile } from "@/context/ProfileContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -12,6 +12,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
 import { GlowBackground } from "@/components/layout/GlowBackground";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { UpdatePasswordModal } from "@/components/auth/UpdatePasswordModal";
 import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 
@@ -162,6 +163,7 @@ function AppLayout() {
     return (
       <>
         <Outlet />
+        <UpdatePasswordModal />
         <Toaster richColors position="top-right" />
         <ScrollToTopButton />
       </>
@@ -187,6 +189,7 @@ function AppLayout() {
                       </main>
                     </div>
                   </div>
+                  <UpdatePasswordModal />
                   <Toaster richColors position="top-right" />
                   <ScrollToTopButton />
                 </SidebarProvider>

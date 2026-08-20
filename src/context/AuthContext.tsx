@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+﻿import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { isEmailAllowed } from "@/lib/auth-config";
@@ -10,9 +10,12 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   isAllowed: boolean;
+  isPasswordRecovery: boolean;
+  setIsPasswordRecovery: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<{ error: Error | null }>;
+  updateUserPassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   const checkUserAccess = async (currentSession: Session | null) => {
     if (!currentSession?.user?.email) {
@@ -47,6 +51,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    // Detectar si la URL contiene token de recuperación
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      if (hash.includes("type=recovery") || search.includes("type=recovery")) {
+        setIsPasswordRecovery(true);
+      }
+    }
+
     async function initAuth() {
       try {
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
@@ -67,12 +80,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      if (mounted) {
-        setLoading(true);
-        await checkUserAccess(newSession);
-        setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (!mounted) return;
+
+      if (event === "PASSWORD_RECOVERY") {
+        setIsPasswordRecovery(true);
       }
+
+      setLoading(true);
+      await checkUserAccess(newSession);
+      setLoading(false);
     });
 
     return () => {
@@ -84,9 +101,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     const trimmedEmail = email.trim().toLowerCase();
     
-    // Verificación preventiva antes de llamar a Supabase
     if (!isEmailAllowed(trimmedEmail)) {
-      const err = new Error("El correo ingresado no está autorizado para ingresar a FitHub.");
+      const err = new Error("El correo ingresado no está autorizado para ingresar a la plataforma.");
       toast.error(err.message);
       return { error: err };
     }
@@ -107,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!allowed) {
           return { error: new Error("Cuenta no autorizada.") };
         }
-        toast.success("¡Bienvenida de nuevo a FitHub!");
+        toast.success("¡Bienvenido al sistema!");
       }
 
       return { error: null };
@@ -142,8 +158,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/` : undefined;
       const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo,
       });
       if (error) {
         toast.error(`Error al enviar recuperación: ${error.message}`);
@@ -157,6 +174,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateUserPassword = async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) {
+        toast.error(`Error al actualizar contraseña: ${error.message}`);
+        return { error };
+      }
+      setIsPasswordRecovery(false);
+      toast.success("¡Tu contraseña ha sido actualizada correctamente!");
+      return { error: null };
+    } catch (err: any) {
+      const e = err instanceof Error ? err : new Error(String(err));
+      toast.error(e.message);
+      return { error: e };
+    }
+  };
+
   const isAuthenticated = useMemo(() => !!session && !!user && isEmailAllowed(user.email), [session, user]);
   const isAllowed = useMemo(() => isEmailAllowed(user?.email), [user]);
 
@@ -166,9 +202,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     isAuthenticated,
     isAllowed,
+    isPasswordRecovery,
+    setIsPasswordRecovery,
     signIn,
     signOut,
     sendPasswordReset,
+    updateUserPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
