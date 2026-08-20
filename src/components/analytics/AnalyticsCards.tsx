@@ -148,17 +148,18 @@ export function StoreComparisonCard(props: CardProps) {
   const { isDark, textColor, gridColor } = useThemeColors();
   
   const data = useMemo(() => {
-    const cats: Record<string, { name: string, sur: number, norte: number }> = {};
+    const cats: Record<string, { name: string, sur: number, norte: number, centro: number }> = {};
     for (const v of props.ventas) {
       if (!v.productos) continue;
       const cat = v.productos.categoria || "Otros";
-      const isSur = v.productos.tienda_id === 2;
+      const tId = v.productos.tienda_id;
       
-      if (!cats[cat]) cats[cat] = { name: cat, sur: 0, norte: 0 };
-      if (isSur) cats[cat].sur += v.cantidad;
-      else cats[cat].norte += v.cantidad;
+      if (!cats[cat]) cats[cat] = { name: cat, sur: 0, norte: 0, centro: 0 };
+      if (tId === 2) cats[cat].sur += v.cantidad;
+      else if (tId === 1) cats[cat].norte += v.cantidad;
+      else if (tId === 3) cats[cat].centro += v.cantidad;
     }
-    return Object.values(cats).sort((a, b) => (b.sur + b.norte) - (a.sur + a.norte)).slice(0, 6);
+    return Object.values(cats).sort((a, b) => (b.sur + b.norte + b.centro) - (a.sur + a.norte + a.centro)).slice(0, 6);
   }, [props.ventas]);
 
   return (
@@ -176,8 +177,9 @@ export function StoreComparisonCard(props: CardProps) {
                 contentStyle={{ borderRadius: '12px', border: isDark ? '1px solid #334155' : 'none', backgroundColor: isDark ? '#0f172a' : '#ffffff', color: isDark ? '#f8fafc' : '#0f172a' }}
               />
               <Legend verticalAlign="top" wrapperStyle={{ paddingBottom: '10px' }} />
-              <Bar name="Sur" dataKey="sur" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               <Bar name="Norte" dataKey="norte" fill="#10b981" radius={[4, 4, 0, 0]} />
+              <Bar name="Sur" dataKey="sur" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar name="Centro" dataKey="centro" fill="#f59e0b" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
