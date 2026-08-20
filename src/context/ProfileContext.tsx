@@ -42,6 +42,8 @@ const defaultProfile: Profile = {
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
+const CONFIG_RECORD_ID = "00000000-0000-0000-0000-000000000001";
+
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const userEmail = user?.email || "guest";
@@ -52,61 +54,69 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   });
 
   const [profile, setProfile] = useState<Profile>(() => {
-    // 1. Prioridad: Metadatos de la cuenta en Supabase Cloud
-    if (user?.user_metadata?.name) {
-      return {
-        ...defaultProfile,
-        ...user.user_metadata,
-      };
-    }
-    // 2. Caché local
     try {
       const saved = localStorage.getItem(profileStorageKey);
       if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error("Error reading profile cache:", e);
-    }
+    } catch (e) {}
     return defaultProfile;
   });
 
-  // Sincronizar cuando el usuario autenticado cambia o llegan metadatos de Supabase
+  // 1. Cargar fotos públicas globales desde Supabase
+  useEffect(() => {
+    async function fetchGlobalStorePhotos() {
+      try {
+        const { data, error } = await supabase
+          .from("visitas")
+          .select("notas")
+          .eq("id", CONFIG_RECORD_ID)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching global store photos:", error);
+          return;
+        }
+
+        if (data && data.notas) {
+          try {
+            const parsed = JSON.parse(data.notas);
+            setProfile((prev) => ({
+              ...prev,
+              storePhotos: {
+                ...DEFAULT_STORE_PHOTOS,
+                ...parsed,
+              },
+            }));
+          } catch (e) {}
+        }
+      } catch (err) {
+        console.error("Error loading store photos from DB:", err);
+      }
+    }
+
+    fetchGlobalStorePhotos();
+
+    // Polling cada 30 segundos para sincronizar fotos si otro usuario las cambia
+    const interval = setInterval(fetchGlobalStorePhotos, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 2. Sincronizar cuando el usuario autenticado cambia o llegan metadatos de Supabase
   useEffect(() => {
     if (!user) return;
 
     if (user.user_metadata && Object.keys(user.user_metadata).length > 0) {
-      const cloudProfile: Profile = {
-        name: user.user_metadata.name || defaultProfile.name,
-        subtitle: user.user_metadata.subtitle || defaultProfile.subtitle,
-        avatar: user.user_metadata.avatar || "",
-        soundEnabled: user.user_metadata.soundEnabled ?? true,
-        glowEnabled: user.user_metadata.glowEnabled ?? true,
-        stylePreset: user.user_metadata.stylePreset || "classic",
-        fontPreset: user.user_metadata.fontPreset || "jakarta",
-        storePhotos: {
-          ...DEFAULT_STORE_PHOTOS,
-          ...(user.user_metadata.storePhotos || {}),
-        },
-      };
-      setProfile(cloudProfile);
-      localStorage.setItem(profileStorageKey, JSON.stringify(cloudProfile));
-    } else {
-      // Fallback a localStorage si aún no se han sincronizado metadatos en la nube
-      try {
-        const saved = localStorage.getItem(profileStorageKey);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          setProfile({
-            ...defaultProfile,
-            ...parsed,
-            storePhotos: {
-              ...DEFAULT_STORE_PHOTOS,
-              ...(parsed.storePhotos || {}),
-            },
-          });
-        }
-      } catch (e) {}
+      setProfile((prev) => ({
+        ...prev,
+        name: user.user_metadata.name || prev.name,
+        subtitle: user.user_metadata.subtitle || prev.subtitle,
+        avatar: user.user_metadata.avatar || prev.avatar,
+        soundEnabled: user.user_metadata.soundEnabled ?? prev.soundEnabled,
+        glowEnabled: user.user_metadata.glowEnabled ?? prev.glowEnabled,
+        stylePreset: user.user_metadata.stylePreset || prev.stylePreset,
+        fontPreset: user.user_metadata.fontPreset || prev.fontPreset,
+      }));
     }
-  }, [user, userEmail, profileStorageKey]);
+  }, [user]);
 
   // Aplicar clases visuales dinámicas
   useEffect(() => {
@@ -148,7 +158,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setThemeState(t);
   };
 
-  // Guardar tanto en estado local como en la nube de Supabase (user_metadata)
+  // Guardar en estado local, perfil de usuario y EN LA BASE DE DATOS PÚBLICA DE SUPABASE
   const updateProfile = async (data: Partial<Profile>) => {
     const updated = { ...profile, ...data };
     setProfile(updated);
@@ -156,7 +166,24 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(profileStorageKey, JSON.stringify(updated));
     } catch (e) {}
 
-    // Guardar en la nube de Supabase para que viaje con la cuenta a cualquier dispositivo
+    // Si se modificaron las fotos de las tiendas, guardar GLOBALMENTE en la base de datos para que todos los usuarios las vean
+    if (data.storePhotos) {
+      try {
+        const payload = JSON.stringify(data.storePhotos);
+        const { error: dbErr } = await supabase
+          .from("visitas")
+          .update({ notas: payload })
+          .eq("id", CONFIG_RECORD_ID);
+
+        if (dbErr) {
+          console.error("Error guardando fotos globales en base de datos:", dbErr);
+        }
+      } catch (err) {
+        console.error("Error updating global store photos in DB:", err);
+      }
+    }
+
+    // Guardar en metadatos de la cuenta
     try {
       if (user) {
         await supabase.auth.updateUser({

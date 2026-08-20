@@ -25,6 +25,7 @@ export function VisitProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from("visitas")
         .select("*")
+        .neq("id", "00000000-0000-0000-0000-000000000001")
         .order("fecha", { ascending: false });
 
       if (error) throw error;
