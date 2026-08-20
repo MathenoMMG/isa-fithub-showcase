@@ -46,41 +46,54 @@ function NotFoundComponent() {
 
 function ErrorComponent({ error }: { error: Error }) {
   console.error("FitHub Runtime Error:", error);
+  const [copied, setCopied] = useState(false);
+
+  const copyErrorDetails = () => {
+    const details = `FitHub Error:\nMessage: ${error?.message || "Sin mensaje"}\n\nStack:\n${error?.stack || "Sin stack"}`;
+    navigator.clipboard.writeText(details);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-lg text-center p-6 bg-card border rounded-2xl shadow-xl">
+      <div className="max-w-xl w-full text-center p-6 sm:p-8 bg-card border rounded-2xl shadow-2xl select-text">
         <h1 className="text-xl font-bold tracking-tight text-foreground">Algo no cargó correctamente</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-red-500 font-medium select-text break-words">
           {error?.message || "Error al renderizar los datos locales o remotos."}
         </p>
         
         {error?.stack && (
-          <div className="mt-4 p-3 bg-muted/60 rounded-lg text-left overflow-auto max-h-40 font-mono text-[11px] text-muted-foreground border">
+          <div className="mt-4 p-3 bg-muted/80 rounded-xl text-left overflow-auto max-h-48 font-mono text-[11px] text-muted-foreground border select-text whitespace-pre-wrap break-all">
             {error.stack}
           </div>
         )}
 
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <div className="mt-6 flex flex-wrap justify-center gap-2.5">
+          <button
+            onClick={copyErrorDetails}
+            className="inline-flex items-center justify-center rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2.5 text-xs font-bold hover:opacity-90 cursor-pointer shadow-sm"
+          >
+            {copied ? "✓ ¡Copiado al portapapeles!" : "📋 Copiar detalles del error"}
+          </button>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 cursor-pointer shadow-sm"
+            className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 cursor-pointer shadow-sm"
           >
             Recargar página
           </button>
           <button
             onClick={() => {
-              localStorage.removeItem("fithub-profile");
-              localStorage.removeItem("fithub-theme");
-              localStorage.removeItem("fithub_pending_ops");
+              localStorage.clear();
               window.location.href = "/dashboard";
             }}
-            className="inline-flex items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-2.5 text-sm font-semibold hover:bg-amber-500/20 cursor-pointer"
+            className="inline-flex items-center justify-center rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-2.5 text-xs font-bold hover:bg-amber-500/20 cursor-pointer"
           >
-            Restablecer caché local
+            Limpiar todo el almacenamiento local
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-xl border border-input bg-background px-4 py-2.5 text-sm font-medium hover:bg-muted cursor-pointer"
+            className="inline-flex items-center justify-center rounded-xl border border-input bg-background px-4 py-2.5 text-xs font-medium hover:bg-muted cursor-pointer"
           >
             Ir al inicio
           </a>
