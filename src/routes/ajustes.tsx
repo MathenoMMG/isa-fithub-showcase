@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useStore } from "@/context/StoreContext";
 import { useInventory } from "@/context/InventoryContext";
 import { useTimeLog } from "@/context/TimeLogContext";
+import { useVisitas } from "@/context/VisitContext";
 import { useProfile, DEFAULT_STORE_PHOTOS } from "@/context/ProfileContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
