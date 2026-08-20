@@ -53,12 +53,25 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     return (localStorage.getItem("fithub-theme") as ThemeMode) || "system";
   });
 
+  const globalPresetKey = `fithub-style-preset-${userEmail}`;
+  const globalFontKey = `fithub-font-preset-${userEmail}`;
+
   const [profile, setProfile] = useState<Profile>(() => {
+    let base = defaultProfile;
     try {
       const saved = localStorage.getItem(profileStorageKey);
-      if (saved) return JSON.parse(saved);
+      if (saved) base = { ...base, ...JSON.parse(saved) };
     } catch (e) {}
-    return defaultProfile;
+
+    // Rescatar presets específicos si están guardados
+    try {
+      const savedStyle = localStorage.getItem(globalPresetKey) as any;
+      const savedFont = localStorage.getItem(globalFontKey) as any;
+      if (savedStyle) base.stylePreset = savedStyle;
+      if (savedFont) base.fontPreset = savedFont;
+    } catch (e) {}
+
+    return base;
   });
 
   // 1. Cargar fotos públicas globales desde Supabase
@@ -105,18 +118,27 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     if (!user) return;
 
     if (user.user_metadata && Object.keys(user.user_metadata).length > 0) {
-      setProfile((prev) => ({
-        ...prev,
-        name: user.user_metadata.name || prev.name,
-        subtitle: user.user_metadata.subtitle || prev.subtitle,
-        avatar: user.user_metadata.avatar || prev.avatar,
-        soundEnabled: user.user_metadata.soundEnabled ?? prev.soundEnabled,
-        glowEnabled: user.user_metadata.glowEnabled ?? prev.glowEnabled,
-        stylePreset: user.user_metadata.stylePreset || prev.stylePreset,
-        fontPreset: user.user_metadata.fontPreset || prev.fontPreset,
-      }));
+      setProfile((prev) => {
+        const style = user.user_metadata.stylePreset || prev.stylePreset || "classic";
+        const font = user.user_metadata.fontPreset || prev.fontPreset || "jakarta";
+        try {
+          localStorage.setItem(globalPresetKey, style);
+          localStorage.setItem(globalFontKey, font);
+        } catch (e) {}
+
+        return {
+          ...prev,
+          name: user.user_metadata.name || prev.name,
+          subtitle: user.user_metadata.subtitle || prev.subtitle,
+          avatar: user.user_metadata.avatar || prev.avatar,
+          soundEnabled: user.user_metadata.soundEnabled ?? prev.soundEnabled,
+          glowEnabled: user.user_metadata.glowEnabled ?? prev.glowEnabled,
+          stylePreset: style,
+          fontPreset: font,
+        };
+      });
     }
-  }, [user]);
+  }, [user, userEmail]);
 
   // Aplicar clases visuales dinámicas
   useEffect(() => {
@@ -164,6 +186,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setProfile(updated);
     try {
       localStorage.setItem(profileStorageKey, JSON.stringify(updated));
+      if (data.stylePreset) localStorage.setItem(globalPresetKey, data.stylePreset);
+      if (data.fontPreset) localStorage.setItem(globalFontKey, data.fontPreset);
     } catch (e) {}
 
     // Si se modificaron las fotos de las tiendas, guardar GLOBALMENTE en la base de datos para que todos los usuarios las vean

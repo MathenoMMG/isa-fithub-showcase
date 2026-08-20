@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { formatInBogota } from "./date-utils";
-import type { Venta, ProductoConLotes } from "@/types/inventory";
+import type { Venta, ProductoConLotes, Merma } from "@/types/inventory";
 import { getExpiryStatus } from "./expiry";
 import html2canvas from "html2canvas";
 
@@ -12,9 +12,10 @@ interface ReportOptions {
   range: string;
   ventas: (Venta & { productos: { tienda_id: number; nombre: string; categoria: string; articulo: string } })[];
   inventory: ProductoConLotes[];
+  mermas?: Merma[];
 }
 
-export async function generatePdfReport({ store, range, ventas, inventory }: ReportOptions) {
+export async function generatePdfReport({ store, range, ventas, inventory, mermas = [] }: ReportOptions) {
   const doc = new jsPDF();
   const dateStr = formatInBogota(new Date(), "dd 'de' MMMM, yyyy");
   
@@ -217,6 +218,51 @@ export async function generatePdfReport({ store, range, ventas, inventory }: Rep
           }
         }
       }
+    });
+  }
+
+  // -- MERMAS Y PÉRDIDAS --
+  if (currentY > 230) {
+    doc.addPage();
+    currentY = 20;
+  } else {
+    currentY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 15 : currentY + 15;
+  }
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Registro de Mermas y Pérdidas (${mermas.length} eventos)`, 14, currentY);
+
+  if (mermas.length === 0) {
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("No se registraron mermas ni pérdidas en el periodo seleccionado.", 14, currentY + 7);
+  } else {
+    const TIENDA_NAMES: Record<number, string> = { 1: "Norte", 2: "Sur", 3: "Centro" };
+    const MOTIVOS: Record<string, string> = {
+      caducidad: "Caducidad",
+      perdida_bodega: "Pérdida bodega",
+      averia: "Avería / Daño",
+      descuadre: "Descuadre",
+    };
+
+    autoTable(doc, {
+      startY: currentY + 5,
+      head: [["Fecha", "Tienda", "Producto", "Motivo", "Uds", "Notas"]],
+      body: mermas.map(m => {
+        const prod = inventory.find(p => p.id === m.producto_id);
+        return [
+          formatInBogota(m.created_at, "dd/MM/yyyy HH:mm"),
+          TIENDA_NAMES[m.tienda_id] || "N/A",
+          prod?.nombre || "Producto",
+          MOTIVOS[m.motivo] || m.motivo,
+          `-${m.cantidad}`,
+          m.notas || "-"
+        ];
+      }),
+      headStyles: { fillColor: [185, 28, 28] }, // Dark Red
+      theme: "striped",
+      styles: { fontSize: 8 },
     });
   }
 

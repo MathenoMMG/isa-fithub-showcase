@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History, PackageOpen, AlertTriangle } from "lucide-react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History, PackageOpen, AlertTriangle, AlertOctagon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,11 +15,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import type { ProductoConLotes } from "@/types/inventory";
+import type { ProductoConLotes, Lote } from "@/types/inventory";
 import { useInventory } from "@/context/InventoryContext";
 import { useProfile } from "@/context/ProfileContext";
 import { ExpiryBadge } from "./ExpiryBadge";
 import { AddLoteDialog } from "./AddLoteDialog";
+import { MermaDialog } from "./MermaDialog";
 import { formatExpiryDate, getEarliestExpiry, getExpiryStatus, getTotalQty, getWorstStatus } from "@/lib/expiry";
 import { ProductRow } from "./ProductRow";
 
@@ -208,6 +209,8 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notesTemp, setNotesTemp] = useState(product.notas || "");
   const [showPreviousLotes, setShowPreviousLotes] = useState(false);
+  const [mermaDialogOpen, setMermaDialogOpen] = useState(false);
+  const [selectedLoteForMerma, setSelectedLoteForMerma] = useState<Lote | undefined>(undefined);
 
   // Sync temp notes when product changes
   useEffect(() => {
@@ -423,6 +426,20 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
                       </Button>
                       
                       <Button
+                        disabled={lote.cantidad <= 0}
+                        onClick={() => {
+                          setSelectedLoteForMerma(lote);
+                          setMermaDialogOpen(true);
+                        }}
+                        variant="outline"
+                        size="icon"
+                        className="h-10 w-10 border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-[2px]"
+                        title="Registrar merma / pérdida de este lote"
+                      >
+                        <AlertOctagon className="h-4 w-4" />
+                      </Button>
+
+                      <Button
                         disabled={status === "vencido" || lote.cantidad <= 0}
                         onClick={() => {
                           if (lote.cantidad <= 0) {
@@ -592,9 +609,23 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
         </div>
       )}
 
-      {/* Control panel footer: Add Lote + Delete Product */}
+      {/* Control panel footer: Add Lote + Registrar Merma + Delete Product */}
       <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-border dark:border-primary/5">
         <AddLoteDialog productId={product.id} productName={product.nombre} />
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setSelectedLoteForMerma(undefined);
+            setMermaDialogOpen(true);
+          }}
+          disabled={totalQty <= 0}
+          className="h-10 gap-1.5 border-red-200 dark:border-red-900/40 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 font-mono text-[10px] font-bold uppercase tracking-wider rounded-[2px]"
+        >
+          <AlertOctagon className="h-4 w-4" />
+          REGISTRAR MERMA
+        </Button>
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -641,6 +672,13 @@ function ProductDetailConsole({ product }: { product: ProductoConLotes }) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      <MermaDialog
+        product={product}
+        lote={selectedLoteForMerma}
+        open={mermaDialogOpen}
+        onOpenChange={setMermaDialogOpen}
+      />
     </div>
   );
 }

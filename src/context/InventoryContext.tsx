@@ -1,5 +1,5 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto } from "@/types/inventory";
+import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto, Merma, MotivoMerma, StoreId } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
 import { useAuth } from "./AuthContext";
@@ -14,6 +14,7 @@ export interface DeletedProduct {
 interface InventoryContextValue {
   items: ProductoConLotes[];
   filteredItems: ProductoConLotes[];
+  mermas: Merma[];
   loading: boolean;
   addProduct: (input: NewProductInput & { cantidad: number; fecha_caducidad: string | null }) => Promise<void>;
   updateProduct: (productId: string, updates: Partial<ProductoConLotes>) => Promise<void>;
@@ -25,6 +26,8 @@ interface InventoryContextValue {
   removeLote: (productId: string, loteId: string) => Promise<void>;
   sellFromLote: (productId: string, loteId: string, qty?: number) => Promise<void>;
   undoSale: (productId: string, loteId: string) => Promise<boolean>;
+  registerMerma: (productId: string, loteId: string | null, cantidad: number, motivo: MotivoMerma, notas?: string) => Promise<void>;
+  undoMerma: (mermaId: string) => Promise<boolean>;
   adjustLote: (productId: string, loteId: string, delta: number) => Promise<void>;
   updateProductCategories: (updates: Record<string, string>) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -33,12 +36,14 @@ interface InventoryContextValue {
 const InventoryContext = createContext<InventoryContextValue | null>(null);
 
 const TIENDA_MAP: Record<number, StoreId> = { 1: "Norte", 2: "Sur", 3: "Centro" };
+const MERMAS_RECORD_ID = "00000000-0000-0000-0000-000000000002";
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ProductoConLotes[]>([]);
+  const [mermas, setMermas] = useState<Merma[]>([]);
   const [loading, setLoading] = useState(true);
   const { store } = useStore();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [trashBin, setTrashBin] = useState<DeletedProduct[]>(() => {
     try {
       const stored = localStorage.getItem("fithub_trash_bin");
@@ -61,7 +66,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const fetchData = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
     try {
-      // Fetch products with lotes
+      // 1. Fetch products with lotes
       const { data: productos, error: pErr } = await supabase
         .from("productos")
         .select("*, lotes(*)")
@@ -69,12 +74,28 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 
       if (pErr) throw pErr;
 
-      // Fetch sales totals grouped by producto_id and lote_id
+      // 2. Fetch sales totals grouped by producto_id and lote_id
       const { data: ventasTotals, error: vErr } = await supabase
         .from("ventas")
         .select("producto_id, lote_id, cantidad");
 
       if (vErr) throw vErr;
+
+      // 3. Fetch global mermas log from Supabase
+      try {
+        const { data: mermasData } = await supabase
+          .from("visitas")
+          .select("notas")
+          .eq("id", MERMAS_RECORD_ID)
+          .maybeSingle();
+
+        if (mermasData && mermasData.notas) {
+          const parsedMermas = JSON.parse(mermasData.notas);
+          setMermas(parsedMermas || []);
+        }
+      } catch (e) {
+        console.error("Error fetching mermas log:", e);
+      }
 
       // Aggregate sales per product and per lote
       const salesMap: Record<string, number> = {};
@@ -388,6 +409,90 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const registerMerma = async (
+    productId: string,
+    loteId: string | null,
+    cantidad: number,
+    motivo: MotivoMerma,
+    notas?: string
+  ) => {
+    try {
+      const product = items.find((p) => p.id === productId);
+      if (!product) throw new Error("Producto no encontrado");
+
+      const newMerma: Merma = {
+        id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
+        producto_id: productId,
+        lote_id: loteId,
+        tienda_id: product.tienda_id,
+        cantidad,
+        motivo,
+        notas: notas || null,
+        created_at: new Date().toISOString(),
+        usuario: user?.user_metadata?.name || user?.email || "Usuario",
+      };
+
+      // 1. Descontar del lote si aplica
+      if (loteId) {
+        const lote = product.lotes.find((l) => l.id === loteId);
+        if (lote) {
+          const newQty = Math.max(0, lote.cantidad - cantidad);
+          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", loteId);
+        }
+      }
+
+      // 2. Guardar en registro global de Supabase
+      const updatedMermas = [newMerma, ...mermas];
+      setMermas(updatedMermas);
+
+      await supabase
+        .from("visitas")
+        .update({ notas: JSON.stringify(updatedMermas) })
+        .eq("id", MERMAS_RECORD_ID);
+
+      await fetchData();
+      toast.success(`Merma registrada: -${cantidad} uds por ${motivo.replace('_', ' ')}`);
+    } catch (err) {
+      console.error("Error registering merma:", err);
+      toast.error("Error al registrar la merma");
+      throw err;
+    }
+  };
+
+  const undoMerma = async (mermaId: string): Promise<boolean> => {
+    try {
+      const targetMerma = mermas.find((m) => m.id === mermaId);
+      if (!targetMerma) return false;
+
+      // 1. Restaurar stock en el lote
+      if (targetMerma.lote_id) {
+        const product = items.find((p) => p.id === targetMerma.producto_id);
+        const lote = product?.lotes.find((l) => l.id === targetMerma.lote_id);
+        if (lote) {
+          const newQty = lote.cantidad + targetMerma.cantidad;
+          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", targetMerma.lote_id);
+        }
+      }
+
+      // 2. Actualizar registro global
+      const filtered = mermas.filter((m) => m.id !== mermaId);
+      setMermas(filtered);
+
+      await supabase
+        .from("visitas")
+        .update({ notas: JSON.stringify(filtered) })
+        .eq("id", MERMAS_RECORD_ID);
+
+      await fetchData();
+      toast.success("Merma deshecha y stock restaurado");
+      return true;
+    } catch (err) {
+      console.error("Error undoing merma:", err);
+      toast.error("No se pudo deshacer la merma");
+      return false;
+    }
+  };
+
   const updateProductCategories = async (updates: Record<string, string>) => {
     const promises = Object.entries(updates).map(([productId, newCategory]) =>
       supabase
@@ -421,6 +526,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       value={{
         items,
         filteredItems,
+        mermas,
         loading,
         addProduct,
         updateProduct,
@@ -432,6 +538,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         removeLote,
         sellFromLote,
         undoSale,
+        registerMerma,
+        undoMerma,
         adjustLote,
         updateProductCategories,
         refreshData: fetchData,

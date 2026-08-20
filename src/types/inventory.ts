@@ -40,6 +40,20 @@ export interface Venta {
   created_at: string;
 }
 
+export type MotivoMerma = "caducidad" | "perdida_bodega" | "averia" | "descuadre";
+
+export interface Merma {
+  id: string;
+  producto_id: string;
+  lote_id: string | null;
+  tienda_id: number;
+  cantidad: number;
+  motivo: MotivoMerma;
+  notas: string | null;
+  created_at: string;
+  usuario?: string;
+}
+
 export interface Visita {
   id: string;
   tienda_id: number;
