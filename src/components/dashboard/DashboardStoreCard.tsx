@@ -39,9 +39,9 @@ export function DashboardStoreCard() {
   const currentPhoto = activeStorePhotos[currentStoreId] || DEFAULT_STORE_PHOTOS.Norte;
   const currentInfo = STORE_INFO[currentStoreId] || STORE_INFO.Norte;
 
-  const totalProducts = filteredItems.length;
-  const totalStock = filteredItems.reduce(
-    (acc, item) => acc + (item.lotes?.reduce((sum, l) => sum + (l.cantidad || 0), 0) || 0),
+  const totalProducts = (filteredItems || []).length;
+  const totalStock = (filteredItems || []).reduce(
+    (acc, item) => acc + (item.lotes?.reduce((sum, l) => sum + (l?.cantidad || 0), 0) || 0),
     0
   );
 

@@ -11,10 +11,14 @@ export function DashboardAlerts() {
   const navigate = useNavigate();
 
   // "Atención inmediata" top 6 urgent items (based on lotes expiration with active stock)
-  const urgentLotes = filteredItems
-    .flatMap((p) => p.lotes.map((l) => ({ ...l, producto: p })))
-    .filter((l) => l.fecha_caducidad != null && l.cantidad > 0)
-    .sort((a, b) => new Date(a.fecha_caducidad!).getTime() - new Date(b.fecha_caducidad!).getTime())
+  const urgentLotes = (filteredItems || [])
+    .flatMap((p) => (p.lotes || []).map((l) => ({ ...l, producto: p })))
+    .filter((l) => l && l.fecha_caducidad != null && l.cantidad > 0)
+    .sort((a, b) => {
+      const tA = a.fecha_caducidad ? new Date(a.fecha_caducidad).getTime() : Infinity;
+      const tB = b.fecha_caducidad ? new Date(b.fecha_caducidad).getTime() : Infinity;
+      return tA - tB;
+    })
     .slice(0, 6);
 
   const getStatus = (fecha: string | null) => {

@@ -8,17 +8,17 @@ export function DashboardBanners() {
   const { filteredItems } = useInventory();
   const { profile } = useProfile();
   
-  const allLotes = filteredItems.flatMap((i) => i.lotes);
+  const allLotes = (filteredItems || []).flatMap((i) => i.lotes || []);
   const { proximos, vencidos } = countLotesByStatus(allLotes);
 
   // We need to find the name of the first expired or near-expiry product (with active stock)
-  const vencidosItems = filteredItems.filter(p => p.lotes.some(l => {
-    if (!l.fecha_caducidad || l.cantidad <= 0) return false;
+  const vencidosItems = (filteredItems || []).filter(p => (p.lotes || []).some(l => {
+    if (!l || !l.fecha_caducidad || l.cantidad <= 0) return false;
     return getExpiryStatus(l.fecha_caducidad) === "vencido";
   }));
 
-  const proximosItems = filteredItems.filter(p => p.lotes.some(l => {
-    if (!l.fecha_caducidad || l.cantidad <= 0) return false;
+  const proximosItems = (filteredItems || []).filter(p => (p.lotes || []).some(l => {
+    if (!l || !l.fecha_caducidad || l.cantidad <= 0) return false;
     return getExpiryStatus(l.fecha_caducidad) === "proximo";
   }));
 
