@@ -1,7 +1,7 @@
 import { AlertCircle, Clock, CheckCircle, ChevronRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useInventory } from "@/context/InventoryContext";
-import { countLotesByStatus } from "@/lib/expiry";
+import { countLotesByStatus, getExpiryStatus } from "@/lib/expiry";
 import { useProfile } from "@/context/ProfileContext";
 
 export function DashboardBanners() {
