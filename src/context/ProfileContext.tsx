@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
 import { useAuth } from "./AuthContext";
 
 type ThemeMode = "light" | "dark" | "system";
@@ -26,7 +26,7 @@ const getDefaultProfileForEmail = (email?: string | null): Profile => {
   
   if (normalized === "owner@example.com") {
     return {
-      name: "Isabella",
+      name: "Isabel",
       subtitle: "Mercaimpulsadora FitHub",
       avatar: "",
       soundEnabled: true,
