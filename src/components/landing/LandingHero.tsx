@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ArrowRight, Sparkles, CheckCircle2, Store, Calendar, FileSpreadsheet, Lock } from "lucide-react";
+import { ArrowRight, Sparkles, Lock, Store, Layers, BarChart3, ShieldCheck } from "lucide-react";
 
 export function LandingHero() {
   const { isAuthenticated } = useAuth();
@@ -21,17 +21,17 @@ export function LandingHero() {
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm font-semibold mb-8 shadow-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <span>Plataforma Operativa de Gestión y Punto de Venta</span>
+          <span>Plataforma de Control Operativo y Mercaimpulsación</span>
         </div>
 
         {/* Main Heading */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50 max-w-4xl mx-auto leading-[1.12]">
-          Control inteligente de <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent">inventarios y rotación</span>
+          Gestión inteligente de <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent">inventarios y caducidades</span>
         </h1>
 
         {/* Subtitle */}
         <p className="mt-6 text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-          Diseñada para optimizar el control de stock en las sucursales de <strong className="text-slate-900 dark:text-slate-100 font-semibold">Sur</strong> y <strong className="text-slate-900 dark:text-slate-100 font-semibold">Norte</strong>, alertando en tiempo real sobre fechas de vencimiento y jornadas operativas.
+          Optimiza la rotación de producto en punto de venta, monitorea fechas de vencimiento críticas con semáforos predictivos y controla registros de asistencia en tiempo real.
         </p>
 
         {/* Call to Actions */}
@@ -65,23 +65,23 @@ export function LandingHero() {
           </a>
         </div>
 
-        {/* Key Highlights / Trust Stats */}
+        {/* Key Highlights / Generic Pillars */}
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
           <div className="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">2 Sedes</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Sur & Norte</div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">Multi-Sede</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Control Independiente</div>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
             <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">&lt; 30 Días</div>
             <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Semáforo de Alertas</div>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">Excel .xlsx</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Exportación Inmediata</div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">Export .xlsx</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Informes Inmediatos</div>
           </div>
           <div className="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 text-center">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">100% Cloud</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Seguridad Supabase</div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">Cloud Sync</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Acceso Cifrado</div>
           </div>
         </div>
 

@@ -7,16 +7,10 @@ import {
   AlertTriangle, 
   XCircle, 
   FileSpreadsheet, 
-  Clock, 
-  TrendingUp, 
-  Layers,
-  ChevronRight,
-  Plus,
-  Minus,
-  Sparkles
+  Plus, 
+  Minus, 
+  Sparkles 
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface MockProduct {
@@ -24,7 +18,7 @@ interface MockProduct {
   nombre: string;
   linea: string;
   sabor: string;
-  tienda: "Sur" | "Norte";
+  tienda: "Sucursal Norte" | "Sucursal Centro";
   lote: string;
   diasRestantes: number;
   stock: number;
@@ -34,74 +28,74 @@ interface MockProduct {
 const MOCK_DATA: MockProduct[] = [
   {
     id: "1",
-    nombre: "AREPA FIT ARTESANAL CHOCLO X5",
-    linea: "Arepas",
-    sabor: "Choclo",
-    tienda: "Sur",
-    lote: "L-2044",
-    diasRestantes: 42,
-    stock: 24,
+    nombre: "BEBIDA HIDRATANTE BOTÁNICA 500ML",
+    linea: "Bebidas Funcionales",
+    sabor: "Cítricos & Jengibre",
+    tienda: "Sucursal Norte",
+    lote: "L-9042",
+    diasRestantes: 45,
+    stock: 28,
     estado: "ok",
   },
   {
     id: "2",
-    nombre: "AREPA FIT SEMILLAS DE CHÍA & QUINOA",
-    linea: "Arepas",
-    sabor: "Semillas",
-    tienda: "Sur",
-    lote: "L-1980",
-    diasRestantes: 12,
-    stock: 15,
+    nombre: "BARRA PROTEICA CRUNCH AVELLANA 60G",
+    linea: "Snacks Saludables",
+    sabor: "Avellana & Cacao",
+    tienda: "Sucursal Norte",
+    lote: "L-8831",
+    diasRestantes: 14,
+    stock: 12,
     estado: "warning",
   },
   {
     id: "3",
-    nombre: "YOGURT GRIEGO NATURAL 0% AZÚCAR 500G",
-    linea: "Lácteos Saludables",
-    sabor: "Natural",
-    tienda: "Sur",
-    lote: "L-3011",
-    diasRestantes: 28,
-    stock: 18,
+    nombre: "EXTRACTO COLD PRESSED DETOX 330ML",
+    linea: "Bebidas Funcionales",
+    sabor: "Manzana & Espinaca",
+    tienda: "Sucursal Norte",
+    lote: "L-7120",
+    diasRestantes: 22,
+    stock: 16,
     estado: "warning",
   },
   {
     id: "4",
-    nombre: "YOGURT GRIEGO FRUTOS DEL BOSQUE 250G",
-    linea: "Lácteos Saludables",
-    sabor: "Frutos Rojos",
-    tienda: "Norte",
-    lote: "L-2900",
-    diasRestantes: 65,
-    stock: 30,
+    nombre: "MIX DE FRUTOS SECOS & SEMILLAS 150G",
+    linea: "Granos & Semillas",
+    sabor: "Tostado Suave",
+    tienda: "Sucursal Centro",
+    lote: "L-9400",
+    diasRestantes: 60,
+    stock: 35,
     estado: "ok",
   },
   {
     id: "5",
-    nombre: "GALLETA DE AVENA, ALMENDRAS & CACAO FIT",
-    linea: "Snacks & Repostería",
-    sabor: "Cacao & Nuez",
-    tienda: "Norte",
-    lote: "L-1120",
-    diasRestantes: 3,
-    stock: 8,
+    nombre: "PROTEÍNA VEGANA ORGANIC VAINILLA 1KG",
+    linea: "Nutrición & Suplementos",
+    sabor: "Vainilla Bourbon",
+    tienda: "Sucursal Centro",
+    lote: "L-6021",
+    diasRestantes: 5,
+    stock: 7,
     estado: "warning",
   },
   {
     id: "6",
-    nombre: "AREPA FIT YUCA & QUESO COSTEÑO LIGHT",
-    linea: "Arepas",
-    sabor: "Yuca",
-    tienda: "Norte",
-    lote: "L-2250",
-    diasRestantes: 50,
-    stock: 35,
+    nombre: "TORTITAS HORNEADAS DE ARROZ & QUINOA",
+    linea: "Snacks Saludables",
+    sabor: "Sal Marina",
+    tienda: "Sucursal Centro",
+    lote: "L-8104",
+    diasRestantes: 52,
+    stock: 40,
     estado: "ok",
   },
 ];
 
 export function LandingInteractivePreview() {
-  const [selectedTienda, setSelectedTienda] = useState<"Todas" | "Sur" | "Norte">("Todas");
+  const [selectedTienda, setSelectedTienda] = useState<"Todas" | "Sucursal Norte" | "Sucursal Centro">("Todas");
   const [searchTerm, setSearchTerm] = useState("");
   const [mockProducts, setMockProducts] = useState(MOCK_DATA);
 
@@ -134,14 +128,14 @@ export function LandingInteractivePreview() {
             <span>Demostración Interactiva</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-slate-50 tracking-tight">
-            Así funciona la experiencia en punto de venta
+            Experiencia fluida para el punto de venta
           </h2>
           <p className="mt-4 text-slate-600 dark:text-slate-400 text-base sm:text-lg">
-            Interactúa con la interfaz simulada abajo. Prueba cambiar de sucursal, buscar categorías o simular ventas de stock sin afectar los datos reales de la operación.
+            Interactúa con la interfaz simulada abajo. Prueba cambiar de sucursal, filtrar categorías o simular ventas de stock en tiempo real.
           </p>
         </div>
 
-        {/* iPad-like Mockup Container */}
+        {/* Mockup Container */}
         <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
           
           {/* Top Bar of the Mockup */}
@@ -150,9 +144,9 @@ export function LandingInteractivePreview() {
             {/* Store Filter Pills */}
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1 flex items-center gap-1">
-                <Store className="w-3.5 h-3.5 text-emerald-600" /> Sede:
+                <Store className="w-3.5 h-3.5 text-emerald-600" /> Sucursal:
               </span>
-              {(["Todas", "Sur", "Norte"] as const).map((tienda) => (
+              {(["Todas", "Sucursal Norte", "Sucursal Centro"] as const).map((tienda) => (
                 <button
                   key={tienda}
                   onClick={() => setSelectedTienda(tienda)}
@@ -172,7 +166,7 @@ export function LandingInteractivePreview() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
                 type="text"
-                placeholder="Buscar producto o línea..."
+                placeholder="Buscar artículo o línea..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 h-9 text-xs rounded-xl bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
@@ -189,7 +183,7 @@ export function LandingInteractivePreview() {
               </div>
               <div>
                 <div className="text-xl font-extrabold text-slate-900 dark:text-slate-100">{totalStock} uds</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Unidades en Display</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Unidades Disponibles</div>
               </div>
             </div>
 
@@ -199,7 +193,7 @@ export function LandingInteractivePreview() {
               </div>
               <div>
                 <div className="text-xl font-extrabold text-amber-600 dark:text-amber-400">{criticalCount} lotes</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Próximos a Vencer</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Lotes Próximos (&lt; 30d)</div>
               </div>
             </div>
 
@@ -209,7 +203,7 @@ export function LandingInteractivePreview() {
               </div>
               <div>
                 <div className="text-xl font-extrabold text-slate-900 dark:text-slate-100">100% OK</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sincronización Cloud</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Telemetría y Registro</div>
               </div>
             </div>
           </div>
@@ -219,11 +213,11 @@ export function LandingInteractivePreview() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th className="py-3.5 px-6">Producto & Línea</th>
-                  <th className="py-3.5 px-4">Sede</th>
+                  <th className="py-3.5 px-6">Descripción del Artículo</th>
+                  <th className="py-3.5 px-4">Punto de Venta</th>
                   <th className="py-3.5 px-4">Lote</th>
-                  <th className="py-3.5 px-4">Caducidad (Semáforo)</th>
-                  <th className="py-3.5 px-6 text-center">Gestión Rápida de Stock</th>
+                  <th className="py-3.5 px-4">Semáforo de Caducidad</th>
+                  <th className="py-3.5 px-6 text-center">Ajuste de Stock</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200/80 dark:divide-slate-800/80">
@@ -273,7 +267,7 @@ export function LandingInteractivePreview() {
                         <button
                           onClick={() => handleAdjustStock(item.id, -1)}
                           className="h-8 w-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 font-bold transition-all active:scale-90 cursor-pointer"
-                          title="Vender / Descontar 1 unidad"
+                          title="Descontar 1 unidad"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -298,7 +292,7 @@ export function LandingInteractivePreview() {
 
           {/* Table Footer Note */}
           <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-center text-[11px] text-slate-500 dark:text-slate-400">
-            🔒 Muestra interactiva ilustrativa con datos ficticios. Los datos reales se encuentran cifrados bajo autenticación Supabase.
+            🔒 Entorno de demostración ilustrativo con datos simulados.
           </div>
 
         </div>

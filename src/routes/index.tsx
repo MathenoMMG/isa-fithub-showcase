@@ -8,8 +8,8 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FitHub Manager — Gestión Inteligente de Inventarios" },
-      { name: "description", content: "Plataforma operativa para control de inventarios, caducidades y jornadas en Ciudad Demo." },
+      { title: "Sistema de Gestión de Inventarios y Punto de Venta" },
+      { name: "description", content: "Plataforma para el control de inventarios, caducidades y jornadas en punto de venta." },
     ],
   }),
   component: LandingPage,

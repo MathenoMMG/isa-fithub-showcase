@@ -2,7 +2,7 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
 import { LoginModal } from "@/components/auth/LoginModal";
-import { ShieldCheck, Lock, ArrowUp } from "lucide-react";
+import { ShieldCheck, Lock, Layers } from "lucide-react";
 
 export function LandingFooter() {
   const { isAuthenticated } = useAuth();
@@ -17,19 +17,19 @@ export function LandingFooter() {
           {/* Col 1: Brand */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center p-1.5 shadow-md">
-                <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain filter brightness-0 invert" />
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center p-2 text-white shadow-md">
+                <Layers className="w-5 h-5" />
               </div>
               <span className="text-xl font-extrabold text-white tracking-tight">
-                FitHub Manager
+                StockSync Manager
               </span>
             </div>
             <p className="text-sm text-slate-400 max-w-md leading-relaxed">
-              Sistema integral privado para el control de inventario, semáforo de fechas de caducidad, registro de asistencia y reportería comercial en Ciudad Demo.
+              Plataforma integral para el control de inventarios, semáforo de caducidades, registro de jornadas y analítica comercial en punto de venta.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs text-emerald-400 font-mono">
               <ShieldCheck className="w-4 h-4" />
-              <span>Sistema protegido bajo Supabase Auth v2</span>
+              <span>Infraestructura protegida y cifrada</span>
             </div>
           </div>
 
@@ -39,7 +39,7 @@ export function LandingFooter() {
             <ul className="space-y-2.5 text-sm">
               <li>
                 <a href="#caracteristicas" className="hover:text-emerald-400 transition-colors">
-                  Capacidades del Sistema
+                  Módulos del Sistema
                 </a>
               </li>
               <li>
@@ -76,7 +76,7 @@ export function LandingFooter() {
                 </li>
               )}
               <li className="text-xs text-slate-500 pt-1">
-                Acceso restringido exclusivamente a correos registrados en lista blanca.
+                Acceso privado restringido para cuentas autorizadas.
               </li>
             </ul>
           </div>
@@ -86,10 +86,10 @@ export function LandingFooter() {
         {/* Bottom copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div>
-            © {new Date().getFullYear()} FitHub Ciudad Demo. Todos los derechos reservados.
+            © {new Date().getFullYear()} Plataforma de Gestión de Inventario. Todos los derechos reservados.
           </div>
           <div>
-            Plataforma desarrollada para gestión comercial & mercaimpulsación.
+            Diseñado para operaciones en punto de venta & mercaimpulsación.
           </div>
         </div>
 

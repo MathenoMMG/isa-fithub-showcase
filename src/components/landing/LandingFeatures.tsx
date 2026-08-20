@@ -1,15 +1,11 @@
 ﻿import React from "react";
 import { 
   CalendarClock, 
-  ShieldCheck, 
   Store, 
   FileSpreadsheet, 
   Clock3, 
-  Layers, 
-  Zap, 
   Smartphone,
-  Lock,
-  CheckCircle2
+  Lock
 } from "lucide-react";
 
 export function LandingFeatures() {
@@ -18,43 +14,43 @@ export function LandingFeatures() {
       icon: CalendarClock,
       color: "from-emerald-500 to-teal-600",
       title: "Semáforo Proactivo de Caducidad",
-      description: "Algoritmo en tiempo real que clasifica los lotes en Verde (óptimo), Amarillo (menos de 30 días) y Rojo (vencido) para garantizar una rotación eficiente y cero mermas.",
-      badge: "Cero Desperdicios",
+      description: "Algoritmo en tiempo real que clasifica lotes en Verde (óptimo), Amarillo (menos de 30 días) y Rojo (crítico) para garantizar rotación FIFO y reducir mermas.",
+      badge: "Cero Mermas",
     },
     {
       icon: Store,
       color: "from-blue-500 to-cyan-600",
-      title: "Gestión Dual Sur & Norte",
-      description: "Alterna en un solo toque entre las dos sucursales principales de Ciudad Demo, visualizando el stock disponible, lotes activos y movimientos de inventario independientes.",
-      badge: "Multi-Sede",
+      title: "Gestión Multi-Sucursal Simultánea",
+      description: "Alterna con fluidez entre diferentes sedes o almacenes, visualizando stock disponible, lotes activos y movimientos de inventario en tiempo real.",
+      badge: "Multi-Punto",
     },
     {
       icon: Clock3,
       color: "from-amber-500 to-orange-600",
-      title: "Registro de Jornadas & Asistencia",
-      description: "Módulo integrado para registrar ingresos, salidas y permanencia en punto de venta con hora oficial colombiana (Bogotá GMT-5) y trazabilidad completa.",
+      title: "Control de Turnos & Asistencia",
+      description: "Módulo integrado para registrar ingresos, salidas y permanencia en punto de venta con validación de hora local y cálculo de horas de jornada.",
       badge: "Control Operativo",
     },
     {
       icon: FileSpreadsheet,
       color: "from-purple-500 to-indigo-600",
       title: "Exportación Ejecutiva a Excel",
-      description: "Genera reportes .xlsx formateados con los filtros exactos de la vista activa para compartir informes consolidados con proveedores y gerencia.",
+      description: "Genera reportes .xlsx estructurados con los filtros exactos de la vista activa para compartir informes consolidados con proveedores o dirección.",
       badge: "Reportes 1-Click",
     },
     {
       icon: Smartphone,
       color: "from-rose-500 to-pink-600",
-      title: "Diseño iPad-First & Táctil",
-      description: "Botones amplios, controles de incremento rápido (mínimo 44px de área táctil) y modales cómodos optimizados para operar de pie en el punto de venta.",
+      title: "Diseño Táctil iPad-First",
+      description: "Botones amplios, controles de incremento rápido (mínimo 44px de área táctil) y modales cómodos optimizados para operar de pie en punto de venta.",
       badge: "Touch Friendly",
     },
     {
       icon: Lock,
       color: "from-emerald-600 to-green-700",
-      title: "Seguridad y Lista Blanca Cerrada",
-      description: "Autenticación segura mediante Supabase Auth y validación criptográfica estricta con lista blanca exclusiva para los operadores autorizados.",
-      badge: "100% Blindado",
+      title: "Seguridad y Lista Blanca Privada",
+      description: "Autenticación segura mediante tokens criptográficos y validación estricta con lista blanca exclusiva para los operadores autorizados.",
+      badge: "Acceso Seguro",
     },
   ];
 
@@ -68,10 +64,10 @@ export function LandingFeatures() {
             Módulos & Herramientas
           </h2>
           <p className="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-slate-50 tracking-tight leading-tight">
-            Todo lo necesario para la excelencia en el punto de venta
+            Todo lo necesario para la gestión en punto de venta
           </p>
           <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400">
-            Una plataforma pensada en la agilidad del día a día, eliminando errores manuales y agilizando la toma de decisiones.
+            Una solución pensada para la agilidad operativa, eliminando errores manuales y agilizando la toma de decisiones.
           </p>
         </div>
 
