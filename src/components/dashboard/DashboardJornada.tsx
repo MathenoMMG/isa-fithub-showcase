@@ -4,6 +4,7 @@ import { useTimeLog } from "@/context/TimeLogContext";
 import { useStore } from "@/context/StoreContext";
 import { useEffect, useState } from "react";
 import { useProfile } from "@/context/ProfileContext";
+import { isTodayInBogota } from "@/lib/date-utils";
 
 export function DashboardJornada() {
   const { logs } = useTimeLog();
@@ -20,11 +21,10 @@ export function DashboardJornada() {
   }, []);
   
   // Encontrar logs de hoy
-  const todayStr = now.toISOString().slice(0, 10);
   const storeId = store === "Sur" ? 2 : store === "Centro" ? 3 : 1;
   
   const todayLogs = logs.filter(l => {
-    const isToday = l.created_at.startsWith(todayStr);
+    const isToday = isTodayInBogota(l.created_at);
     const isStore = (store === "Ambas" || store === "Todas") ? true : l.tienda_id === storeId;
     return isToday && isStore;
   });

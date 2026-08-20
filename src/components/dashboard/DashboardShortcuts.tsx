@@ -5,6 +5,7 @@ import { useStore } from "@/context/StoreContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useProfile } from "@/context/ProfileContext";
+import { isTodayInBogota } from "@/lib/date-utils";
 
 export function DashboardShortcuts() {
   const { logs, refreshLogs } = useTimeLog();
@@ -12,8 +13,7 @@ export function DashboardShortcuts() {
   const { profile } = useProfile();
 
   const storeId = store === "Sur" ? 2 : store === "Centro" ? 3 : 1;
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const hasEntrada = logs.some(l => l.created_at.startsWith(todayStr) && l.tienda_id === storeId && l.tipo === "entrada");
+  const hasEntrada = logs.some(l => isTodayInBogota(l.created_at) && l.tienda_id === storeId && l.tipo === "entrada");
 
   const handleCheckInOut = async () => {
     if (store === "Ambas" || store === "Todas") {

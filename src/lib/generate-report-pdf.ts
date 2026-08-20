@@ -203,8 +203,21 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
   } else {
     autoTable(doc, {
       startY: currentY + 5,
-      head: [["Estado", "Fecha Cad.", "Tienda", "Articulo", "Producto", "Uds"]],
-      body: criticos.map(c => [c.estado, formatInBogota(c.caducidad, "dd/MM/yyyy"), c.tienda, c.articulo, c.nombre, c.loteQty.toString()]),
+      head: [["Estado", "Fecha Cad.", "Tienda", "Articulo", "Producto", "Uds", "Notas"]],
+      body: criticos.map(c => {
+        const prod = inventory.find(p => p.articulo === c.articulo && (p.tienda_nombre || "Norte") === c.tienda);
+        const loteProd = prod?.lotes?.find(l => l.fecha_caducidad === c.caducidad);
+        const notasTexto = loteProd?.notas || prod?.notas || "—";
+        return [
+          c.estado,
+          formatInBogota(c.caducidad, "dd/MM/yyyy"),
+          c.tienda,
+          c.articulo,
+          c.nombre,
+          c.loteQty.toString(),
+          notasTexto
+        ];
+      }),
       headStyles: { fillColor: [220, 38, 38] }, // Red header for critical
       theme: "striped",
       styles: { fontSize: 8 },
@@ -221,23 +234,19 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
     });
   }
 
-  // -- MERMAS Y PÉRDIDAS --
-  if (currentY > 230) {
-    doc.addPage();
-    currentY = 20;
-  } else {
-    currentY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 15 : currentY + 15;
-  }
+  // -- MERMAS Y PÉRDIDAS (Solo si se proporcionó mermas con registros o solicitado) --
+  if (mermas && mermas.length > 0) {
+    if (currentY > 230) {
+      doc.addPage();
+      currentY = 20;
+    } else {
+      currentY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 15 : currentY + 15;
+    }
 
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text(`Registro de Mermas y Pérdidas (${mermas.length} eventos)`, 14, currentY);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Registro de Mermas y Pérdidas (${mermas.length} eventos)`, 14, currentY);
 
-  if (mermas.length === 0) {
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("No se registraron mermas ni pérdidas en el periodo seleccionado.", 14, currentY + 7);
-  } else {
     const TIENDA_NAMES: Record<number, string> = { 1: "Norte", 2: "Sur", 3: "Centro" };
     const MOTIVOS: Record<string, string> = {
       caducidad: "Caducidad",
@@ -251,13 +260,14 @@ export async function generatePdfReport({ store, range, ventas, inventory, merma
       head: [["Fecha", "Tienda", "Producto", "Motivo", "Uds", "Notas"]],
       body: mermas.map(m => {
         const prod = inventory.find(p => p.id === m.producto_id);
+        const prodNota = m.notas || prod?.notas || "—";
         return [
           formatInBogota(m.created_at, "dd/MM/yyyy HH:mm"),
           TIENDA_NAMES[m.tienda_id] || "N/A",
           prod?.nombre || "Producto",
           MOTIVOS[m.motivo] || m.motivo,
           `-${m.cantidad}`,
-          m.notas || "-"
+          prodNota
         ];
       }),
       headStyles: { fillColor: [185, 28, 28] }, // Dark Red

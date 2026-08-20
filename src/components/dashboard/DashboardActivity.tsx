@@ -44,7 +44,7 @@ export function DashboardActivity() {
                 </div>
               </div>
               <div className="shrink-0 font-sans text-[9px] bg-[#F3F4F6] text-[#6B7280] dark:bg-slate-800 dark:text-slate-400 px-[7px] py-[2px] rounded-full">
-                {log.tienda_id === 1 ? "BCG" : "MNG"}
+                {log.tienda_id === 1 ? "BCG" : log.tienda_id === 2 ? "MNG" : log.tienda_id === 3 ? "GTS" : "—"}
               </div>
             </div>
           ))}

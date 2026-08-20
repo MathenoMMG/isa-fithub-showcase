@@ -80,8 +80,8 @@ function Informes() {
     if (!salesDateFilter) return salesData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     
     return salesData.filter(v => {
-      // YYYY-MM-DD
-      const vDate = new Date(v.created_at).toISOString().split('T')[0];
+      // YYYY-MM-DD en hora de Colombia
+      const vDate = formatInBogota(v.created_at, "yyyy-MM-dd");
       return vDate === salesDateFilter;
     }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [salesData, salesDateFilter]);
