@@ -5,7 +5,7 @@ import { useTimeLog } from "@/context/TimeLogContext";
 export function DashboardActivity() {
   const { logs } = useTimeLog();
 
-  const recentLogs = logs.slice(0, 5);
+  const recentLogs = (logs || []).slice(0, 5);
 
   const getPassedText = (dateIso: string) => {
     const diffMs = new Date().getTime() - new Date(dateIso).getTime();

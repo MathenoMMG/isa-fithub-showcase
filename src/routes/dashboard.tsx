@@ -27,7 +27,7 @@ function Dashboard() {
 
   const getLastSyncText = () => {
     if (!filteredItems || filteredItems.length === 0) return "hace un momento";
-    const allLotes = filteredItems.flatMap(i => i.lotes);
+    const allLotes = (filteredItems || []).flatMap(i => i?.lotes || []);
     if (allLotes.length === 0) return "hace un momento";
     return "hace un momento";
   };

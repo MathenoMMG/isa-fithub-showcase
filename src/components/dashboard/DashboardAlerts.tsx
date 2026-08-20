@@ -127,7 +127,7 @@ export function DashboardAlerts() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trendData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                 <XAxis dataKey="name" fontSize={8} fill="currentColor" className="text-muted-foreground/60 font-mono" tickLine={false} axisLine={false} />
-                <Bar dataKey="vencidos" fill="var(--color-primary)" opacity={0.35} radius={[1, 1, 0, 0]} />
+                <Bar dataKey="vencidos" fill="#10b981" opacity={0.35} radius={[1, 1, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -143,7 +143,7 @@ export function DashboardAlerts() {
             </div>
             <div className="flex-1 text-center pl-2">
               <p className="font-mono text-[18px] font-semibold text-slate-800 dark:text-slate-200 m-0">
-                {new Set(filteredItems.map(i => i.categoria)).size}
+                {new Set((filteredItems || []).map(i => i?.categoria || "Otros")).size}
               </p>
               <p className="font-mono text-[8px] text-muted-foreground/70 uppercase tracking-wider mt-0.5">LÍNEAS</p>
             </div>
@@ -239,7 +239,7 @@ export function DashboardAlerts() {
           </div>
           <div className="flex-1 text-center">
             <p className="font-mono-data text-[18px] font-semibold text-[#111827] dark:text-slate-200 m-0">
-              {new Set(filteredItems.map(i => i.categoria)).size}
+              {new Set((filteredItems || []).map(i => i?.categoria || "Otros")).size}
             </p>
             <p className="font-sans text-[9px] text-[#9CA3AF] uppercase tracking-[0.05em]">Líneas</p>
           </div>

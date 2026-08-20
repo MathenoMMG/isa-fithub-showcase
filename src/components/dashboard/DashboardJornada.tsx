@@ -23,7 +23,8 @@ export function DashboardJornada() {
   // Encontrar logs de hoy
   const storeId = store === "Sur" ? 2 : store === "Centro" ? 3 : 1;
   
-  const todayLogs = logs.filter(l => {
+  const todayLogs = (logs || []).filter(l => {
+    if (!l || !l.created_at) return false;
     const isToday = isTodayInBogota(l.created_at);
     const isStore = (store === "Ambas" || store === "Todas") ? true : l.tienda_id === storeId;
     return isToday && isStore;
