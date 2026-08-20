@@ -9,6 +9,7 @@ import { useInventory } from "@/context/InventoryContext";
 import { useTimeLog } from "@/context/TimeLogContext";
 import { useVisitas } from "@/context/VisitContext";
 import { useProfile } from "@/context/ProfileContext";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import type { StoreFilter } from "@/types/inventory";
 import { RotateCcw, Monitor, Moon, Sun, Camera, RefreshCcw, Bell, BellOff, Database, AlertTriangle, Download, Sparkles } from "lucide-react";
@@ -30,8 +31,9 @@ function AjustesPage() {
   const { store, setStore } = useStore();
   const { refreshData, filteredItems } = useInventory();
   const { refreshLogs, logs } = useTimeLog();
-  const { visitas } = useVisitas(); // assuming useVisitas is exported from VisitContext, need to import if not. Wait, I should import useVisitas.
+  const { visitas } = useVisitas();
   const { theme, setTheme, profile, updateProfile } = useProfile();
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isSyncing, setIsSyncing] = useState(false);
@@ -151,7 +153,14 @@ function AjustesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Perfil */}
         <Card className="p-6 md:p-8 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all hover:shadow-md">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 transition-colors">Tu Perfil</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 transition-colors">Tu Perfil</h3>
+            {user?.email && (
+              <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">
+                {user.email}
+              </span>
+            )}
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-6 mb-6">
             <div className="flex-shrink-0 flex flex-col items-center gap-3">
