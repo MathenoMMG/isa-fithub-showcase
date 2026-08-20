@@ -92,7 +92,7 @@ function InventarioPage() {
   };
 
   const uniqueCategories = useMemo(() => {
-    return Array.from(new Set(filteredItems.map(i => i.categoria).filter(Boolean))).sort();
+    return Array.from(new Set((filteredItems || []).map(i => i?.categoria).filter(Boolean))).sort();
   }, [filteredItems]);
 
   const visibleItems = useMemo(() => {

@@ -377,9 +377,9 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         throw new Error("offline");
       }
       // Find current quantity
-      const currentLote = items
-        .flatMap((p) => p.lotes)
-        .find((l) => l.id === loteId);
+      const currentLote = (items || [])
+        .flatMap((p) => p?.lotes || [])
+        .find((l) => l && l.id === loteId);
 
       if (currentLote) {
         const newQty = Math.max(0, currentLote.cantidad + delta);

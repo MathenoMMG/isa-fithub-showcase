@@ -17,7 +17,7 @@ export function KpiCards({
   onFilterProximos?: () => void;
   onFilterVencidos?: () => void;
 }) {
-  const allLotes = items.flatMap((i) => i.lotes);
+  const allLotes = (items || []).flatMap((i) => i?.lotes || []);
   const totalUnidades = getTotalQty(allLotes);
   const { proximos, vencidos } = countLotesByStatus(allLotes);
   const { profile } = useProfile();
