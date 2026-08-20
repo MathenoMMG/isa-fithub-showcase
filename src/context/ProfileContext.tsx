@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
+﻿import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
 import { useAuth } from "./AuthContext";
+import { supabase } from "@/lib/supabase";
 
 type ThemeMode = "light" | "dark" | "system";
 
 interface Profile {
   name: string;
   subtitle: string;
-  avatar: string; // Base64 image
+  avatar: string; // Base64 image or URL
   soundEnabled: boolean;
   glowEnabled: boolean;
   stylePreset?: "classic" | "obsidian";
@@ -17,53 +18,25 @@ interface ProfileContextValue {
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
   profile: Profile;
-  updateProfile: (data: Partial<Profile>) => void;
+  updateProfile: (data: Partial<Profile>) => Promise<void>;
   playBeep: () => void;
 }
 
-const getDefaultProfileForEmail = (email?: string | null): Profile => {
-  const normalized = email?.trim().toLowerCase() || "";
-  
-  if (normalized === "owner@example.com") {
-    return {
-      name: "Isabel",
-      subtitle: "Mercaimpulsadora FitHub",
-      avatar: "",
-      soundEnabled: true,
-      glowEnabled: true,
-      stylePreset: "classic",
-      fontPreset: "jakarta",
-    };
-  }
-
-  if (normalized === "mathewpro123@gmail.com") {
-    return {
-      name: "Mathew",
-      subtitle: "Administrador de Sistema",
-      avatar: "",
-      soundEnabled: true,
-      glowEnabled: true,
-      stylePreset: "obsidian",
-      fontPreset: "jakarta",
-    };
-  }
-
-  return {
-    name: "Operador FitHub",
-    subtitle: "Punto de Venta",
-    avatar: "",
-    soundEnabled: true,
-    glowEnabled: true,
-    stylePreset: "classic",
-    fontPreset: "jakarta",
-  };
+const defaultProfile: Profile = {
+  name: "Usuario",
+  subtitle: "Punto de Venta",
+  avatar: "",
+  soundEnabled: true,
+  glowEnabled: true,
+  stylePreset: "classic",
+  fontPreset: "jakarta",
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const userEmail = user?.email || "default";
+  const userEmail = user?.email || "guest";
   const profileStorageKey = `fithub-profile-${userEmail}`;
 
   const [theme, setThemeState] = useState<ThemeMode>(() => {
@@ -71,66 +44,66 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   });
 
   const [profile, setProfile] = useState<Profile>(() => {
+    // 1. Prioridad: Metadatos de la cuenta en Supabase Cloud
+    if (user?.user_metadata?.name) {
+      return {
+        ...defaultProfile,
+        ...user.user_metadata,
+      };
+    }
+    // 2. Caché local
     try {
       const saved = localStorage.getItem(profileStorageKey);
       if (saved) return JSON.parse(saved);
-      // Fallback a clave legacy o default
-      const legacy = localStorage.getItem("fithub-profile");
-      if (legacy && userEmail === "owner@example.com") {
-        return JSON.parse(legacy);
-      }
     } catch (e) {
-      console.error("Error reading profile from localStorage:", e);
+      console.error("Error reading profile cache:", e);
     }
-    return getDefaultProfileForEmail(user?.email);
+    return defaultProfile;
   });
 
-  // Rehidratar perfil cuando cambia la sesión de usuario
+  // Sincronizar cuando el usuario autenticado cambia o llegan metadatos de Supabase
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(profileStorageKey);
-      if (saved) {
-        setProfile(JSON.parse(saved));
-        return;
-      }
-      const legacy = localStorage.getItem("fithub-profile");
-      if (legacy && userEmail === "owner@example.com") {
-        const parsed = JSON.parse(legacy);
-        setProfile(parsed);
-        localStorage.setItem(profileStorageKey, JSON.stringify(parsed));
-        return;
-      }
-    } catch (e) {
-      console.error("Error updating profile for active user:", e);
-    }
-    setProfile(getDefaultProfileForEmail(user?.email));
-  }, [userEmail, profileStorageKey]);
+    if (!user) return;
 
+    if (user.user_metadata && Object.keys(user.user_metadata).length > 0) {
+      const cloudProfile: Profile = {
+        name: user.user_metadata.name || defaultProfile.name,
+        subtitle: user.user_metadata.subtitle || defaultProfile.subtitle,
+        avatar: user.user_metadata.avatar || "",
+        soundEnabled: user.user_metadata.soundEnabled ?? true,
+        glowEnabled: user.user_metadata.glowEnabled ?? true,
+        stylePreset: user.user_metadata.stylePreset || "classic",
+        fontPreset: user.user_metadata.fontPreset || "jakarta",
+      };
+      setProfile(cloudProfile);
+      localStorage.setItem(profileStorageKey, JSON.stringify(cloudProfile));
+    } else {
+      // Fallback a localStorage si aún no se han sincronizado metadatos en la nube
+      try {
+        const saved = localStorage.getItem(profileStorageKey);
+        if (saved) {
+          setProfile(JSON.parse(saved));
+        }
+      } catch (e) {}
+    }
+  }, [user, userEmail, profileStorageKey]);
+
+  // Aplicar clases visuales dinámicas
   useEffect(() => {
     try {
       localStorage.setItem(profileStorageKey, JSON.stringify(profile));
-    } catch (e) {
-      console.error("Error saving profile to storage:", e);
-    }
-    
-    // Sincronizar clase global de estilo preferencial en el elemento html raíz
+    } catch (e) {}
+
     if (typeof window !== "undefined") {
       const root = window.document.documentElement;
-      
-      // Limpiar clases de tipografía previas
       root.classList.remove("font-jakarta", "font-sans-preset", "font-serif-preset");
-      
+
       if (profile.stylePreset === "obsidian") {
         root.classList.add("style-obsidian");
-        
         const font = profile.fontPreset || "jakarta";
-        if (font === "jakarta") {
-          root.classList.add("font-jakarta");
-        } else if (font === "sans") {
-          root.classList.add("font-sans-preset");
-        } else if (font === "serif") {
-          root.classList.add("font-serif-preset");
-        }
+        if (font === "jakarta") root.classList.add("font-jakarta");
+        else if (font === "sans") root.classList.add("font-sans-preset");
+        else if (font === "serif") root.classList.add("font-serif-preset");
       } else {
         root.classList.remove("style-obsidian");
       }
@@ -146,7 +119,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       root.classList.add(systemTheme);
       return;
     }
-    
+
     root.classList.add(theme);
     localStorage.setItem("fithub-theme", theme);
   }, [theme]);
@@ -155,8 +128,24 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setThemeState(t);
   };
 
-  const updateProfile = (data: Partial<Profile>) => {
-    setProfile(prev => ({ ...prev, ...data }));
+  // Guardar tanto en estado local como en la nube de Supabase (user_metadata)
+  const updateProfile = async (data: Partial<Profile>) => {
+    const updated = { ...profile, ...data };
+    setProfile(updated);
+    try {
+      localStorage.setItem(profileStorageKey, JSON.stringify(updated));
+    } catch (e) {}
+
+    // Guardar en la nube de Supabase para que viaje con la cuenta a cualquier dispositivo
+    try {
+      if (user) {
+        await supabase.auth.updateUser({
+          data: updated,
+        });
+      }
+    } catch (err) {
+      console.error("Error sincronizando perfil con Supabase:", err);
+    }
   };
 
   const playBeep = () => {
