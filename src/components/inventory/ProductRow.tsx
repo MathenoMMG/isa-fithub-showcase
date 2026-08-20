@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History } from "lucide-react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History, AlertOctagon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import type { ProductoConLotes } from "@/types/inventory";
+import type { ProductoConLotes, Lote } from "@/types/inventory";
 import { useInventory } from "@/context/InventoryContext";
 import { ExpiryBadge } from "./ExpiryBadge";
 import { AddLoteDialog } from "./AddLoteDialog";
+import { MermaDialog } from "./MermaDialog";
 import { formatExpiryDate, getEarliestExpiry, getExpiryStatus, getTotalQty, getWorstStatus } from "@/lib/expiry";
 import { useProfile } from "@/context/ProfileContext";
 
@@ -34,9 +35,11 @@ const rowStyles: Record<ReturnType<typeof getWorstStatus>, { bg: string; dot: st
 };
 
 export function ProductRow({ product, defaultOpen = false }: Props) {
-  const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct, restoreProduct } = useInventory();
+  const { sellFromLote, adjustLote, removeLote, removeProduct, updateProduct, restoreProduct, undoSale } = useInventory();
   const [open, setOpen] = useState(defaultOpen);
   const [showPreviousLotes, setShowPreviousLotes] = useState(false);
+  const [mermaDialogOpen, setMermaDialogOpen] = useState(false);
+  const [selectedLoteForMerma, setSelectedLoteForMerma] = useState<Lote | undefined>(undefined);
   const { profile } = useProfile();
   
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -256,6 +259,23 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                       >
                         <Undo2 className="h-5 w-5" />
                       </Button>
+
+                      <Button
+                        disabled={lote.cantidad <= 0}
+                        onClick={() => {
+                          setSelectedLoteForMerma(lote);
+                          setMermaDialogOpen(true);
+                        }}
+                        variant="outline"
+                        size="icon"
+                        className={`h-11 w-11 border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 ${
+                          isPremium ? "rounded-[2px]" : "rounded-xl"
+                        }`}
+                        title="Registrar merma / pérdida de este lote"
+                      >
+                        <AlertOctagon className="h-5 w-5" />
+                      </Button>
+
                       <Button
                         disabled={status === "vencido" || lote.cantidad <= 0}
                         onClick={() => {
@@ -447,6 +467,22 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <AddLoteDialog productId={product.id} productName={product.nombre} />
 
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedLoteForMerma(undefined);
+                setMermaDialogOpen(true);
+              }}
+              disabled={total <= 0}
+              className={`h-10 gap-1.5 border-red-200 dark:border-red-900/40 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 ${
+                isPremium ? "font-mono text-[10px] font-bold uppercase tracking-wider rounded-[2px]" : "rounded-xl"
+              }`}
+            >
+              <AlertOctagon className="h-4 w-4" />
+              {isPremium ? "REGISTRAR MERMA" : "Registrar merma"}
+            </Button>
+
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
@@ -495,6 +531,13 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
           </div>
         </div>
       </div>
+
+      <MermaDialog
+        product={product}
+        lote={selectedLoteForMerma}
+        open={mermaDialogOpen}
+        onOpenChange={setMermaDialogOpen}
+      />
     </div>
   );
 }
