@@ -2,6 +2,7 @@ import { createContext, useContext, useCallback, useEffect, useState, type React
 import type { RegistroHorario, StoreId } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
+import { useAuth } from "./AuthContext";
 import { addPendingOp } from "@/lib/offline";
 import { toast } from "sonner";
 
@@ -19,6 +20,7 @@ const TimeLogContext = createContext<TimeLogContextValue | null>(null);
 export function TimeLogProvider({ children }: { children: ReactNode }) {
   const [logs, setLogs] = useState<RegistroHorario[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth();
 
   const fetchLogs = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -38,6 +40,12 @@ export function TimeLogProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLogs([]);
+      setLoading(false);
+      return;
+    }
+
     // Carga inicial
     fetchLogs(true);
 
@@ -47,7 +55,7 @@ export function TimeLogProvider({ children }: { children: ReactNode }) {
     }, 15000);
 
     return () => clearInterval(interval);
-  }, [fetchLogs]);
+  }, [fetchLogs, isAuthenticated]);
 
   const addLog = async (tipo: "entrada" | "salida", tienda_id: number | null) => {
     try {

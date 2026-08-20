@@ -4,13 +4,15 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { StoreSelector } from "./StoreSelector";
 import { formatInBogota } from "@/lib/date-utils";
 import { useProfile } from "@/context/ProfileContext";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { Wifi, WifiOff, RefreshCw, LogOut } from "lucide-react";
 import { getPendingOps, processPendingOp, removePendingOp, type PendingOp } from "@/lib/offline";
 import { toast } from "sonner";
 
 const titles: Record<string, string> = {
-  "/": "Dashboard",
+  "/": "Inicio",
+  "/dashboard": "Dashboard",
   "/inventario": "Inventario",
   "/horarios": "Registro de Horarios",
   "/ajustes": "Ajustes",
@@ -21,6 +23,7 @@ export function TopBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const title = titles[pathname] ?? "FitHub";
   const { profile } = useProfile();
+  const { signOut } = useAuth();
 
   const [now, setNow] = useState(new Date());
   const [isOnline, setIsOnline] = useState(true);
@@ -141,10 +144,19 @@ export function TopBar() {
             {profile.subtitle}
           </div>
           <div className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-0.5">
-            {formatInBogota(now, "d MMM · HH:mm")}
+            {formatInBogota(now, "d MMM • HH:mm")}
           </div>
         </div>
       </Link>
+
+      <button
+        onClick={() => signOut()}
+        className="p-2.5 rounded-xl text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all cursor-pointer"
+        title="Cerrar sesión"
+        aria-label="Cerrar sesión"
+      >
+        <LogOut className="h-4 w-4" />
+      </button>
     </header>
   );
 }

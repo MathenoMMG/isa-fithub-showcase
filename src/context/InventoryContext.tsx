@@ -2,6 +2,7 @@ import { createContext, useContext, useCallback, useEffect, useMemo, useState, t
 import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
+import { useAuth } from "./AuthContext";
 import { addPendingOp } from "@/lib/offline";
 import { toast } from "sonner";
 
@@ -37,6 +38,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ProductoConLotes[]>([]);
   const [loading, setLoading] = useState(true);
   const { store } = useStore();
+  const { isAuthenticated } = useAuth();
   const [trashBin, setTrashBin] = useState<DeletedProduct[]>(() => {
     try {
       const stored = localStorage.getItem("fithub_trash_bin");
@@ -109,6 +111,12 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
     // Carga inicial
     fetchData(true);
 
@@ -118,7 +126,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [fetchData]);
+  }, [fetchData, isAuthenticated]);
 
   const addProduct = async (
     input: NewProductInput & { cantidad: number; fecha_caducidad: string | null },

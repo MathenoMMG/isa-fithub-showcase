@@ -1,13 +1,14 @@
 import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
 import type { Visita } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "./AuthContext";
 import { addPendingOp } from "@/lib/offline";
 import { toast } from "sonner";
 
 interface VisitContextValue {
   visitas: Visita[];
   loading: boolean;
-  registrarVisita: (tienda_id: number, fecha: string, notas?: string) => Promise<void>;
+  addVisita: (tienda_id: number, comentario: string) => Promise<void>;
   refreshVisitas: () => Promise<void>;
 }
 
@@ -16,6 +17,7 @@ const VisitContext = createContext<VisitContextValue | null>(null);
 export function VisitProvider({ children }: { children: ReactNode }) {
   const [visitas, setVisitas] = useState<Visita[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth();
 
   const fetchVisitas = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -35,16 +37,22 @@ export function VisitProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setVisitas([]);
+      setLoading(false);
+      return;
+    }
+
     // Carga inicial
     fetchVisitas(true);
 
-    // Polling silencioso cada 15 segundos para mantener registros de visitas sincronizados
+    // Polling silencioso cada 15 segundos para mantener visitas sincronizadas
     const interval = setInterval(() => {
       fetchVisitas(false);
     }, 15000);
 
     return () => clearInterval(interval);
-  }, [fetchVisitas]);
+  }, [fetchVisitas, isAuthenticated]);
 
   const registrarVisita = async (tienda_id: number, fecha: string, notas?: string) => {
     try {

@@ -1,97 +1,30 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useInventory } from "@/context/InventoryContext";
-import { useStore } from "@/context/StoreContext";
-import { Skeleton } from "@/components/ui/skeleton";
-
-import { DashboardBanners } from "@/components/dashboard/DashboardBanners";
-import { DashboardStats } from "@/components/dashboard/DashboardStats";
-import { DashboardAlerts } from "@/components/dashboard/DashboardAlerts";
-import { DashboardJornada } from "@/components/dashboard/DashboardJornada";
-import { DashboardActivity } from "@/components/dashboard/DashboardActivity";
-import { DashboardShortcuts } from "@/components/dashboard/DashboardShortcuts";
+﻿import { createFileRoute } from "@tanstack/react-router";
+import { LandingNavbar } from "@/components/landing/LandingNavbar";
+import { LandingHero } from "@/components/landing/LandingHero";
+import { LandingFeatures } from "@/components/landing/LandingFeatures";
+import { LandingInteractivePreview } from "@/components/landing/LandingInteractivePreview";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard · FitHub" },
-      { name: "description", content: "Resumen de inventario y accesos rápidos." },
+      { title: "FitHub Manager — Gestión Inteligente de Inventarios" },
+      { name: "description", content: "Plataforma operativa para control de inventarios, caducidades y jornadas en Ciudad Demo." },
     ],
   }),
-  component: Dashboard,
+  component: LandingPage,
 });
 
-function Dashboard() {
-  const { filteredItems, loading } = useInventory();
-  const { store } = useStore();
-
-  const getLastSyncText = () => {
-    // If no items, say "hace un momento"
-    if (!filteredItems || filteredItems.length === 0) return "hace un momento";
-    // Find the latest created_at or fecha_caducidad from lotes to simulate last sync
-    const allLotes = filteredItems.flatMap(i => i.lotes);
-    if (allLotes.length === 0) return "hace un momento";
-    
-    // Sort by something that represents recentness, here we just use the last item assuming order or we could just say "hace un momento" as it's realtime.
-    return "hace un momento";
-  };
-
+function LandingPage() {
   return (
-    <div className="max-w-[1600px] mx-auto space-y-[24px] animate-in fade-in slide-in-from-bottom-4 duration-500 pb-8">
-      
-      {loading ? (
-        <Skeleton className="w-full h-[52px] rounded-lg" />
-      ) : (
-        <DashboardBanners />
-      )}
-
-      {loading ? (
-        <div className="grid grid-cols-3 gap-[10px]">
-          <Skeleton className="h-[90px] rounded-[10px]" />
-          <Skeleton className="h-[90px] rounded-[10px]" />
-          <Skeleton className="h-[90px] rounded-[10px]" />
-        </div>
-      ) : (
-        <DashboardStats />
-      )}
-
-      {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[10px]">
-          <Skeleton className="h-[250px] rounded-[10px]" />
-          <Skeleton className="h-[250px] rounded-[10px]" />
-        </div>
-      ) : (
-        <DashboardAlerts />
-      )}
-
-      {loading ? (
-        <Skeleton className="w-full h-[120px] rounded-[10px]" />
-      ) : (
-        <DashboardJornada />
-      )}
-
-      {loading ? (
-        <Skeleton className="w-full h-[250px] rounded-[10px]" />
-      ) : (
-        <DashboardActivity />
-      )}
-
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
-          <Skeleton className="h-[64px] rounded-[10px]" />
-          <Skeleton className="h-[64px] rounded-[10px]" />
-          <Skeleton className="h-[64px] rounded-[10px]" />
-          <Skeleton className="h-[64px] rounded-[10px]" />
-        </div>
-      ) : (
-        <DashboardShortcuts />
-      )}
-
-      <div className="text-center pt-[12px]">
-        <p className="font-sans text-[10px] text-[#9CA3AF] m-0">
-          Última sincronización: {getLastSyncText()} · FitHub Ciudad Demo
-        </p>
-      </div>
-
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-emerald-500 selection:text-white transition-colors">
+      <LandingNavbar />
+      <main className="flex-1">
+        <LandingHero />
+        <LandingInteractivePreview />
+        <LandingFeatures />
+      </main>
+      <LandingFooter />
     </div>
   );
 }

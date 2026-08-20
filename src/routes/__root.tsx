@@ -1,4 +1,5 @@
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+﻿import { Outlet, createRootRoute, useRouterState } from "@tanstack/react-router";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ProfileProvider, useProfile } from "@/context/ProfileContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
@@ -6,9 +7,13 @@ import { TopBar } from "@/components/layout/TopBar";
 import { StoreProvider } from "@/context/StoreContext";
 import { InventoryProvider } from "@/context/InventoryContext";
 import { TimeLogProvider } from "@/context/TimeLogContext";
-import { Toaster } from "@/components/ui/sonner";
 import { VisitProvider } from "@/context/VisitContext";
+import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
+import { GlowBackground } from "@/components/layout/GlowBackground";
+import { AuthGuard } from "@/components/auth/AuthGuard";
+import { useState, useEffect } from "react";
+import { ArrowUp } from "lucide-react";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -28,7 +33,7 @@ function NotFoundComponent() {
         <div className="mt-6">
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
           >
             Ir al inicio
           </a>
@@ -48,7 +53,7 @@ function ErrorComponent({ error }: { error: Error }) {
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
           >
             Intentar de nuevo
           </button>
@@ -63,11 +68,6 @@ function ErrorComponent({ error }: { error: Error }) {
     </div>
   );
 }
-
-import { GlowBackground } from "@/components/layout/GlowBackground";
-import { Gatekeeper } from "@/components/layout/Gatekeeper";
-import { useState, useEffect } from "react";
-import { ArrowUp } from "lucide-react";
 
 function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
@@ -104,7 +104,7 @@ function ScrollToTopButton() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-[#1C4A2E] hover:bg-[#1C4A2E]/90 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white flex items-center justify-center shadow-xl border border-emerald-700/20 dark:border-emerald-500/30 transition-all hover:scale-110 active:scale-95 duration-300 cursor-pointer animate-in fade-in zoom-in-75 duration-300"
+      className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white flex items-center justify-center shadow-xl border border-emerald-500/30 transition-all hover:scale-110 active:scale-95 duration-300 cursor-pointer animate-in fade-in zoom-in-75 duration-300"
       aria-label="Volver arriba"
     >
       <ArrowUp className="h-5 w-5 stroke-[2.5]" />
@@ -114,8 +114,10 @@ function ScrollToTopButton() {
 
 function ConnectionLogger() {
   const { profile } = useProfile();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     let active = true;
 
     const logConnection = async () => {
@@ -135,7 +137,7 @@ function ConnectionLogger() {
 
         await supabase.from("conexiones").insert({
           usuario: profile.name || "Mercaimpulsadora",
-          ip: ip
+          ip: ip,
         });
       } catch (err) {
         console.error("Error al registrar conexión:", err);
@@ -147,14 +149,27 @@ function ConnectionLogger() {
     return () => {
       active = false;
     };
-  }, [profile.name]);
+  }, [profile.name, isAuthenticated]);
 
   return null;
 }
 
-function RootComponent() {
+function AppLayout() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isLandingPage = pathname === "/";
+
+  if (isLandingPage) {
+    return (
+      <>
+        <Outlet />
+        <Toaster richColors position="top-right" />
+        <ScrollToTopButton />
+      </>
+    );
+  }
+
   return (
-    <Gatekeeper>
+    <AuthGuard>
       <ProfileProvider>
         <ConnectionLogger />
         <StoreProvider>
@@ -180,6 +195,14 @@ function RootComponent() {
           </InventoryProvider>
         </StoreProvider>
       </ProfileProvider>
-    </Gatekeeper>
+    </AuthGuard>
+  );
+}
+
+function RootComponent() {
+  return (
+    <AuthProvider>
+      <AppLayout />
+    </AuthProvider>
   );
 }

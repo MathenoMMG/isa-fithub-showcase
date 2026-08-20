@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Clock, Settings, LogIn, FileBarChart, Plus } from "lucide-react";
+import { LayoutDashboard, Package, Clock, Settings, LogIn, FileBarChart, Plus, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +15,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { AddProductDialog } from "@/components/inventory/AddProductDialog";
 import { useProfile } from "@/context/ProfileContext";
+import { useAuth } from "@/context/AuthContext";
 
 const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Inventario", url: "/inventario", icon: Package },
   { title: "Informes", url: "/informes", icon: FileBarChart },
   { title: "Horarios", url: "/horarios", icon: Clock },
@@ -26,15 +27,16 @@ const items = [
 
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
-  const isActive = (p: string) => (p === "/" ? currentPath === "/" : currentPath.startsWith(p));
+  const isActive = (p: string) => (p === "/dashboard" ? currentPath === "/dashboard" : currentPath.startsWith(p));
   const { profile } = useProfile();
+  const { signOut } = useAuth();
 
   const isPremium = profile.stylePreset === "obsidian";
 
   return (
     <Sidebar collapsible="icon" className="bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-r-slate-200 dark:border-r-slate-800">
       <SidebarHeader className={`p-4 group-data-[collapsible=icon]:p-2 transition-all ${isPremium ? "border-b border-border dark:border-primary/5" : "border-b border-sidebar-border"}`}>
-        <Link to="/" className="flex items-center gap-3 justify-start hover:opacity-80 transition-opacity px-2">
+        <Link to="/dashboard" className="flex items-center gap-3 justify-start hover:opacity-80 transition-opacity px-2">
           <div className="h-10 w-10 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 flex items-center justify-center shrink-0 overflow-hidden rounded-xl transition-all">
             <img src="/isa.svg" alt="FitHub Logo" className="h-full w-full object-contain" />
           </div>
@@ -139,6 +141,14 @@ export function AppSidebar() {
               {isPremium ? "REGISTRO_TURNO" : "Registrar Turno"}
             </span>
           </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => signOut()}
+          className="h-10 text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-semibold rounded-xl gap-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0 cursor-pointer"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="group-data-[collapsible=icon]:hidden">Cerrar Sesión</span>
         </Button>
       </SidebarFooter>
     </Sidebar>
