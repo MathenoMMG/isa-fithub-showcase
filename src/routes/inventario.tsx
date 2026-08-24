@@ -161,7 +161,7 @@ function InventarioPage() {
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-50 transition-colors">Inventario</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors">
-            Tienda: <span className="font-semibold text-slate-700 dark:text-slate-300">{store === "Ambas" ? "Ambas" : store}</span>
+            Tienda: <span className="font-semibold text-slate-700 dark:text-slate-300">{store === "Ambas" || store === "Todas" ? "Todas" : store}</span>
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">

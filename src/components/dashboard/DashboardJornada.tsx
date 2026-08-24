@@ -222,7 +222,7 @@ export function DashboardJornada() {
                   </button>
                 </Link>
                 <span className="font-mono text-[9px] text-muted-foreground/70 uppercase hidden lg:inline">
-                  {store === "Ambas" ? "MNG/BCG" : store}
+                  {store === "Ambas" || store === "Todas" ? "TODAS" : store}
                 </span>
               </div>
             )}

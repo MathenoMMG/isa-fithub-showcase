@@ -58,7 +58,7 @@ export function ClockInOutCard() {
         <div className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-slate-50 tabular-nums mt-2">{formatInBogota(now, "HH:mm:ss")}</div>
         <div className="text-sm text-slate-500 mt-2">
           Tienda activa: <span className="font-semibold text-emerald-700 dark:text-emerald-500">{tiendaName}</span>
-          {store === "Ambas" && <span className="text-slate-400"> (por rotación)</span>}
+          {(store === "Ambas" || store === "Todas") && <span className="text-slate-400"> (por rotación)</span>}
         </div>
         {horarioHoy && (
           <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">
