@@ -1,5 +1,5 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto, Merma, MotivoMerma, StoreId } from "@/types/inventory";
+import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto, Merma, MotivoMerma, StoreId, Traspaso, TraspasoInput } from "@/types/inventory";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
 import { useAuth } from "./AuthContext";
@@ -15,6 +15,7 @@ interface InventoryContextValue {
   items: ProductoConLotes[];
   filteredItems: ProductoConLotes[];
   mermas: Merma[];
+  traspasos: Traspaso[];
   loading: boolean;
   addProduct: (input: NewProductInput & { cantidad: number; fecha_caducidad: string | null }) => Promise<void>;
   updateProduct: (productId: string, updates: Partial<ProductoConLotes>) => Promise<void>;
@@ -29,6 +30,8 @@ interface InventoryContextValue {
   registerMerma: (productId: string, loteId: string | null, cantidad: number, motivo: MotivoMerma, notas?: string) => Promise<void>;
   undoMerma: (mermaId: string) => Promise<boolean>;
   adjustLote: (productId: string, loteId: string, delta: number) => Promise<void>;
+  transferStock: (input: TraspasoInput) => Promise<void>;
+  undoTraspaso: (traspasoId: string) => Promise<boolean>;
   updateProductCategories: (updates: Record<string, string>) => Promise<void>;
   refreshData: () => Promise<void>;
 }
@@ -37,10 +40,12 @@ const InventoryContext = createContext<InventoryContextValue | null>(null);
 
 const TIENDA_MAP: Record<number, StoreId> = { 1: "Norte", 2: "Sur", 3: "Centro" };
 const MERMAS_RECORD_ID = "00000000-0000-0000-0000-000000000002";
+const TRASPASOS_RECORD_ID = "00000000-0000-0000-0000-000000000003";
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ProductoConLotes[]>([]);
   const [mermas, setMermas] = useState<Merma[]>([]);
+  const [traspasos, setTraspasos] = useState<Traspaso[]>([]);
   const [loading, setLoading] = useState(true);
   const { store } = useStore();
   const { isAuthenticated, user } = useAuth();
@@ -95,6 +100,22 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         }
       } catch (e) {
         console.error("Error fetching mermas log:", e);
+      }
+
+      // 4. Fetch global traspasos log from Supabase
+      try {
+        const { data: traspasosData } = await supabase
+          .from("visitas")
+          .select("notas")
+          .eq("id", TRASPASOS_RECORD_ID)
+          .maybeSingle();
+
+        if (traspasosData && traspasosData.notas) {
+          const parsedTraspasos = JSON.parse(traspasosData.notas);
+          setTraspasos(parsedTraspasos || []);
+        }
+      } catch (e) {
+        console.error("Error fetching traspasos log:", e);
       }
 
       // Aggregate sales per product and per lote
@@ -523,6 +544,184 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const transferStock = async (input: TraspasoInput) => {
+    const { origenTiendaId, destinoTiendaId, productoOrigenId, loteOrigenId, cantidad, motivo } = input;
+
+    if (origenTiendaId === destinoTiendaId) {
+      throw new Error("La tienda de origen y destino no pueden ser la misma.");
+    }
+    if (cantidad <= 0) {
+      throw new Error("La cantidad a transferir debe ser mayor a 0.");
+    }
+
+    const productoOrigen = items.find((p) => p.id === productoOrigenId);
+    if (!productoOrigen) throw new Error("Producto de origen no encontrado.");
+
+    const loteOrigen = productoOrigen.lotes.find((l) => l.id === loteOrigenId);
+    if (!loteOrigen) throw new Error("Lote de origen no encontrado.");
+
+    if (loteOrigen.cantidad < cantidad) {
+      throw new Error(`Stock insuficiente en el lote. Disponible: ${loteOrigen.cantidad}`);
+    }
+
+    // 1. Buscar si el producto ya existe en la tienda de destino (por articulo/SKU o nombre)
+    let productoDestino = items.find(
+      (p) => p.tienda_id === destinoTiendaId && (p.articulo === productoOrigen.articulo || p.nombre.trim().toLowerCase() === productoOrigen.nombre.trim().toLowerCase())
+    );
+
+    let productoDestinoId: string;
+
+    if (productoDestino) {
+      productoDestinoId = productoDestino.id;
+    } else {
+      // Crear el producto en la tienda destino
+      const { data: newProd, error: newProdErr } = await supabase
+        .from("productos")
+        .insert({
+          tienda_id: destinoTiendaId,
+          articulo: productoOrigen.articulo,
+          sicol: productoOrigen.sicol,
+          nombre: productoOrigen.nombre,
+          categoria: productoOrigen.categoria,
+          proveedor_nombre: productoOrigen.proveedor_nombre,
+          proveedor_codigo: productoOrigen.proveedor_codigo,
+          notas: productoOrigen.notas,
+        })
+        .select()
+        .single();
+
+      if (newProdErr) throw newProdErr;
+      productoDestinoId = newProd.id;
+    }
+
+    // 2. Buscar si en el destino ya existe un lote con la misma fecha de caducidad
+    const loteDestinoMismaCaducidad = productoDestino?.lotes.find(
+      (l) => (l.fecha_caducidad || null) === (loteOrigen.fecha_caducidad || null)
+    );
+
+    if (loteDestinoMismaCaducidad) {
+      // Incrementar cantidad en lote existente de destino
+      const { error: incErr } = await supabase
+        .from("lotes")
+        .update({ cantidad: loteDestinoMismaCaducidad.cantidad + cantidad })
+        .eq("id", loteDestinoMismaCaducidad.id);
+
+      if (incErr) throw incErr;
+    } else {
+      // Insertar nuevo lote en destino
+      const { error: newLoteErr } = await supabase
+        .from("lotes")
+        .insert({
+          producto_id: productoDestinoId,
+          cantidad,
+          fecha_caducidad: loteOrigen.fecha_caducidad || null,
+          notas: `Traspaso desde ${TIENDA_MAP[origenTiendaId]} (${new Date().toLocaleDateString()})`,
+        });
+
+      if (newLoteErr) throw newLoteErr;
+    }
+
+    // 3. Deducir cantidad del lote en origen
+    const newQtyOrigen = loteOrigen.cantidad - cantidad;
+    const { error: decErr } = await supabase
+      .from("lotes")
+      .update({ cantidad: newQtyOrigen })
+      .eq("id", loteOrigenId);
+
+    if (decErr) throw decErr;
+
+    // 4. Registrar en el historial de traspasos (Global Audit Record)
+    const newTraspaso: Traspaso = {
+      id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
+      origen_tienda_id: origenTiendaId,
+      origen_tienda_nombre: TIENDA_MAP[origenTiendaId] || "Norte",
+      destino_tienda_id: destinoTiendaId,
+      destino_tienda_nombre: TIENDA_MAP[destinoTiendaId] || "Sur",
+      producto_id_origen: productoOrigenId,
+      producto_id_destino: productoDestinoId,
+      articulo: productoOrigen.articulo,
+      nombre: productoOrigen.nombre,
+      categoria: productoOrigen.categoria,
+      lote_id_origen: loteOrigenId,
+      cantidad,
+      fecha_caducidad: loteOrigen.fecha_caducidad,
+      motivo: motivo || "Reubicación de stock",
+      usuario: user?.user_metadata?.name || user?.email || "Usuario",
+      created_at: new Date().toISOString(),
+    };
+
+    const updatedTraspasos = [newTraspaso, ...traspasos];
+    setTraspasos(updatedTraspasos);
+
+    try {
+      await supabase
+        .from("visitas")
+        .upsert(
+          {
+            id: TRASPASOS_RECORD_ID,
+            tienda_id: 1,
+            fecha: "2099-12-31",
+            notas: JSON.stringify(updatedTraspasos),
+          },
+          { onConflict: "id" }
+        );
+    } catch (e) {
+      console.error("Error saving traspasos log to Supabase:", e);
+    }
+
+    await fetchData();
+    toast.success(`Traspaso exitoso: ${cantidad} uds de "${productoOrigen.nombre}" a ${TIENDA_MAP[destinoTiendaId]}`);
+  };
+
+  const undoTraspaso = async (traspasoId: string): Promise<boolean> => {
+    try {
+      const targetTraspaso = traspasos.find((t) => t.id === traspasoId);
+      if (!targetTraspaso) return false;
+
+      // 1. Restaurar stock en origen
+      const prodOrigen = items.find((p) => p.id === targetTraspaso.producto_id_origen);
+      const loteOrigen = prodOrigen?.lotes.find((l) => l.id === targetTraspaso.lote_id_origen);
+      if (loteOrigen) {
+        await supabase
+          .from("lotes")
+          .update({ cantidad: loteOrigen.cantidad + targetTraspaso.cantidad })
+          .eq("id", targetTraspaso.lote_id_origen);
+      }
+
+      // 2. Deducir stock en destino si es posible
+      if (targetTraspaso.producto_id_destino) {
+        const prodDestino = items.find((p) => p.id === targetTraspaso.producto_id_destino);
+        const loteDestino = prodDestino?.lotes.find(
+          (l) => (l.fecha_caducidad || null) === (targetTraspaso.fecha_caducidad || null)
+        );
+        if (loteDestino) {
+          const remQty = Math.max(0, loteDestino.cantidad - targetTraspaso.cantidad);
+          await supabase
+            .from("lotes")
+            .update({ cantidad: remQty })
+            .eq("id", loteDestino.id);
+        }
+      }
+
+      // 3. Actualizar historial
+      const filtered = traspasos.filter((t) => t.id !== traspasoId);
+      setTraspasos(filtered);
+
+      await supabase
+        .from("visitas")
+        .update({ notas: JSON.stringify(filtered) })
+        .eq("id", TRASPASOS_RECORD_ID);
+
+      await fetchData();
+      toast.success("Traspaso revertido exitosamente.");
+      return true;
+    } catch (err) {
+      console.error("Error undoing traspaso:", err);
+      toast.error("No se pudo revertir el traspaso.");
+      return false;
+    }
+  };
+
   const updateProductCategories = async (updates: Record<string, string>) => {
     const promises = Object.entries(updates).map(([productId, newCategory]) =>
       supabase
@@ -557,6 +756,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         items,
         filteredItems,
         mermas,
+        traspasos,
         loading,
         addProduct,
         updateProduct,
@@ -571,6 +771,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         registerMerma,
         undoMerma,
         adjustLote,
+        transferStock,
+        undoTraspaso,
         updateProductCategories,
         refreshData: fetchData,
       }}

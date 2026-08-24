@@ -29,7 +29,7 @@ export const Route = createFileRoute("/ajustes")({
 
 function AjustesPage() {
   const { store, setStore } = useStore();
-  const { refreshData, filteredItems } = useInventory();
+  const { refreshData, filteredItems, mermas, traspasos } = useInventory();
   const { refreshLogs, logs } = useTimeLog();
   const { visitas } = useVisitas();
   const { theme, setTheme, profile, updateProfile } = useProfile();
@@ -132,10 +132,26 @@ function AjustesPage() {
       const wsMermas = XLSX.utils.json_to_sheet(mermasData);
       XLSX.utils.book_append_sheet(wb, wsMermas, "Mermas");
 
+      // Hoja 5: Traspasos
+      const traspasosData = (traspasos || []).map(t => ({
+        ID: t.id,
+        SKU: t.articulo,
+        Producto: t.nombre,
+        Origen: t.origen_tienda_nombre,
+        Destino: t.destino_tienda_nombre,
+        Cantidad: t.cantidad,
+        Fecha_Caducidad: t.fecha_caducidad || "—",
+        Motivo: t.motivo || "—",
+        Usuario: t.usuario || "—",
+        Fecha: t.created_at,
+      }));
+      const wsTraspasos = XLSX.utils.json_to_sheet(traspasosData);
+      XLSX.utils.book_append_sheet(wb, wsTraspasos, "Traspasos");
+
       // Guardar
       const today = new Date().toISOString().slice(0,10);
       XLSX.writeFile(wb, `Backup_Global_FitHub_${today}.xlsx`);
-      toast.success("Backup exportado correctamente");
+      toast.success("Backup exportado correctamente (5 hojas)");
     } catch(err) {
       toast.error("Error exportando backup");
       console.error(err);

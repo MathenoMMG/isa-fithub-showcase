@@ -87,7 +87,35 @@ export interface NewProductInput {
   notas?: string;
 }
 
+export interface Traspaso {
+  id: string;
+  origen_tienda_id: number;
+  origen_tienda_nombre: StoreId;
+  destino_tienda_id: number;
+  destino_tienda_nombre: StoreId;
+  producto_id_origen: string;
+  producto_id_destino?: string;
+  articulo: string;
+  nombre: string;
+  categoria?: string | null;
+  lote_id_origen: string;
+  cantidad: number;
+  fecha_caducidad: string | null;
+  motivo?: string | null;
+  usuario?: string;
+  created_at: string;
+}
+
 export interface NewLoteInput {
   cantidad: number;
   fecha_caducidad: string | null;
+}
+
+export interface TraspasoInput {
+  origenTiendaId: number;
+  destinoTiendaId: number;
+  productoOrigenId: string;
+  loteOrigenId: string;
+  cantidad: number;
+  motivo?: string;
 }

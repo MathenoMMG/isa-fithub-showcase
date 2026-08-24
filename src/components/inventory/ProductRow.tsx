@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History, AlertOctagon } from "lucide-react";
+import { ChevronDown, ChevronRight, Minus, Plus, ShoppingCart, Trash2, Edit2, Check, X, Undo2, History, AlertOctagon, ArrowLeftRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import { useInventory } from "@/context/InventoryContext";
 import { ExpiryBadge } from "./ExpiryBadge";
 import { AddLoteDialog } from "./AddLoteDialog";
 import { MermaDialog } from "./MermaDialog";
+import { TransferStockDialog } from "./TransferStockDialog";
 import { formatExpiryDate, getEarliestExpiry, getExpiryStatus, getTotalQty, getWorstStatus } from "@/lib/expiry";
 import { useProfile } from "@/context/ProfileContext";
 
@@ -259,6 +260,24 @@ export function ProductRow({ product, defaultOpen = false }: Props) {
                       >
                         <Undo2 className="h-5 w-5" />
                       </Button>
+
+                      <TransferStockDialog
+                        initialProductId={product.id}
+                        initialLoteId={lote.id}
+                        customTrigger={
+                          <Button
+                            disabled={lote.cantidad <= 0}
+                            variant="outline"
+                            size="icon"
+                            className={`h-11 w-11 border-emerald-200 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 ${
+                              isPremium ? "rounded-[2px]" : "rounded-xl"
+                            }`}
+                            title="Trasladar stock de este lote a otra tienda"
+                          >
+                            <ArrowLeftRight className="h-5 w-5" />
+                          </Button>
+                        }
+                      />
 
                       <Button
                         disabled={lote.cantidad <= 0}

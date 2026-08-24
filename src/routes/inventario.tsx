@@ -17,6 +17,7 @@ import { ExportExcelButton } from "@/components/inventory/ExportExcelButton";
 import { AddProductDialog } from "@/components/inventory/AddProductDialog";
 import { CategoryManagerDialog } from "@/components/inventory/CategoryManagerDialog";
 import { TrashBinDialog } from "@/components/inventory/TrashBinDialog";
+import { TransferStockDialog } from "@/components/inventory/TransferStockDialog";
 import { useInventory } from "@/context/InventoryContext";
 import { useStore } from "@/context/StoreContext";
 import { getExpiryStatus, getEarliestExpiry } from "@/lib/expiry";
@@ -164,6 +165,7 @@ function InventarioPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <TransferStockDialog />
           <ExportExcelButton items={visibleItems} />
           <CategoryManagerDialog />
           <TrashBinDialog />
