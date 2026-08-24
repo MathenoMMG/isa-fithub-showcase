@@ -135,7 +135,7 @@ export function getCriticalStock(
     for (const lote of prod.lotes) {
       if (lote.cantidad <= 0 || !lote.fecha_caducidad) continue;
       const status = getExpiryStatus(lote.fecha_caducidad);
-      if (status === "expired" || status === "warning") {
+      if (status === "vencido" || status === "proximo") {
         const dias = Math.ceil(
           (new Date(lote.fecha_caducidad).getTime() - Date.now()) /
             (1000 * 60 * 60 * 24),

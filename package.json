@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "import-excel": "npx tsx scripts/import-excel.ts",
-    "test": "npx tsx tests/test-transfers.ts"
+    "test:unit": "npx tsx tests/test-services.ts",
+    "test:integration": "npx tsx tests/test-transfers.ts",
+    "test": "npx tsx tests/test-services.ts; npx tsx tests/test-transfers.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
