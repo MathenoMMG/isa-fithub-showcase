@@ -1,10 +1,39 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ProductoConLotes, Lote, NewProductInput, NewLoteInput, Producto, Merma, MotivoMerma, StoreId, Traspaso, TraspasoInput } from "@/types/inventory";
-import { supabase } from "@/lib/supabase";
 import { useStore } from "./StoreContext";
 import { useAuth } from "./AuthContext";
 import { addPendingOp } from "@/lib/offline";
 import { toast } from "sonner";
+
+// ── Service layer imports ────────────────────────────────────────────
+import {
+  fetchInventory,
+  createProduct as svcCreateProduct,
+  deleteProduct as svcDeleteProduct,
+  restoreProduct as svcRestoreProduct,
+  updateProduct as svcUpdateProduct,
+  updateProductCategories as svcUpdateCategories,
+  createLote as svcCreateLote,
+  deleteLote as svcDeleteLote,
+  adjustLoteQuantity,
+  recordSale,
+  undoLastSale,
+} from "@/services/inventory.service";
+
+import {
+  fetchMermas as svcFetchMermas,
+  registerMerma as svcRegisterMerma,
+  undoMerma as svcUndoMerma,
+} from "@/services/mermas.service";
+
+import {
+  fetchTraspasos as svcFetchTraspasos,
+  executeTransfer,
+  saveTraspasosLog,
+  undoTransfer,
+} from "@/services/transfers.service";
+
+// ── Types ────────────────────────────────────────────────────────────
 
 export interface DeletedProduct {
   deletedAt: string;
@@ -38,9 +67,9 @@ interface InventoryContextValue {
 
 const InventoryContext = createContext<InventoryContextValue | null>(null);
 
-const TIENDA_MAP: Record<number, StoreId> = { 1: "Norte", 2: "Sur", 3: "Centro" };
-const MERMAS_RECORD_ID = "00000000-0000-0000-0000-000000000002";
-const TRASPASOS_RECORD_ID = "00000000-0000-0000-0000-000000000003";
+// ─────────────────────────────────────────────────────────────────────
+// Provider
+// ─────────────────────────────────────────────────────────────────────
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ProductoConLotes[]>([]);
@@ -68,83 +97,20 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ── Data Fetcher (delegates to services) ───────────────────────────
+
   const fetchData = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
     try {
-      // 1. Fetch products with lotes
-      const { data: productos, error: pErr } = await supabase
-        .from("productos")
-        .select("*, lotes(*)")
-        .order("nombre");
-
-      if (pErr) throw pErr;
-
-      // 2. Fetch sales totals grouped by producto_id and lote_id
-      const { data: ventasTotals, error: vErr } = await supabase
-        .from("ventas")
-        .select("producto_id, lote_id, cantidad");
-
-      if (vErr) throw vErr;
-
-      // 3. Fetch global mermas log from Supabase
-      try {
-        const { data: mermasData } = await supabase
-          .from("visitas")
-          .select("notas")
-          .eq("id", MERMAS_RECORD_ID)
-          .maybeSingle();
-
-        if (mermasData && mermasData.notas) {
-          const parsedMermas = JSON.parse(mermasData.notas);
-          setMermas(parsedMermas || []);
-        }
-      } catch (e) {
-        console.error("Error fetching mermas log:", e);
-      }
-
-      // 4. Fetch global traspasos log from Supabase
-      try {
-        const { data: traspasosData } = await supabase
-          .from("visitas")
-          .select("notas")
-          .eq("id", TRASPASOS_RECORD_ID)
-          .maybeSingle();
-
-        if (traspasosData && traspasosData.notas) {
-          const parsedTraspasos = JSON.parse(traspasosData.notas);
-          setTraspasos(parsedTraspasos || []);
-        }
-      } catch (e) {
-        console.error("Error fetching traspasos log:", e);
-      }
-
-      // Aggregate sales per product and per lote
-      const salesMap: Record<string, number> = {};
-      const loteSalesMap: Record<string, number> = {};
-      for (const v of ventasTotals || []) {
-        salesMap[v.producto_id] = (salesMap[v.producto_id] || 0) + v.cantidad;
-        if (v.lote_id) {
-          loteSalesMap[v.lote_id] = (loteSalesMap[v.lote_id] || 0) + v.cantidad;
-        }
-      }
-
-      const enriched: ProductoConLotes[] = (productos || []).map((p) => ({
-        ...p,
-        tienda_nombre: TIENDA_MAP[p.tienda_id] || "Norte",
-        vendidos_total: salesMap[p.id] || 0,
-        lotes: (p.lotes || [])
-          .map((l: Lote) => ({
-            ...l,
-            vendidos: loteSalesMap[l.id] || 0,
-          }))
-          .sort(
-            (a: Lote, b: Lote) =>
-              new Date(a.fecha_caducidad || "9999-12-31").getTime() -
-              new Date(b.fecha_caducidad || "9999-12-31").getTime(),
-          ),
-      }));
+      const [enriched, mermasData, traspasosData] = await Promise.all([
+        fetchInventory(),
+        svcFetchMermas(),
+        svcFetchTraspasos(),
+      ]);
 
       setItems(enriched);
+      setMermas(mermasData);
+      setTraspasos(traspasosData);
     } catch (err) {
       console.error("Error fetching inventory:", err);
     } finally {
@@ -159,10 +125,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Carga inicial
     fetchData(true);
 
-    // Polling cada 10 segundos para mantener sincronizadas las sesiones en tiempo real
     const interval = setInterval(() => {
       fetchData(false);
     }, 10000);
@@ -170,36 +134,18 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [fetchData, isAuthenticated]);
 
+  // ── Product Operations ─────────────────────────────────────────────
+
   const addProduct = async (
     input: NewProductInput & { cantidad: number; fecha_caducidad: string | null },
   ) => {
     try {
-      if (!window.navigator.onLine) {
-        throw new Error("offline");
-      }
-      
-      const { cantidad, fecha_caducidad, ...productData } = input;
-      const { data: product, error: pErr } = await supabase
-        .from("productos")
-        .insert(productData)
-        .select()
-        .single();
-
-      if (pErr) throw pErr;
-
-      if (cantidad > 0) {
-        const { error: lErr } = await supabase.from("lotes").insert({
-          producto_id: product.id,
-          cantidad,
-          fecha_caducidad: fecha_caducidad || null,
-        });
-        if (lErr) throw lErr;
-      }
-
+      if (!window.navigator.onLine) throw new Error("offline");
+      await svcCreateProduct(input);
       await fetchData();
     } catch (err) {
       console.warn("Error adding product, saving offline:", err);
-      addPendingOp('add_product', input);
+      addPendingOp("add_product", input);
       toast.warning("Sin conexión: Producto guardado localmente en cola.");
     }
   };
@@ -211,62 +157,27 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         deletedAt: new Date().toISOString(),
         product: productToDelete,
       };
-      const updatedTrash = [deletedItem, ...trashBin.filter(t => t.product.id !== productId)].slice(0, 50);
+      const updatedTrash = [deletedItem, ...trashBin.filter((t) => t.product.id !== productId)].slice(0, 50);
       saveTrashBin(updatedTrash);
     }
 
-    const { error } = await supabase.from("productos").delete().eq("id", productId);
-    if (error) throw error;
+    await svcDeleteProduct(productId);
     await fetchData();
   };
 
-  const restoreProduct = async (productId: string) => {
+  const restoreProductHandler = async (productId: string) => {
     const deletedEntry = trashBin.find((t) => t.product.id === productId);
-    if (!deletedEntry) {
-      throw new Error("Producto no encontrado en la papelera");
-    }
-
-    const { product } = deletedEntry;
+    if (!deletedEntry) throw new Error("Producto no encontrado en la papelera");
 
     try {
-      const { error: pErr } = await supabase
-        .from("productos")
-        .insert({
-          id: product.id,
-          tienda_id: product.tienda_id,
-          articulo: product.articulo,
-          sicol: product.sicol,
-          nombre: product.nombre,
-          categoria: product.categoria,
-          proveedor_nombre: product.proveedor_nombre,
-          proveedor_codigo: product.proveedor_codigo,
-          notas: product.notas,
-        });
-
-      if (pErr) throw pErr;
-
-      if (product.lotes && product.lotes.length > 0) {
-        const lotesToInsert = product.lotes.map((l) => ({
-          id: l.id,
-          producto_id: product.id,
-          cantidad: l.cantidad,
-          fecha_caducidad: l.fecha_caducidad,
-          fecha_ingreso: l.fecha_ingreso,
-          notas: l.notas,
-        }));
-
-        const { error: lErr } = await supabase.from("lotes").insert(lotesToInsert);
-        if (lErr) throw lErr;
-      }
-
+      await svcRestoreProduct(deletedEntry.product);
       const updatedTrash = trashBin.filter((t) => t.product.id !== productId);
       saveTrashBin(updatedTrash);
-
       await fetchData();
-      toast.success(`Producto "${product.nombre}" restaurado exitosamente.`);
+      toast.success(`Producto "${deletedEntry.product.nombre}" restaurado exitosamente.`);
     } catch (err) {
       console.error("Error restoring product:", err);
-      toast.error(`Error al restaurar "${product.nombre}": ` + (err as Error).message);
+      toast.error(`Error al restaurar "${deletedEntry.product.nombre}": ` + (err as Error).message);
       throw err;
     }
   };
@@ -276,171 +187,134 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     toast.success("Papelera de reciclaje vaciada.");
   };
 
-  const updateProduct = async (productId: string, updates: Partial<Producto>) => {
-    const { error } = await supabase.from("productos").update(updates).eq("id", productId);
-    if (error) throw error;
-    await fetchData(true); // skip loading state for smooth UI
+  const updateProductHandler = async (productId: string, updates: Partial<Producto>) => {
+    await svcUpdateProduct(productId, updates);
+    await fetchData(true);
   };
+
+  const updateProductCategories = async (updates: Record<string, string>) => {
+    await svcUpdateCategories(updates);
+    await fetchData();
+  };
+
+  // ── Lote Operations ────────────────────────────────────────────────
 
   const addLote = async (productId: string, input: NewLoteInput) => {
     try {
-      if (!window.navigator.onLine) {
-        throw new Error("offline");
-      }
-      const { error } = await supabase.from("lotes").insert({
-        producto_id: productId,
-        cantidad: input.cantidad,
-        fecha_caducidad: input.fecha_caducidad || null,
-      });
-      if (error) throw error;
+      if (!window.navigator.onLine) throw new Error("offline");
+      await svcCreateLote(productId, input);
       await fetchData();
     } catch (err) {
       console.warn("Error adding lote, saving offline:", err);
-      addPendingOp('add_lote', { producto_id: productId, cantidad: input.cantidad, fecha_caducidad: input.fecha_caducidad });
+      addPendingOp("add_lote", { producto_id: productId, cantidad: input.cantidad, fecha_caducidad: input.fecha_caducidad });
       toast.warning("Sin conexión: Nuevo lote guardado localmente en cola.");
     }
   };
 
   const removeLote = async (_productId: string, loteId: string) => {
-    const { error } = await supabase.from("lotes").delete().eq("id", loteId);
-    if (error) throw error;
+    await svcDeleteLote(loteId);
     await fetchData();
   };
 
+  // ── Sales ──────────────────────────────────────────────────────────
+
   const sellFromLote = async (productId: string, loteId: string, qty = 1) => {
     try {
-      if (!window.navigator.onLine) {
-        throw new Error("offline");
-      }
-      // Record the sale
-      const { error: vErr } = await supabase.from("ventas").insert({
-        producto_id: productId,
-        lote_id: loteId,
-        cantidad: qty,
-      });
-      if (vErr) throw vErr;
+      if (!window.navigator.onLine) throw new Error("offline");
 
-      // Decrement lote quantity
-      const lote = items
-        .find((p) => p.id === productId)
-        ?.lotes.find((l) => l.id === loteId);
+      await recordSale(productId, loteId, qty);
 
+      const lote = items.find((p) => p.id === productId)?.lotes.find((l) => l.id === loteId);
       if (lote) {
         const newQty = Math.max(0, lote.cantidad - qty);
-        const { error: lErr } = await supabase
-          .from("lotes")
-          .update({ cantidad: newQty })
-          .eq("id", loteId);
-        if (lErr) throw lErr;
+        await adjustLoteQuantity(loteId, newQty);
       }
 
       await fetchData();
     } catch (err) {
       console.warn("Error registering sale, saving offline:", err);
-      addPendingOp('sell', { producto_id: productId, lote_id: loteId, cantidad: qty });
+      addPendingOp("sell", { producto_id: productId, lote_id: loteId, cantidad: qty });
       toast.warning("Sin conexión: Venta guardada localmente.");
-      
+
       // Optimistic UI Update
-      setItems(prev => prev.map(p => {
-        if (p.id !== productId) return p;
-        return {
-          ...p,
-          lotes: p.lotes.map(l => {
-            if (l.id !== loteId) return l;
-            return { ...l, cantidad: Math.max(0, l.cantidad - qty) };
-          })
-        };
-      }));
+      setItems((prev) =>
+        prev.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            lotes: p.lotes.map((l) => {
+              if (l.id !== loteId) return l;
+              return { ...l, cantidad: Math.max(0, l.cantidad - qty) };
+            }),
+          };
+        }),
+      );
     }
   };
 
   const undoSale = async (productId: string, loteId: string): Promise<boolean> => {
-    // Buscar la última venta de este lote
-    const { data: lastSale, error: fetchErr } = await supabase
-      .from("ventas")
-      .select("*")
-      .eq("lote_id", loteId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const result = await undoLastSale(loteId);
+    if (!result.found) return false;
 
-    if (fetchErr) throw fetchErr;
-    if (!lastSale) return false; // No hay venta que deshacer
-
-    // Eliminar la venta
-    const { error: delErr } = await supabase
-      .from("ventas")
-      .delete()
-      .eq("id", lastSale.id);
-    if (delErr) throw delErr;
-
-    // Restaurar cantidad en lote
-    const lote = items
-      .find((p) => p.id === productId)
-      ?.lotes.find((l) => l.id === loteId);
-
+    const lote = items.find((p) => p.id === productId)?.lotes.find((l) => l.id === loteId);
     if (lote) {
-      const newQty = lote.cantidad + lastSale.cantidad;
-      const { error: lErr } = await supabase
-        .from("lotes")
-        .update({ cantidad: newQty })
-        .eq("id", loteId);
-      if (lErr) throw lErr;
+      const newQty = lote.cantidad + result.cantidad;
+      await adjustLoteQuantity(loteId, newQty);
     }
 
     await fetchData();
     return true;
   };
 
+  // ── Stock Adjustment ───────────────────────────────────────────────
+
   const adjustLote = async (productId: string, loteId: string, delta: number) => {
     try {
-      if (!window.navigator.onLine) {
-        throw new Error("offline");
-      }
-      // Find current quantity
-      const currentLote = (items || [])
-        .flatMap((p) => p?.lotes || [])
-        .find((l) => l && l.id === loteId);
+      if (!window.navigator.onLine) throw new Error("offline");
 
+      const currentLote = (items || []).flatMap((p) => p?.lotes || []).find((l) => l && l.id === loteId);
       if (currentLote) {
         const newQty = Math.max(0, currentLote.cantidad + delta);
-        const { error } = await supabase
-          .from("lotes")
-          .update({ cantidad: newQty })
-          .eq("id", loteId);
-        if (error) throw error;
+        await adjustLoteQuantity(loteId, newQty);
         await fetchData();
       }
     } catch (err) {
       console.warn("Error adjusting stock, saving offline:", err);
-      addPendingOp('adjust', { lote_id: loteId, delta });
+      addPendingOp("adjust", { lote_id: loteId, delta });
       toast.warning("Sin conexión: Ajuste guardado localmente.");
 
       // Optimistic UI Update
-      setItems(prev => prev.map(p => {
-        if (p.id !== productId) return p;
-        return {
-          ...p,
-          lotes: p.lotes.map(l => {
-            if (l.id !== loteId) return l;
-            return { ...l, cantidad: Math.max(0, l.cantidad + delta) };
-          })
-        };
-      }));
+      setItems((prev) =>
+        prev.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            lotes: p.lotes.map((l) => {
+              if (l.id !== loteId) return l;
+              return { ...l, cantidad: Math.max(0, l.cantidad + delta) };
+            }),
+          };
+        }),
+      );
     }
   };
 
-  const registerMerma = async (
+  // ── Mermas (delegates to mermas.service) ───────────────────────────
+
+  const registerMermaHandler = async (
     productId: string,
     loteId: string | null,
     cantidad: number,
     motivo: MotivoMerma,
-    notas?: string
+    notas?: string,
   ) => {
     const product = items.find((p) => p.id === productId);
     if (!product) throw new Error("Producto no encontrado");
 
-    const newMerma: Merma = {
+    const usuario = user?.user_metadata?.name || user?.email || "Usuario";
+
+    // Optimistic UI update for merma list
+    const optimisticMerma: Merma = {
       id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
       producto_id: productId,
       lote_id: loteId,
@@ -449,91 +323,59 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       motivo,
       notas: notas || null,
       created_at: new Date().toISOString(),
-      usuario: user?.user_metadata?.name || user?.email || "Usuario",
+      usuario,
     };
 
-    // Determinar lote objetivo (si loteId es null, tomar el lote con fecha más próxima con stock)
+    // Resolve FEFO target for optimistic UI
     let targetLoteId = loteId;
     if (!targetLoteId) {
       const activeLotes = [...product.lotes]
-        .filter(l => l.cantidad > 0)
-        .sort((a, b) => new Date(a.fecha_caducidad || '9999').getTime() - new Date(b.fecha_caducidad || '9999').getTime());
+        .filter((l) => l.cantidad > 0)
+        .sort((a, b) => new Date(a.fecha_caducidad || "9999").getTime() - new Date(b.fecha_caducidad || "9999").getTime());
       if (activeLotes.length > 0) {
         targetLoteId = activeLotes[0].id;
-        newMerma.lote_id = targetLoteId;
+        optimisticMerma.lote_id = targetLoteId;
       }
     }
 
-    // Actualización optimista inmediata
-    const updatedMermas = [newMerma, ...mermas];
-    setMermas(updatedMermas);
-
+    setMermas((prev) => [optimisticMerma, ...prev]);
     if (targetLoteId) {
-      setItems(prev => prev.map(p => {
-        if (p.id !== productId) return p;
-        return {
-          ...p,
-          lotes: p.lotes.map(l => {
-            if (l.id !== targetLoteId) return l;
-            return { ...l, cantidad: Math.max(0, l.cantidad - cantidad) };
-          })
-        };
-      }));
+      setItems((prev) =>
+        prev.map((p) => {
+          if (p.id !== productId) return p;
+          return {
+            ...p,
+            lotes: p.lotes.map((l) => {
+              if (l.id !== targetLoteId) return l;
+              return { ...l, cantidad: Math.max(0, l.cantidad - cantidad) };
+            }),
+          };
+        }),
+      );
     }
 
     try {
-      if (!window.navigator.onLine) {
-        throw new Error("offline");
-      }
+      if (!window.navigator.onLine) throw new Error("offline");
 
-      // 1. Descontar del lote en Supabase
-      if (targetLoteId) {
-        const lote = product.lotes.find((l) => l.id === targetLoteId);
-        if (lote) {
-          const newQty = Math.max(0, lote.cantidad - cantidad);
-          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", targetLoteId);
-        }
-      }
-
-      // 2. Guardar en registro global de Supabase
-      await supabase
-        .from("visitas")
-        .update({ notas: JSON.stringify(updatedMermas) })
-        .eq("id", MERMAS_RECORD_ID);
+      await svcRegisterMerma(
+        { productId, loteId, cantidad, motivo, notas, usuario },
+        product,
+        mermas,
+      );
 
       await fetchData();
-      toast.success(`Merma registrada: -${cantidad} uds (${motivo.replace('_', ' ')})`);
+      toast.success(`Merma registrada: -${cantidad} uds (${motivo.replace("_", " ")})`);
     } catch (err) {
       console.warn("Sin conexión o error al registrar merma, encolando offline:", err);
-      addPendingOp('merma', { merma: newMerma, lote_id: loteId, cantidad });
+      addPendingOp("merma", { merma: optimisticMerma, lote_id: loteId, cantidad });
       toast.warning("Sin conexión: Merma registrada en cola local.");
     }
   };
 
-  const undoMerma = async (mermaId: string): Promise<boolean> => {
+  const undoMermaHandler = async (mermaId: string): Promise<boolean> => {
     try {
-      const targetMerma = mermas.find((m) => m.id === mermaId);
-      if (!targetMerma) return false;
-
-      // 1. Restaurar stock en el lote
-      if (targetMerma.lote_id) {
-        const product = items.find((p) => p.id === targetMerma.producto_id);
-        const lote = product?.lotes.find((l) => l.id === targetMerma.lote_id);
-        if (lote) {
-          const newQty = lote.cantidad + targetMerma.cantidad;
-          await supabase.from("lotes").update({ cantidad: newQty }).eq("id", targetMerma.lote_id);
-        }
-      }
-
-      // 2. Actualizar registro global
-      const filtered = mermas.filter((m) => m.id !== mermaId);
+      const filtered = await svcUndoMerma(mermaId, mermas, items);
       setMermas(filtered);
-
-      await supabase
-        .from("visitas")
-        .update({ notas: JSON.stringify(filtered) })
-        .eq("id", MERMAS_RECORD_ID);
-
       await fetchData();
       toast.success("Merma deshecha y stock restaurado");
       return true;
@@ -544,174 +386,31 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ── Transfers (delegates to transfers.service) ─────────────────────
+
   const transferStock = async (input: TraspasoInput) => {
-    const { origenTiendaId, destinoTiendaId, productoOrigenId, loteOrigenId, cantidad, motivo } = input;
+    const usuario = user?.user_metadata?.name || user?.email || "Usuario";
+    const { traspaso } = await executeTransfer(input, items, usuario);
 
-    if (origenTiendaId === destinoTiendaId) {
-      throw new Error("La tienda de origen y destino no pueden ser la misma.");
-    }
-    if (cantidad <= 0) {
-      throw new Error("La cantidad a transferir debe ser mayor a 0.");
-    }
-
-    const productoOrigen = items.find((p) => p.id === productoOrigenId);
-    if (!productoOrigen) throw new Error("Producto de origen no encontrado.");
-
-    const loteOrigen = productoOrigen.lotes.find((l) => l.id === loteOrigenId);
-    if (!loteOrigen) throw new Error("Lote de origen no encontrado.");
-
-    if (loteOrigen.cantidad < cantidad) {
-      throw new Error(`Stock insuficiente en el lote. Disponible: ${loteOrigen.cantidad}`);
-    }
-
-    // 1. Buscar si el producto ya existe en la tienda de destino (por articulo/SKU o nombre)
-    let productoDestino = items.find(
-      (p) => p.tienda_id === destinoTiendaId && (p.articulo === productoOrigen.articulo || p.nombre.trim().toLowerCase() === productoOrigen.nombre.trim().toLowerCase())
-    );
-
-    let productoDestinoId: string;
-
-    if (productoDestino) {
-      productoDestinoId = productoDestino.id;
-    } else {
-      // Crear el producto en la tienda destino
-      const { data: newProd, error: newProdErr } = await supabase
-        .from("productos")
-        .insert({
-          tienda_id: destinoTiendaId,
-          articulo: productoOrigen.articulo,
-          sicol: productoOrigen.sicol,
-          nombre: productoOrigen.nombre,
-          categoria: productoOrigen.categoria,
-          proveedor_nombre: productoOrigen.proveedor_nombre,
-          proveedor_codigo: productoOrigen.proveedor_codigo,
-          notas: productoOrigen.notas,
-        })
-        .select()
-        .single();
-
-      if (newProdErr) throw newProdErr;
-      productoDestinoId = newProd.id;
-    }
-
-    // 2. Buscar si en el destino ya existe un lote con la misma fecha de caducidad
-    const loteDestinoMismaCaducidad = productoDestino?.lotes.find(
-      (l) => (l.fecha_caducidad || null) === (loteOrigen.fecha_caducidad || null)
-    );
-
-    if (loteDestinoMismaCaducidad) {
-      // Incrementar cantidad en lote existente de destino
-      const { error: incErr } = await supabase
-        .from("lotes")
-        .update({ cantidad: loteDestinoMismaCaducidad.cantidad + cantidad })
-        .eq("id", loteDestinoMismaCaducidad.id);
-
-      if (incErr) throw incErr;
-    } else {
-      // Insertar nuevo lote en destino
-      const { error: newLoteErr } = await supabase
-        .from("lotes")
-        .insert({
-          producto_id: productoDestinoId,
-          cantidad,
-          fecha_caducidad: loteOrigen.fecha_caducidad || null,
-          notas: `Traspaso desde ${TIENDA_MAP[origenTiendaId]} (${new Date().toLocaleDateString()})`,
-        });
-
-      if (newLoteErr) throw newLoteErr;
-    }
-
-    // 3. Deducir cantidad del lote en origen
-    const newQtyOrigen = loteOrigen.cantidad - cantidad;
-    const { error: decErr } = await supabase
-      .from("lotes")
-      .update({ cantidad: newQtyOrigen })
-      .eq("id", loteOrigenId);
-
-    if (decErr) throw decErr;
-
-    // 4. Registrar en el historial de traspasos (Global Audit Record)
-    const newTraspaso: Traspaso = {
-      id: Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
-      origen_tienda_id: origenTiendaId,
-      origen_tienda_nombre: TIENDA_MAP[origenTiendaId] || "Norte",
-      destino_tienda_id: destinoTiendaId,
-      destino_tienda_nombre: TIENDA_MAP[destinoTiendaId] || "Sur",
-      producto_id_origen: productoOrigenId,
-      producto_id_destino: productoDestinoId,
-      articulo: productoOrigen.articulo,
-      nombre: productoOrigen.nombre,
-      categoria: productoOrigen.categoria,
-      lote_id_origen: loteOrigenId,
-      cantidad,
-      fecha_caducidad: loteOrigen.fecha_caducidad,
-      motivo: motivo || "Reubicación de stock",
-      usuario: user?.user_metadata?.name || user?.email || "Usuario",
-      created_at: new Date().toISOString(),
-    };
-
-    const updatedTraspasos = [newTraspaso, ...traspasos];
+    const updatedTraspasos = [traspaso, ...traspasos];
     setTraspasos(updatedTraspasos);
 
     try {
-      await supabase
-        .from("visitas")
-        .upsert(
-          {
-            id: TRASPASOS_RECORD_ID,
-            tienda_id: 1,
-            fecha: "2099-12-31",
-            notas: JSON.stringify(updatedTraspasos),
-          },
-          { onConflict: "id" }
-        );
+      await saveTraspasosLog(updatedTraspasos);
     } catch (e) {
       console.error("Error saving traspasos log to Supabase:", e);
     }
 
     await fetchData();
-    toast.success(`Traspaso exitoso: ${cantidad} uds de "${productoOrigen.nombre}" a ${TIENDA_MAP[destinoTiendaId]}`);
+    toast.success(
+      `Traspaso exitoso: ${input.cantidad} uds de "${traspaso.nombre}" a ${traspaso.destino_tienda_nombre}`,
+    );
   };
 
-  const undoTraspaso = async (traspasoId: string): Promise<boolean> => {
+  const undoTraspasoHandler = async (traspasoId: string): Promise<boolean> => {
     try {
-      const targetTraspaso = traspasos.find((t) => t.id === traspasoId);
-      if (!targetTraspaso) return false;
-
-      // 1. Restaurar stock en origen
-      const prodOrigen = items.find((p) => p.id === targetTraspaso.producto_id_origen);
-      const loteOrigen = prodOrigen?.lotes.find((l) => l.id === targetTraspaso.lote_id_origen);
-      if (loteOrigen) {
-        await supabase
-          .from("lotes")
-          .update({ cantidad: loteOrigen.cantidad + targetTraspaso.cantidad })
-          .eq("id", targetTraspaso.lote_id_origen);
-      }
-
-      // 2. Deducir stock en destino si es posible
-      if (targetTraspaso.producto_id_destino) {
-        const prodDestino = items.find((p) => p.id === targetTraspaso.producto_id_destino);
-        const loteDestino = prodDestino?.lotes.find(
-          (l) => (l.fecha_caducidad || null) === (targetTraspaso.fecha_caducidad || null)
-        );
-        if (loteDestino) {
-          const remQty = Math.max(0, loteDestino.cantidad - targetTraspaso.cantidad);
-          await supabase
-            .from("lotes")
-            .update({ cantidad: remQty })
-            .eq("id", loteDestino.id);
-        }
-      }
-
-      // 3. Actualizar historial
-      const filtered = traspasos.filter((t) => t.id !== traspasoId);
+      const filtered = await undoTransfer(traspasoId, traspasos, items);
       setTraspasos(filtered);
-
-      await supabase
-        .from("visitas")
-        .update({ notas: JSON.stringify(filtered) })
-        .eq("id", TRASPASOS_RECORD_ID);
-
       await fetchData();
       toast.success("Traspaso revertido exitosamente.");
       return true;
@@ -722,25 +421,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateProductCategories = async (updates: Record<string, string>) => {
-    const promises = Object.entries(updates).map(([productId, newCategory]) =>
-      supabase
-        .from("productos")
-        .update({ categoria: newCategory })
-        .eq("id", productId)
-    );
-    
-    // Execute all updates in parallel
-    const results = await Promise.all(promises);
-    const errors = results.filter(r => r.error);
-    
-    if (errors.length > 0) {
-      console.error("Errors updating categories:", errors);
-      throw new Error("Ocurrió un error al actualizar algunas categorías.");
-    }
-    
-    await fetchData();
-  };
+  // ── Filtered view ──────────────────────────────────────────────────
 
   const filteredItems = useMemo(
     () =>
@@ -749,6 +430,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         : items.filter((it) => it.tienda_nombre === store),
     [items, store],
   );
+
+  // ── Provider ───────────────────────────────────────────────────────
 
   return (
     <InventoryContext.Provider
@@ -759,20 +442,20 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
         traspasos,
         loading,
         addProduct,
-        updateProduct,
+        updateProduct: updateProductHandler,
         removeProduct,
-        restoreProduct,
+        restoreProduct: restoreProductHandler,
         clearTrashBin,
         trashBin,
         addLote,
         removeLote,
         sellFromLote,
         undoSale,
-        registerMerma,
-        undoMerma,
+        registerMerma: registerMermaHandler,
+        undoMerma: undoMermaHandler,
         adjustLote,
         transferStock,
-        undoTraspaso,
+        undoTraspaso: undoTraspasoHandler,
         updateProductCategories,
         refreshData: fetchData,
       }}
