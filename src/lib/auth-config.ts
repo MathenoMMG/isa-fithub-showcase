@@ -14,8 +14,8 @@ const envEmails = import.meta.env.VITE_ALLOWED_EMAILS
   : [];
 
 export const DEFAULT_ALLOWED_EMAILS: string[] = [
-  "owner@example.com",
-  "mathewpro123@gmail.com",
+  "admin@example.com",
+  "demo@isafithub.dev",
 ];
 
 export const ALLOWED_EMAILS = Array.from(
