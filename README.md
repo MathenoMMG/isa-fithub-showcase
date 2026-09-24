@@ -1,7 +1,9 @@
 # Isa FitHub
 
 Multi-store inventory, point-of-sale and staff time-tracking app built for a gym supplement retailer.
-This is a **public showcase copy** of a private client project: credentials, client data and internal notes were removed from the whole history.
+This is a **public showcase copy** of a private client project (a fitness-food retailer in Colombia). Client data, store names, credentials and internal notes were removed from the whole history.
+
+> **Demo mode:** this build runs entirely on **mock data** (fictitious stores Norte / Sur / Centro, products and sales) with **authentication disabled**, so every screen can be explored without an account. Changes persist in your browser; use the *Reiniciar* button on the demo badge to restore the sample data. The mock backend lives in `src/lib/demo/` and implements the subset of the Supabase client the app uses.
 
 ## Stack
 

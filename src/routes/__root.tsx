@@ -9,7 +9,8 @@ import { InventoryProvider } from "@/context/InventoryContext";
 import { TimeLogProvider } from "@/context/TimeLogContext";
 import { VisitProvider } from "@/context/VisitContext";
 import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/lib/supabase";
+import { supabase, IS_DEMO } from "@/lib/supabase";
+import { DemoBadge } from "@/components/layout/DemoBadge";
 import { GlowBackground } from "@/components/layout/GlowBackground";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { UpdatePasswordModal } from "@/components/auth/UpdatePasswordModal";
@@ -151,7 +152,7 @@ function ConnectionLogger() {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || IS_DEMO) return;
     let active = true;
 
     const logConnection = async () => {
@@ -199,6 +200,7 @@ function AppLayout() {
         <UpdatePasswordModal />
         <Toaster richColors position="top-right" />
         <ScrollToTopButton />
+        <DemoBadge />
       </>
     );
   }
@@ -225,6 +227,7 @@ function AppLayout() {
                   <UpdatePasswordModal />
                   <Toaster richColors position="top-right" />
                   <ScrollToTopButton />
+        <DemoBadge />
                 </SidebarProvider>
               </VisitProvider>
             </TimeLogProvider>

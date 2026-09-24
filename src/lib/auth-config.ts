@@ -1,3 +1,5 @@
+import { IS_DEMO } from "./supabase";
+
 /**
  * FitHub Security & Access Control Configuration
  * Allowed emails list can be specified in environment (VITE_ALLOWED_EMAILS)
@@ -21,6 +23,8 @@ export const ALLOWED_EMAILS = Array.from(
 );
 
 export function isEmailAllowed(email?: string | null): boolean {
+  // Showcase build: authentication is disabled and the demo user is always allowed.
+  if (IS_DEMO) return true;
   if (!email) return false;
   const normalized = email.trim().toLowerCase();
   
